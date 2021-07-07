@@ -1,0 +1,275 @@
+import {
+  constants,
+  formatPriceAndInterval,
+  getColumnOptionMetadata,
+} from '@devhub/core'
+import React from 'react'
+import { View } from 'react-native'
+import { useDispatch } from 'react-redux'
+
+import { useDesktopOptions } from '../../hooks/use-desktop-options'
+import { useReduxState } from '../../hooks/use-redux-state'
+import { Browser } from '../../libs/browser'
+import { Platform } from '../../libs/platform'
+import * as actions from '../../redux/actions'
+import * as selectors from '../../redux/selectors'
+import { sharedStyles } from '../../styles/shared'
+import { contentPadding, radius, scaleFactor } from '../../styles/variables'
+import { Button } from '../common/Button'
+import { ButtonLink } from '../common/ButtonLink'
+import { ConditionalWrap } from '../common/ConditionalWrap'
+import { H3 } from '../common/H3'
+import { Spacer } from '../common/Spacer'
+import { SubHeader } from '../common/SubHeader'
+import { Switch } from '../common/Switch'
+import { TouchableOpacity } from '../common/TouchableOpacity'
+import { useDialog } from '../context/DialogContext'
+import { useAppLayout } from '../context/LayoutContext'
+import { usePlans } from '../context/PlansContext'
+import { ThemedIcon } from '../themed/ThemedIcon'
+import { ThemedText } from '../themed/ThemedText'
+import { ThemedView } from '../themed/ThemedView'
+
+export const DesktopPreferences = React.memo(() => {
+  const dispatch = useDispatch()
+  const plan = useReduxState(selectors.currentUserPlanSelector)
+  const {
+    enablePushNotifications,
+    enablePushNotificationsSound,
+    isMenuBarMode,
+  } = useDesktopOptions()
+
+  const { cheapestPlanWithNotifications } = usePlans()
+
+  const { sizename } = useAppLayout()
+
+  const hasAccessToPushNotifications = getColumnOptionMetadata({
+    Platform,
+    plan,
+  }).enableDesktopPushNotifications.hasAccess
+
+  const Dialog = useDialog()
+
+  const DownloadConfirmationHandler = () => {
+    Dialog.show(
+      'Download Desktop App?',
+      'This option is only available for the Desktop App. Download it at devhubapp.com to have access to it.',
+      [
+        {
+          text: 'Download',
+          onPress: () => {
+            Browser.openURLOnNewTab(constants.DEVHUB_LINKS.DOWNLOAD_PAGE)
+          },
+          style: 'default',
+        },
+        {
+          text: 'Cancel',
+          onPress: () => undefined,
+          style: 'cancel',
+        },
+      ],
+    )
+  }
+
+  return (
+    <View>
+      <SubHeader
+        title={Platform.isElectron ? 'Desktop options' : 'Desktop app'}
+      >
+        {!Platform.isElectron && (
+          <>
+            <Spacer flex={1} />
+
+            <ButtonLink
+              analyticsLabel="download_desktop_app"
+              href={constants.DEVHUB_LINKS.DOWNLOAD_PAGE}
+              openOnNewTab
+              size={32 * scaleFactor}
+            >
+              <View style={[sharedStyles.center, sharedStyles.horizontal]}>
+                <ThemedIcon
+                  color="foregroundColor"
+                  family="octicon"
+                  name="desktop-download"
+                  size={16 * scaleFactor}
+                />
+                <Spacer width={contentPadding / 2} />
+                <ThemedText color="foregroundColor">Download</ThemedText>
+              </View>
+            </ButtonLink>
+          </>
+        )}
+      </SubHeader>
+
+      {!!(
+        Platform.isElectron ||
+        (Platform.OS === 'web' && sizename > '2-medium')
+      ) && (
+        <View style={{ paddingHorizontal: contentPadding }}>
+          <View
+            style={[
+              sharedStyles.horizontal,
+              sharedStyles.alignItemsCenter,
+              sharedStyles.justifyContentSpaceBetween,
+            ]}
+          >
+            <H3>Menubar mode</H3>
+
+            <ConditionalWrap
+              condition={!Platform.isElectron}
+              wrap={(children) => (
+                <TouchableOpacity
+                  onPress={DownloadConfirmationHandler}
+                  style={
+                    Platform.OS === 'web' && ({ cursor: 'not-allowed' } as any)
+                  }
+                >
+                  {children}
+                </TouchableOpacity>
+              )}
+            >
+              <Switch
+                analyticsLabel="desktop_menubar_mode"
+                disabled={!Platform.isElectron}
+                onValueChange={(value) =>
+                  window.ipc.send('update-settings', {
+                    settings: 'isMenuBarMode',
+                    value,
+                  })
+                }
+                value={!!(Platform.isElectron && isMenuBarMode)}
+                pointerEvents={!Platform.isElectron ? 'none' : undefined}
+              />
+            </ConditionalWrap>
+          </View>
+
+          <Spacer height={contentPadding} />
+
+          <View
+            style={[
+              sharedStyles.horizontal,
+              sharedStyles.alignItemsCenter,
+              sharedStyles.justifyContentSpaceBetween,
+            ]}
+          >
+            <H3>Push Notifications</H3>
+            <ConditionalWrap
+              condition={!Platform.isElectron}
+              wrap={(children) => (
+                <TouchableOpacity
+                  onPress={DownloadConfirmationHandler}
+                  style={
+                    Platform.OS === 'web' && ({ cursor: 'not-allowed' } as any)
+                  }
+                >
+                  {children}
+                </TouchableOpacity>
+              )}
+            >
+              <Switch
+                analyticsLabel="desktop_push_notifications"
+                color={!hasAccessToPushNotifications ? 'red' : undefined}
+                disabled={!Platform.isElectron}
+                onValueChange={(value) =>
+                  window.ipc.send('update-settings', {
+                    settings: 'enablePushNotifications',
+                    value,
+                  })
+                }
+                value={!!(Platform.isElectron && enablePushNotifications)}
+                pointerEvents={!Platform.isElectron ? 'none' : undefined}
+              />
+            </ConditionalWrap>
+          </View>
+
+          <Spacer height={contentPadding} />
+          <View
+            style={[
+              sharedStyles.horizontal,
+              sharedStyles.alignItemsCenter,
+              sharedStyles.justifyContentSpaceBetween,
+            ]}
+          >
+            <H3>Push Notifications Sound</H3>
+            <ConditionalWrap
+              condition={!Platform.isElectron}
+              wrap={(children) => (
+                <TouchableOpacity
+                  onPress={DownloadConfirmationHandler}
+                  style={
+                    Platform.OS === 'web' && ({ cursor: 'not-allowed' } as any)
+                  }
+                >
+                  {children}
+                </TouchableOpacity>
+              )}
+            >
+              <Switch
+                analyticsLabel="desktop_push_notifications_sound"
+                color={!hasAccessToPushNotifications ? 'red' : undefined}
+                disabled={!Platform.isElectron || !enablePushNotifications}
+                onValueChange={(value) =>
+                  window.ipc.send('update-settings', {
+                    settings: 'enablePushNotificationsSound',
+                    value,
+                  })
+                }
+                value={
+                  // hasAccessToPushNotifications &&
+                  !!(
+                    Platform.isElectron &&
+                    enablePushNotifications &&
+                    enablePushNotificationsSound
+                  )
+                }
+                pointerEvents={!Platform.isElectron ? 'none' : undefined}
+              />
+            </ConditionalWrap>
+          </View>
+
+          {!!(
+            Platform.isElectron &&
+            !hasAccessToPushNotifications &&
+            enablePushNotifications &&
+            cheapestPlanWithNotifications
+          ) && (
+            <>
+              <Spacer height={contentPadding} />
+
+              <ThemedView
+                backgroundColor="backgroundColorLess1"
+                style={[
+                  sharedStyles.alignSelfStretch,
+                  { borderRadius: radius },
+                ]}
+              >
+                <Button
+                  analyticsLabel="desktop_preferences_push_notifications_cta"
+                  size="auto"
+                  onPress={() => {
+                    dispatch(
+                      actions.pushModal({
+                        name: 'PRICING',
+                        params: {
+                          highlightFeature: 'enablePushNotifications',
+                          // initialSelectedPlanId: cheapestPlanWithNotifications.id,
+                        },
+                      }),
+                    )
+                  }}
+                  textStyle={{ fontWeight: '300' }}
+                >{`Unlock Push Notifications and other features for ${formatPriceAndInterval(
+                  cheapestPlanWithNotifications,
+                )}`}</Button>
+              </ThemedView>
+            </>
+          )}
+
+          <Spacer height={contentPadding} />
+        </View>
+      )}
+    </View>
+  )
+})
+
+DesktopPreferences.displayName = 'DesktopPreferences'

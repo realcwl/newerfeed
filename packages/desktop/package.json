@@ -1,0 +1,112 @@
+{
+  "name": "@devhub/desktop",
+  "version": "0.102.0",
+  "private": false,
+  "main": "dist/index.js",
+  "author": {
+    "name": "Bruno Lemos",
+    "email": "bruno@devhubapp.com",
+    "url": "https://twitter.com/brunolemos"
+  },
+  "description": "GitHub Notifications & Activities on your Desktop",
+  "repository": "https://github.com/devhubapp/devhub",
+  "scripts": {
+    "build": "yarn build:base && yarn build:web && yarn build:web:post && yarn build:electron",
+    "build:base": "yarn compile",
+    "build:electron": "electron-builder",
+    "build:skipweb": "yarn build:base && yarn build:web:post && yarn build:electron",
+    "build:web": "pushd \"../web\" && yarn build && popd",
+    "build:web:post": "shx cp -Rf ../web/dist dist/web",
+    "clean": "shx rm -f *.tsbuildinfo && shx rm -rf build && shx cp -Rf build-persist build && shx rm -rf dist && mkdirp dist",
+    "compile": "tsc -b --incremental",
+    "format": "prettier --write '{.,src}/**/*.{js,jsx,ts,tsx,json}'",
+    "lint": "eslint src",
+    "start": "nodemon --watch dist --watch assets --exec \"electron .\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.devhubapp",
+    "productName": "DevHub",
+    "extends": null,
+    "afterSign": "scripts/notarize.js",
+    "directories": {
+      "buildResources": "assets",
+      "output": "build"
+    },
+    "extraMetadata": {
+      "name": "devhub"
+    },
+    "extraResources": [
+      "**/assets/sounds/**"
+    ],
+    "linux": {
+      "desktop": {
+        "MimeType": "x-scheme-handler/devhub;"
+      },
+      "icon": "icons/icon.png",
+      "target": [
+        {
+          "target": "AppImage"
+        }
+      ]
+    },
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "darkModeSupport": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "hardenedRuntime": true,
+      "icon": "icons/icon.png"
+    },
+    "win": {
+      "icon": "icons/icon.ico",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "files": [
+      "assets",
+      "dist"
+    ],
+    "protocols": [
+      {
+        "name": "DevHub",
+        "schemes": [
+          "devhub"
+        ]
+      }
+    ],
+    "publish": {
+      "provider": "github",
+      "releaseType": "draft"
+    }
+  },
+  "dependencies": {
+    "@devhub/core": "0.102.0",
+    "electron-fetch": "1.7.2",
+    "electron-store": "6.0.1",
+    "electron-updater": "4.3.5",
+    "jsonfile": "6.1.0",
+    "mkdirp": "1.0.4",
+    "semver": "7.3.4"
+  },
+  "devDependencies": {
+    "@types/electron-devtools-installer": "2.2.0",
+    "@types/electron-store": "3.2.0",
+    "@types/jsonfile": "6.0.0",
+    "@types/mkdirp": "1.0.1",
+    "@types/semver": "7.3.4",
+    "dotenv": "8.2.0",
+    "electron": "11.0.3",
+    "electron-builder": "22.9.1",
+    "electron-devtools-installer": "3.1.1",
+    "electron-notarize": "1.0.0",
+    "electron-timber": "0.5.1",
+    "nodemon": "2.0.6",
+    "shx": "0.3.3",
+    "typescript": "4.3.4",
+    "wait-on": "5.2.0"
+  },
+  "peerDependencies": {
+    "eslint": "*"
+  }
+}

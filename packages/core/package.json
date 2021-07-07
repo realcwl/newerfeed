@@ -1,0 +1,38 @@
+{
+  "name": "@devhub/core",
+  "version": "0.102.0",
+  "private": false,
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "shx rm -f *.tsbuildinfo && shx rm -rf dist && mkdirp dist",
+    "compile": "tsc -b --incremental",
+    "format": "prettier --write '{.,src}/**/*.{js,jsx,ts,tsx,json}'",
+    "lint": "eslint src",
+    "prepare": "cd .. && yarn patch-package",
+    "prepublish": "yarn compile"
+  },
+  "dependencies": {
+    "@octokit/rest": "16.43.1",
+    "axios": "0.19.0",
+    "gravatar": "1.8.0",
+    "immer": "4.0.1",
+    "json-to-graphql-query": "1.9.0",
+    "lodash": "4.17.20",
+    "moment": "2.24.0",
+    "polished": "3.4.1",
+    "qs": "6.9.1"
+  },
+  "devDependencies": {
+    "@octokit/webhooks": "7.0.0",
+    "@types/fbemitter": "2.0.32",
+    "@types/lodash": "4.14.165",
+    "@types/qs": "6.9.0",
+    "mkdirp": "0.5.1",
+    "prettier": "2.3.1",
+    "shx": "0.3.3",
+    "typescript": "4.3.4"
+  },
+  "peerDependencies": {
+    "eslint": "*"
+  }
+}
