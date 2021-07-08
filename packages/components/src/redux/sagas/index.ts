@@ -5,7 +5,6 @@ import { authSagas } from './auth'
 import { columnsSagas } from './columns'
 import { configSagas } from './config'
 import { installationSagas } from './installations'
-import { subscriptionsSagas } from './subscriptions'
 
 export function* rootSaga() {
   yield* all([

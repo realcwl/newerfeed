@@ -1,5 +1,5 @@
 import { PlanID } from '../utils'
-import { Column, ColumnSubscription, PlanSource, PlanType } from './devhub'
+import { Column, ColumnSubscription, PlanSource, PlanType } from './newsfeed'
 import { GitHubTokenDetails, GraphQLGitHubUser, Installation } from './graphql'
 import { StripeSubscription } from './stripe'
 
