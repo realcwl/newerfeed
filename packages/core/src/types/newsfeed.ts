@@ -1,7 +1,3 @@
-import { Octokit } from '@octokit/rest'
-
-import { FeatureFlagId, PlanID } from '../utils'
-
 import { ThemeColors } from './themes'
 
 // Although it seems unnecessary to do a one level indirect here, it gives us

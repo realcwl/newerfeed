@@ -1,5 +1,2 @@
-export * from './installation'
-export * from './notifications'
-export * from './organization'
-export * from './repository'
-export * from './user'
+// TODO(chenweilunster): Figure out what this repo is about and how to
+// add customized logic into this repo.

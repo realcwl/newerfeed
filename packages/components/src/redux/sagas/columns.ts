@@ -7,12 +7,8 @@ import * as actions from '../actions'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
 
-function* onAddColumn(
-  action: ExtractActionFromActionCreator<
-    typeof actions.addColumnAndSubscriptions
-  >,
-) {
-  const columnId = action.payload.column.id
+function* onAddColumn() {
+  const columnId = 'FAKE_COLUMN_ID'
 
   if (AppState.currentState === 'active')
     yield* call(InteractionManager.runAfterInteractions)
