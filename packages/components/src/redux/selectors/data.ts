@@ -1,8 +1,5 @@
-import { EnhancedItem } from '@devhub/core'
-
-import { EMPTY_ARRAY, EMPTY_OBJ } from '../../utils/constants'
+import { EMPTY_OBJ } from '../../utils/constants'
 import { RootState } from '../types'
-import { createShallowEqualSelector } from './helpers'
 
 const s = (state: RootState) => state.data || EMPTY_OBJ
 

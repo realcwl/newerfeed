@@ -14,22 +14,12 @@ export const themePairSelector = (state: RootState) =>
 const defaultPreferredDarkThemePair: ThemePair = {
   id: constants.DEFAULT_DARK_THEME,
 }
-export const preferredDarkThemePairSelector = (state: RootState) =>
-  s(state).preferredDarkTheme || defaultPreferredDarkThemePair
-
-const defaultPreferredLightThemePair: ThemePair = {
-  id: constants.DEFAULT_LIGHT_THEME,
-}
-export const preferredLightThemePairSelector = (state: RootState) =>
-  s(state).preferredLightTheme || defaultPreferredLightThemePair
 
 export const themeSelector = createSelector(
   themePairSelector,
-  preferredDarkThemePairSelector,
-  preferredLightThemePairSelector,
   () => Appearance.getColorScheme(),
   () => isNight(),
-  (theme, preferredDarkTheme, preferredLightTheme, _colorScheme, _isNight) => {
-    return loadTheme(theme, { preferredDarkTheme, preferredLightTheme })
+  (theme, _colorScheme, _isNight) => {
+    return loadTheme(theme)
   },
 )

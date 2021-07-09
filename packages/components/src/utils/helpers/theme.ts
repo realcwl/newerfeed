@@ -10,25 +10,6 @@ export const supportsCSSVariables =
   _window.CSS.supports &&
   _window.CSS.supports('color', 'var(--fake-var)')
 
-export function loadTheme(
-  theme: ThemePair,
-  {
-    preferredDarkTheme,
-    preferredLightTheme,
-    prefersDarkTheme,
-  }: {
-    preferredDarkTheme?: ThemePair
-    preferredLightTheme?: ThemePair
-    prefersDarkTheme?: boolean
-  } = {},
-): Theme {
-  return loadThemeBase(theme, {
-    preferredDarkTheme,
-    preferredLightTheme,
-    prefersDarkTheme:
-      typeof prefersDarkTheme === 'boolean'
-        ? prefersDarkTheme
-        : Appearance.getColorScheme() === 'dark' ||
-          (Appearance.getColorScheme() !== 'light' && isNight()),
-  })
+export function loadTheme(theme: ThemePair): Theme {
+  return loadThemeBase(theme, {})
 }

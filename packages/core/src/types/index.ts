@@ -1,4 +1,3 @@
-export * from './database'
 export * from './newsfeed'
 export * from './stripe'
 export * from './themes'
