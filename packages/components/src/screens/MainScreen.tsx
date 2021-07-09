@@ -38,7 +38,6 @@ export const MainScreen = React.memo(() => {
 
   const dispatch = useDispatch()
   const currentOpenedModal = useReduxState(selectors.currentOpenedModal)
-  const plan = useReduxState(selectors.currentUserPlanSelector)
   const FAB = useFAB()
 
   const debounceSyncDown = useMemo(() => {
