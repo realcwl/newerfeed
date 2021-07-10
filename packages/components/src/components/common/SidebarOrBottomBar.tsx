@@ -468,27 +468,6 @@ export const SidebarOrBottomBar = React.memo(
             )}
 
             {!renderPreferencesItemInline && <PreferencesItem />}
-
-            {!(horizontal && small) && (
-              <SidebarOrBottomBarItem horizontal={horizontal} title="">
-                <Link
-                  analyticsLabel="sidebar_devhub_logo"
-                  href={constants.DEVHUB_LINKS.GITHUB_REPOSITORY}
-                  openOnNewTab
-                  style={[
-                    sharedStyles.fullWidth,
-                    sharedStyles.fullHeight,
-                    sharedStyles.center,
-                  ]}
-                >
-                  <Avatar
-                    avatarUrl={
-                      'https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light'
-                    }
-                  />
-                </Link>
-              </SidebarOrBottomBarItem>
-            )}
           </View>
         </ThemedView>
       </SidebarHoverItemContextProvider>

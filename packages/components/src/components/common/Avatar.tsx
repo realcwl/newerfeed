@@ -59,7 +59,7 @@ export function Avatar(props: AvatarProps) {
     .replace('app/', '')
     .split('/')[0]
 
-  const avatarUrl = ''
+  const avatarUrl = _avatarUrl
 
   const uri = avatarUrl
 
