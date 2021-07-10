@@ -15,13 +15,13 @@ import { useDimensions } from '../hooks/use-dimensions'
 import { useLoginHelpers } from '../components/context/LoginHelpersContext'
 import { analytics } from '../libs/analytics'
 import { Platform } from '../libs/platform'
-import { sharedStyles } from '../styles/shared'
 import {
   contentPadding,
   normalTextSize,
   scaleFactor,
-  smallerTextSize,
 } from '../styles/variables'
+import { useDispatch } from 'react-redux'
+import { loginSuccess } from '../redux/actions'
 
 const SHOW_GITHUB_GRANULAR_OAUTH_LOGIN_BUTTON =
   constants.ENABLE_GITHUB_OAUTH_SUPPORT && !Platform.isMacOS
@@ -104,6 +104,7 @@ export const LoginScreen = React.memo(() => {
   const dimensions = useDimensions('width')
 
   const { isLoggingIn } = useLoginHelpers()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     analytics.trackScreenView('LOGIN_SCREEN')
@@ -145,13 +146,13 @@ export const LoginScreen = React.memo(() => {
           <Spacer height={contentPadding} />
 
           <ThemedText color="foregroundColor" style={styles.title}>
-            Welcome to DevHub
+            Welcome to NewsFeed
           </ThemedText>
 
           <Spacer height={contentPadding / 2} />
 
           <ThemedText color="foregroundColorMuted65" style={styles.subtitle}>
-            GitHub Notifications & Activities on your Desktop
+            Your personal len to the global news
           </ThemedText>
 
           <Spacer height={contentPadding * 2} />
@@ -168,7 +169,18 @@ export const LoginScreen = React.memo(() => {
                   disabled={isLoggingIn}
                   loading={isLoggingIn}
                   onPress={() => {
-                    console.log('pressed github login button')
+                    dispatch(
+                      // TODO(chenweilunster): Change this login logic to actually call backend.
+                      loginSuccess({
+                        appToken: 'DUMMY_APP_TOKEN',
+                        user: {
+                          id: 'DUMMY_USER_ID',
+                          name: 'DUMMY_USER_NAME',
+                          avatarUrl:
+                            'https://gravatar.com/avatar/80139cbc27fcec1066bc45100d992c79?s=400&d=robohash&r=x',
+                        },
+                      }),
+                    )
                   }}
                   // rightIcon={{ family: 'octicon', name: 'globe' }}
                   style={styles.button}
@@ -179,7 +191,7 @@ export const LoginScreen = React.memo(() => {
                         hasMultipleLoginButtons || subtitle ? 'left' : 'center',
                     },
                   }}
-                  title="Sign in with GitHub"
+                  title="Sign in"
                 />
               )
             })()}
@@ -189,48 +201,6 @@ export const LoginScreen = React.memo(() => {
 
         <View style={styles.footer}>
           <ScrollView horizontal>
-            <Link
-              analyticsCategory="loginscreen"
-              analyticsLabel="twitter"
-              href={constants.DEVHUB_LINKS.TWITTER_PROFILE}
-              openOnNewTab
-              style={styles.footerLink}
-              textProps={{
-                color: 'foregroundColorMuted65',
-                style: styles.footerLinkText,
-              }}
-            >
-              Twitter
-            </Link>
-
-            <ThemedText
-              color="foregroundColorMuted25"
-              style={styles.footerSeparatorText}
-            >
-              |
-            </ThemedText>
-
-            <Link
-              analyticsCategory="loginscreen"
-              analyticsLabel="github"
-              href={constants.DEVHUB_LINKS.GITHUB_REPOSITORY}
-              openOnNewTab
-              style={styles.footerLink}
-              textProps={{
-                color: 'foregroundColorMuted65',
-                style: styles.footerLinkText,
-              }}
-            >
-              GitHub
-            </Link>
-
-            <ThemedText
-              color="foregroundColorMuted25"
-              style={styles.footerSeparatorText}
-            >
-              |
-            </ThemedText>
-
             <Link
               analyticsCategory="loginscreen"
               analyticsLabel="app_version"

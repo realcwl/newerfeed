@@ -39,6 +39,15 @@ const initialState: State = {
 
 export const authReducer: Reducer<State> = (state = initialState, action) => {
   switch (action.type) {
+    case 'LOGIN_SUCCESS': {
+      return {
+        appToken: action.payload.appToken,
+        user: action.payload.user,
+        isLoggedIn: true,
+        error: undefined,
+      }
+    }
+
     default:
       return state
   }
