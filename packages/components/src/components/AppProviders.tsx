@@ -14,7 +14,6 @@ import { DeepLinkProvider } from './context/DeepLinkContext'
 import { DialogProvider } from './context/DialogContext'
 import { LoginHelpersProvider } from './context/LoginHelpersContext'
 import { AppLayoutProvider } from './context/LayoutContext'
-import { PlansProvider } from './context/PlansContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { Compose } from './common/Compose'
 
@@ -38,7 +37,6 @@ export function AppProviders(props: AppProvidersProps) {
         (child) => <SafeAreaProvider children={child} />,
         (child) => <DialogProvider children={child} />,
         (child) => <DeepLinkProvider children={child} />,
-        (child) => <PlansProvider children={child} />,
         (child) => <AppLayoutProvider children={child} />,
         (child) => <ColumnFocusProvider children={child} />,
         (child) => <ColumnWidthProvider children={child} />,

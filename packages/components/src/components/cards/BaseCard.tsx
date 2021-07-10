@@ -2,14 +2,7 @@ import React, { Fragment } from 'react'
 import { PixelRatio, ScrollView, StyleSheet, View } from 'react-native'
 import { useDispatch } from 'react-redux'
 
-import {
-  getDateSmallText,
-  getFullDateText,
-  Theme,
-  GITHUB_USERNAME_REGEX_PATTERN,
-  getUserURLFromLogin,
-  getBaseUrlFromOtherUrl,
-} from '@devhub/core'
+import { getDateSmallText, getFullDateText, Theme } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
 import * as actions from '../../redux/actions'
@@ -43,7 +36,6 @@ import {
   CardItemSeparator,
   cardItemSeparatorSize,
 } from './partials/CardItemSeparator'
-import { InstallGitHubAppText } from './partials/rows/InstallGitHubAppText'
 
 const GestureHandlerTouchableOpacity = Platform.select({
   android: () => require('react-native-gesture-handler').TouchableOpacity,
@@ -209,15 +201,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     avatar,
     columnId,
     date,
-    githubApp,
     icon,
     isRead,
     isSaved,
     labels,
     link,
     nodeIdOrId,
-    reason,
-    showPrivateLock,
     subitems,
     subtitle,
     text,
@@ -237,7 +226,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       link,
     )
 
-  const baseURL = getBaseUrlFromOtherUrl(link)
+  const baseURL = 'https://www.google.com'
 
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
 
@@ -285,30 +274,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 numberOfLines={1}
                 style={styles.action}
               >
-                {action.text.match(
-                  new RegExp(`@${GITHUB_USERNAME_REGEX_PATTERN}`, 'i'),
-                )
-                  ? action.text.split(' ').map((str, index) => (
-                      <Fragment key={str}>
-                        {index > 0 && ' '}
-
-                        {str.match(
-                          new RegExp(`@${GITHUB_USERNAME_REGEX_PATTERN}`, 'i'),
-                        ) ? (
-                          <Link
-                            href={getUserURLFromLogin(str.replace('@', ''), {
-                              baseURL,
-                            })}
-                            openOnNewTab
-                          >
-                            <Text style={{ fontSize: undefined }}>{str}</Text>
-                          </Link>
-                        ) : (
-                          str
-                        )}
-                      </Fragment>
-                    ))
-                  : action.text}
+                Subtitle For Event Card
               </ThemedText>
             </View>
 
@@ -354,18 +320,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 {title}
               </ThemedText>
 
-              {!!showPrivateLock && (
-                <>
-                  <Text>{'  '}</Text>
-                  <ThemedIcon
-                    family="octicon"
-                    name="lock"
-                    color="foregroundColorMuted65"
-                    size={smallTextSize}
-                  />
-                </>
-              )}
-
               <IntervalRefresh date={date}>
                 {() => {
                   const dateText = getDateSmallText(date)
@@ -407,7 +361,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   <ThemedIcon
                     family="octicon"
                     name="dot-fill"
-                    color={(reason && reason.color) || 'primaryBackgroundColor'}
+                    color={'primaryBackgroundColor'}
                     size={smallTextSize}
                   />
                 </>
@@ -461,16 +415,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                       <Link
                         TouchableComponent={GestureHandlerTouchableOpacity}
                         enableUnderlineHover
-                        href={
-                          textIsOnlyIssueNumber && type === 'issue_or_pr'
-                            ? undefined
-                            : 'javascript:void(0)'
-                        }
+                        href={'javascript:void(0)'}
                         openOnNewTab={false}
                         onPress={(() => {
                           if (textIsOnlyIssueNumber && issueNumber) {
-                            if (type === 'issue_or_pr') return
-
                             return () => {
                               vibrateHapticFeedback()
 
@@ -537,7 +485,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                     </ThemedText>
                   )}
 
-                  {!!(reason && reason.label && columnId) && (
+                  {!!columnId && (
                     <View
                       style={[
                         sharedStyles.horizontalAndVerticallyAligned,
@@ -565,30 +513,19 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                             KeyboardKeyIsPressed.shift
                           )
 
-                          dispatch(
-                            actions.setColumnReasonFilter({
-                              columnId,
-                              reason: reason.reason,
-                              value: KeyboardKeyIsPressed.alt ? false : true,
-                              removeIfAlreadySet,
-                              removeOthers,
-                            }),
-                          )
+                          console.log('Clicked this link')
                         }}
                         style={sharedStyles.flexShrink0}
                         textProps={{
                           color: 'foregroundColorMuted65',
                           numberOfLines: 1,
-                          style: [
-                            styles.reason,
-                            { minWidth: reason.label.length * 7 },
-                          ],
+                          style: [styles.reason],
                         }}
                         {...Platform.select({
-                          web: { title: reason.tooltip },
+                          web: { title: 'reason.tooltip' },
                         })}
                       >
-                        {reason.label.toLowerCase()}
+                        {'reason.text'}
                       </Link>
                     </View>
                   )}
@@ -711,29 +648,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               </View>
             </Fragment>
           ))}
-
-        {!!githubApp && (
-          <>
-            <Spacer height={sizes.verticalSpaceSize} />
-
-            <View style={styles.githubAppMessageContainer}>
-              <Spacer
-                width={sizes.avatarContainerWidth + sizes.horizontalSpaceSize}
-              />
-
-              <InstallGitHubAppText
-                ownerId={githubApp.ownerId}
-                repoId={githubApp.repoId}
-                text={githubApp.text}
-                textProps={{
-                  color: 'foregroundColorMuted65',
-                  numberOfLines: 1,
-                  style: styles.githubAppMessage,
-                }}
-              />
-            </View>
-          </>
-        )}
 
         {!!renderCardActions && (
           <>

@@ -8,7 +8,6 @@ import * as actions from '../../redux/actions'
 import * as selectors from '../../redux/selectors'
 import { sharedStyles } from '../../styles/shared'
 import { contentPadding, scaleFactor } from '../../styles/variables'
-import { parseTextWithEmojisToReactComponents } from '../../utils/helpers/github/emojis'
 import { IconButton } from '../common/IconButton'
 import { Link } from '../common/Link'
 import { Separator } from '../common/Separator'
@@ -63,15 +62,7 @@ export function AppBannerMessage() {
             tooltip={undefined}
           >
             <ThemedText color="foregroundColor" style={sharedStyles.textCenter}>
-              {parseTextWithEmojisToReactComponents(bannerMessage.message, {
-                key: `banner-message-${bannerMessage.message}`,
-                imageProps: {
-                  style: {
-                    width: 16 * scaleFactor,
-                    height: 16 * scaleFactor,
-                  },
-                },
-              })}
+              {'UNIMPLEMENTED_THEMED_TEXT'}
             </ThemedText>
           </Link>
         </View>

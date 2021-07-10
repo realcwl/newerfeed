@@ -1,4 +1,3 @@
-import { ColumnSubscription, fixURLForPlatform } from '@devhub/core'
 import React from 'react'
 import { View } from 'react-native'
 
@@ -24,7 +23,7 @@ export interface CardActionsProps {
   leftSpacing?: number
   // muted?: boolean
   rightSpacing?: number
-  type: ColumnSubscription['type']
+  type: 'COLUMN_TYPE_NEWS_FEED'
 }
 
 export const cardActionsHeight = smallerTextSize + 3 * scaleFactor
@@ -61,9 +60,7 @@ export function CardActions(props: CardActionsProps) {
         }}
         href="javascript:void(0)"
         onPress={() => {
-          dispatch(
-            actions.saveItemsForLater({ itemNodeIdOrIds, save: !isSaved }),
-          )
+          console.log('UNIMPLEMENTED_PRESS')
         }}
         textProps={{
           color: muted ? 'foregroundColorMuted40' : 'foregroundColorMuted65',
@@ -90,13 +87,7 @@ export function CardActions(props: CardActionsProps) {
         }}
         href="javascript:void(0)"
         onPress={() => {
-          dispatch(
-            actions.markItemsAsReadOrUnread({
-              type,
-              itemNodeIdOrIds,
-              unread: !!isRead,
-            }),
-          )
+          console.log('UNIMPLEMENTED_PRESS')
         }}
         textProps={{
           color: muted ? 'foregroundColorMuted40' : 'foregroundColorMuted65',
@@ -121,18 +112,7 @@ export function CardActions(props: CardActionsProps) {
                 left: contentPadding / 4,
                 right: contentPadding / 4,
               }}
-              href={
-                typeof commentsLink === 'string'
-                  ? fixURLForPlatform(
-                      commentsLink,
-                      Platform.realOS === 'ios' ||
-                        Platform.realOS === 'android',
-                      {
-                        addBottomAnchor: true,
-                      },
-                    )
-                  : undefined
-              }
+              href={undefined}
               onPress={
                 typeof commentsLink === 'function' ? commentsLink : undefined
               }

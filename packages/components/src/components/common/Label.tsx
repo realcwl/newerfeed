@@ -10,7 +10,6 @@ import {
   smallTextSize,
 } from '../../styles/variables'
 import { getReadableColor } from '../../utils/helpers/colors'
-import { parseTextWithEmojisToReactComponents } from '../../utils/helpers/github/emojis'
 import { useTheme } from '../context/ThemeContext'
 import { getThemeColorOrItself } from '../themed/helpers'
 import { Text, TextProps } from './Text'
@@ -98,17 +97,7 @@ export const Label = React.memo((props: LabelProps) => {
             textProps && textProps.style,
           ]}
         >
-          {parseTextWithEmojisToReactComponents(children, {
-            key: `label-text-${children}`,
-            imageProps: {
-              style: {
-                marginHorizontal: contentPadding / (small ? 4 : 2),
-                width: small ? smallTextSize : normalTextSize,
-                height: small ? smallTextSize : normalTextSize,
-              },
-            },
-            shouldStripEmojis: disableEmojis,
-          })}
+          {'UNUMPLEMENTED LABEL TEXT'}
         </Text>
       ) : (
         <>

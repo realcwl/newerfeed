@@ -1,4 +1,4 @@
-import { constants } from '@devhub/core'
+import { constants, NewsFeedData } from '@devhub/core'
 import qs from 'qs'
 import { ReactNode } from 'react'
 import { findDOMNode } from 'react-dom'
@@ -30,6 +30,13 @@ export function findNode(ref: any) {
   }
 }
 
+export function getItemNodeIdOrId(
+  item: NewsFeedData | undefined,
+): string | undefined {
+  if (!item) return undefined
+  return item.id
+}
+
 export function tryFocus(ref: any): boolean | null {
   try {
     const node = findNode(ref)
@@ -46,80 +53,6 @@ export function tryFocus(ref: any): boolean | null {
   }
 
   return null
-}
-
-export function getGitHubAppInstallUri(
-  options: {
-    redirectUri?: string | undefined
-    suggestedTargetId?: number | string | undefined
-    repositoryIds?: (number | string)[] | undefined
-  } = {},
-) {
-  const query: Record<string, any> = {}
-
-  const redirectUri =
-    options.redirectUri ||
-    (Platform.OS === 'ios' || Platform.OS === 'android' || Platform.isElectron
-      ? `${constants.APP_DEEP_LINK_SCHEMA}://`
-      : Platform.OS === 'web'
-      ? window.location.origin
-      : '')
-
-  if (redirectUri) query.redirect_uri = redirectUri
-  if (options.repositoryIds) query.repository_ids = options.repositoryIds
-  if (options.suggestedTargetId)
-    query.suggested_target_id = options.suggestedTargetId
-
-  const querystring = qs.stringify(query, {
-    arrayFormat: 'brackets',
-    encode: false,
-  })
-  const baseUri = `${constants.API_BASE_URL}/github/app/install`
-
-  return `${baseUri}${querystring ? `?${querystring}` : ''}`
-}
-
-export async function openAppStore({
-  showReviewModal,
-}: { showReviewModal?: boolean } = {}) {
-  try {
-    if (Platform.realOS === 'android') {
-      let storeUrl = `market://details?id=${constants.GOOGLEPLAY_ID}`
-
-      if (Platform.OS === 'android' && (await Linking.canOpenURL(storeUrl))) {
-        if (__DEV__) console.log(`Requested to open Play Store: ${storeUrl}`) // eslint-disable-line no-console
-        await Linking.openURL(storeUrl)
-        return true
-      }
-
-      storeUrl = `https://play.google.com/store/apps/details?id=${constants.GOOGLEPLAY_ID}`
-      if (__DEV__) console.log(`Requested to open Play Store: ${storeUrl}`) // eslint-disable-line no-console
-      await Browser.openURL(storeUrl)
-      return true
-    }
-
-    if (Platform.realOS === 'ios') {
-      let storeUrl = `itms-apps://itunes.apple.com/app/id${constants.APPSTORE_ID}`
-
-      if (Platform.OS === 'ios' && (await Linking.canOpenURL(storeUrl))) {
-        if (__DEV__) console.log(`Requested to open App Store: ${storeUrl}`) // eslint-disable-line no-console
-        await Linking.openURL(storeUrl)
-        return true
-      }
-
-      storeUrl = showReviewModal
-        ? `https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=${constants.APPSTORE_ID}&pageNumber=0&sortOrdering=2&mt=8`
-        : `https://itunes.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=${constants.APPSTORE_ID}&pageNumber=0&sortOrdering=2&mt=8`
-      if (__DEV__) console.log(`Requested to open App Store: ${storeUrl}`) // eslint-disable-line no-console
-      await Browser.openURL(storeUrl)
-      return true
-    }
-
-    throw new Error(`Invalid platform: ${Platform.realOS}`)
-  } catch (error) {
-    if (__DEV__) console.error(`Failed to open App Store: ${error}`) // eslint-disable-line no-console
-    return false
-  }
 }
 
 export function genericParseText<T extends string>(

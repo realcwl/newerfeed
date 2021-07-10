@@ -8,16 +8,13 @@ import {
   scaleFactor,
   smallTextSize,
 } from '../../styles/variables'
-import {
-  getEmojiImageURL,
-  GitHubEmoji,
-} from '../../utils/helpers/github/emojis'
+
 import { Spacer } from '../common/Spacer'
 import { ThemedText } from '../themed/ThemedText'
 
 export interface GenericMessageWithButtonViewProps {
   buttonView: React.ReactNode
-  emoji: GitHubEmoji | null
+  emoji: string | null
   footer?: React.ReactNode
   fullCenter?: boolean
   style?: ViewProps['style']
@@ -30,7 +27,7 @@ export const GenericMessageWithButtonView = React.memo(
     const { buttonView, emoji, footer, fullCenter, style, subtitle, title } =
       props
 
-    const emojiImageURL = emoji ? getEmojiImageURL(emoji) : null
+    const emojiImageURL = null
 
     return (
       <>

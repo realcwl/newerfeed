@@ -1,8 +1,6 @@
 import React from 'react'
 import { View } from 'react-native'
 
-import { useReduxState } from '../../hooks/use-redux-state'
-import * as selectors from '../../redux/selectors'
 import { sharedStyles } from '../../styles/shared'
 import { contentPadding, scaleFactor } from '../../styles/variables'
 import { Avatar } from '../common/Avatar'
@@ -13,9 +11,9 @@ import { ThemedText } from '../themed/ThemedText'
 
 export interface AccountSettingsProps {}
 
+// TODO(chenweilunster): We probably also want to have account settings. But this isn't
+// planned in the first stage and I'm leaving it here just for reference.
 export function AccountSettings() {
-  const username = useReduxState(selectors.currentGitHubUsernameSelector)
-
   return (
     <View>
       <SubHeader title="Account" />
@@ -29,17 +27,17 @@ export function AccountSettings() {
           },
         ]}
       >
-        <Avatar size={28 * scaleFactor} username={username} />
+        <Avatar size={28 * scaleFactor} username={'username'} />
         <Spacer width={contentPadding / 2} />
         <ThemedText color="foregroundColor">Logged in as </ThemedText>
         <Link
-          href={`https://github.com/${username}`}
+          href={`https://github.com`}
           textProps={{
             color: 'foregroundColor',
             style: { fontWeight: 'bold' },
           }}
         >
-          {username}
+          {'username'}
         </Link>
       </View>
     </View>

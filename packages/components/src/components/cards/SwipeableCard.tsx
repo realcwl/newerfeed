@@ -1,4 +1,3 @@
-import { getItemNodeIdOrId, isItemRead, isItemSaved } from '@devhub/core'
 import React, { useMemo, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 
@@ -11,38 +10,26 @@ import { CardWithLink, CardWithLinkProps } from './CardWithLink'
 export type SwipeableCardProps = CardWithLinkProps
 
 export function SwipeableCard(props: CardWithLinkProps) {
-  const { columnId, nodeIdOrId, ownerIsKnown, repoIsKnown, type } = props
+  const { columnId, nodeIdOrId, type } = props
 
   const swipeableRef = useRef<SwipeableRow>(null)
   const theme = useTheme()
   const dispatch = useDispatch()
   const item = useItem(nodeIdOrId)
-  const isRead = isItemRead(item)
-  const isSaved = isItemSaved(item)
+  const isRead = false
+  const isSaved = false
 
   function handleMarkAsReadOrUnread() {
-    dispatch(
-      actions.markItemsAsReadOrUnread({
-        type,
-        itemNodeIdOrIds: [getItemNodeIdOrId(item)!],
-        localOnly: false,
-        unread: isRead,
-      }),
-    )
+    console.log('handleMarkAsReadOrUnread')
   }
 
   function handleSave() {
-    dispatch(
-      actions.saveItemsForLater({
-        itemNodeIdOrIds: [getItemNodeIdOrId(item)!],
-        save: !isItemSaved(item),
-      }),
-    )
+    console.log('handleSave')
   }
 
   const Content = useMemo(
     () => <CardWithLink {...props} isInsideSwipeable />,
-    [columnId, item, ownerIsKnown, repoIsKnown, type],
+    [columnId, item, type],
   )
 
   return (

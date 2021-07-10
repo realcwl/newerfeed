@@ -42,7 +42,7 @@ export interface NewsFeedColumn extends BaseColumn {
   // Different from NewsFeedDataExpression, filter is a purely frontend data
   // that is used to quickly filter column data to let user find useful
   // information.
-  filter?: ColumnFilter
+  filters?: ColumnFilter
 }
 
 export interface NewsFeedColumnSources {
@@ -123,23 +123,23 @@ export interface ColumnFilter {
 export interface NewsFeedData {
   id: string
   // message shown to user.
-  message: string
+  message?: string
   // if this is not null, user can click a card to go to original page.
-  url: string | undefined
+  url?: string
   // A list of attachment that will be rendered together with this card.
-  attachments: Attachment[]
+  attachments?: Attachment[]
   // This is the timestamp of original post
-  postTimestamp: Date
+  postTimestamp?: Date
   // We might not be able to get postTimestamp
   // in which case we use crawledTimestamp as alternative
-  crawledTimestamp: Date
+  crawledTimestamp?: Date
   // It is a linked list of all repost/retweet
-  repostedFrom: NewsFeedData
+  repostedFrom?: NewsFeedData
   // When this field is a string,
   // which is the parent data ID, don't render it
   parent: string | undefined
   // Put all deplicate children messages.
-  duplicateIds: string[] | undefined
+  duplicateIds?: string[]
 }
 
 export interface Attachment {
@@ -180,6 +180,13 @@ export type ModalPayload =
       name: 'SETTINGS'
       params?: undefined
     }
+
+export interface HeaderDetails {
+  avatarProps?: { imageURL: string; linkURL: string }
+  icon: string
+  subtitle?: string
+  title: string
+}
 
 export type ModalPayloadWithIndex = ModalPayload & { index: number }
 

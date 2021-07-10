@@ -1,6 +1,5 @@
 import {
   Column,
-  getFilterFromSearchQuery,
   getSearchQueryFromFilter,
   getSearchQueryTerms,
 } from '@devhub/core'
@@ -75,51 +74,9 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
 
   const { inlineMode } = useColumnFilters()
 
-  const allFiltersQuery =
-    (column &&
-      getSearchQueryFromFilter(
-        column.type,
-        { ...column.filters, saved: undefined },
-        {
-          groupByKey: false,
-        },
-      )) ||
-    undefined
+  const allFiltersQuery = undefined
 
   const queryTerms = getSearchQueryTerms(allFiltersQuery)
-
-  function replaceColumnFiltersFromQueryString(
-    q: string,
-    {
-      preserveExistingOwners = !!(column && column.type === 'issue_or_pr'),
-    } = {},
-  ) {
-    if (!column) return
-
-    vibrateHapticFeedback()
-
-    const filters: Column['filters'] = getFilterFromSearchQuery(
-      column.type,
-      q,
-      { clearedAt: column.filters && column.filters.clearedAt },
-    )
-
-    if (preserveExistingOwners) {
-      filters.owners = filters.owners || {}
-      Object.keys((column.filters && column.filters.owners) || {}).forEach(
-        (existingOwner) => {
-          if (!filters.owners![existingOwner]) {
-            filters.owners![existingOwner] = {
-              value: undefined,
-              repos: undefined,
-            }
-          }
-        },
-      )
-    }
-
-    dispatch(actions.replaceColumnFilters({ columnId: column.id, filters }))
-  }
 
   const formikProps = useFormik({
     enableReinitialize: true,
@@ -129,20 +86,6 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
     },
     onSubmit(values) {
       if (!column) return
-
-      const allFiltersQueryWithoutQuery =
-        column &&
-        getSearchQueryFromFilter(
-          column.type,
-          { ...column.filters, query: values.query || '' },
-          {
-            groupByKey: false,
-          },
-        )
-
-      replaceColumnFiltersFromQueryString(allFiltersQueryWithoutQuery)
-
-      if (forceShowTextInput && !values.query) setForceShowTextInput(false)
     },
   })
 
@@ -307,7 +250,9 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
                         .join(' ')
                         .trim()
 
-                      replaceColumnFiltersFromQueryString(queryString)
+                      console.log(
+                        'TODO: Replace Column Filters From Query String',
+                      )
                     }}
                     onRemove={
                       key === 'inbox'
@@ -335,9 +280,9 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
                               .join(' ')
                               .trim()
 
-                            replaceColumnFiltersFromQueryString(queryString, {
-                              preserveExistingOwners: false,
-                            })
+                            console.log(
+                              'TODO: Replace Column Filters From Query String',
+                            )
                           }
                     }
                     size={searchBarMainContentHeight}

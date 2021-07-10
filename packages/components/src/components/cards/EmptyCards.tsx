@@ -5,10 +5,7 @@ import { Image, View } from 'react-native'
 import { useColumnLoadingState } from '../../hooks/use-column-loading-state'
 import { sharedStyles } from '../../styles/shared'
 import { contentPadding, scaleFactor } from '../../styles/variables'
-import {
-  getEmojiImageURL,
-  GitHubEmoji,
-} from '../../utils/helpers/github/emojis'
+
 import { Button, defaultButtonSize } from '../common/Button'
 import { fabSize, fabSpacing } from '../common/FAB'
 import { FullHeightScrollView } from '../common/FullHeightScrollView'
@@ -30,7 +27,7 @@ const clearMessages = [
   'Well done!',
 ]
 
-const emojis: GitHubEmoji[] = ['+1', 'muscle', 'tada', '100']
+const emojis: string[] = ['+1', 'muscle', 'tada', '100']
 
 const getRandomClearMessage = () => {
   const randomIndex = Math.floor(Math.random() * clearMessages.length)
@@ -53,11 +50,11 @@ export const defaultCardFooterHeight =
   defaultButtonSize + 2 * defaultCardFooterSpacing
 
 export interface EmptyCardsProps {
-  clearEmoji?: GitHubEmoji | null
+  clearEmoji?: string
   clearMessage?: string
   columnId: string
   disableLoadingIndicator?: boolean
-  emoji?: GitHubEmoji | null
+  emoji?: string
   errorButtonView?: GenericMessageWithButtonViewProps['buttonView']
   errorMessage?: string
   errorTitle?: string
@@ -86,7 +83,7 @@ export const EmptyCards = React.memo((props: EmptyCardsProps) => {
   const _loadState = useColumnLoadingState(columnId)
   const loadState = _loadStateProp || _loadState
 
-  const clearEmojiURL = clearEmoji ? getEmojiImageURL(clearEmoji) : undefined
+  const clearEmojiURL = undefined
   const hasError = errorMessage || loadState === 'error'
 
   const renderContent = () => {

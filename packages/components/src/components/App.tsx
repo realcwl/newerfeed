@@ -12,6 +12,10 @@ import { UnreadCountProvider } from './context/UnreadCountContext'
 
 enableNetworkInterceptors()
 
+/**
+ *
+ */
+
 // TODO: Enable StrictMode after react-native fixes it
 // @see https://github.com/facebook/react-native/issues/22186
 const StrictModePlaceholder = Fragment

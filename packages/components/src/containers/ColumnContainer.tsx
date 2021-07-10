@@ -1,8 +1,6 @@
 import React from 'react'
 
-import { EventColumn } from '../components/columns/EventColumn'
-import { IssueOrPullRequestColumn } from '../components/columns/IssueOrPullRequestColumn'
-import { NotificationColumn } from '../components/columns/NotificationColumn'
+import { EventColumn } from '../components/columns/NewsFeedColumn'
 import { useColumn } from '../hooks/use-column'
 import { bugsnag } from '../libs/bugsnag'
 
@@ -20,36 +18,10 @@ export const ColumnContainer = React.memo((props: ColumnContainerProps) => {
   if (!(column && columnIndex >= 0 && headerDetails)) return null
 
   switch (column.type) {
-    case 'activity': {
+    case 'COLUMN_TYPE_NEWS_FEED': {
       return (
         <EventColumn
           key={`event-column-${column.id}`}
-          columnId={column.id}
-          columnIndex={columnIndex}
-          headerDetails={headerDetails}
-          pagingEnabled={pagingEnabled}
-          swipeable={swipeable}
-        />
-      )
-    }
-
-    case 'issue_or_pr': {
-      return (
-        <IssueOrPullRequestColumn
-          key={`issue-or-pr-column-${column.id}`}
-          columnId={column.id}
-          columnIndex={columnIndex}
-          headerDetails={headerDetails}
-          pagingEnabled={pagingEnabled}
-          swipeable={swipeable}
-        />
-      )
-    }
-
-    case 'notifications': {
-      return (
-        <NotificationColumn
-          key={`notification-column-${column.id}`}
           columnId={column.id}
           columnIndex={columnIndex}
           headerDetails={headerDetails}

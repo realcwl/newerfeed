@@ -1,8 +1,4 @@
-import {
-  AddColumnDetailsPayload,
-  ColumnSubscription,
-  constants,
-} from '@devhub/core'
+import { constants } from '@devhub/core'
 import { rgba } from 'polished'
 import React, { useCallback, useLayoutEffect, useRef } from 'react'
 import { View } from 'react-native'
@@ -39,135 +35,16 @@ export interface AddColumnModalProps {
 
 const columnTypes: {
   title: string
-  type: ColumnSubscription['type']
   icon: IconProp
   items: {
-    payload: AddColumnDetailsPayload | null
+    payload: {
+      title: string
+      icon: string
+    }
   }[]
   soon?: boolean
   soonLink?: string
-}[] = [
-  {
-    title: 'Notifications',
-    type: 'notifications',
-    icon: { family: 'octicon', name: 'bell' },
-    items: [
-      {
-        payload: {
-          icon: { family: 'octicon', name: 'bell' },
-          title: 'Notifications',
-          subscription: {
-            type: 'notifications',
-            subtype: undefined,
-          },
-          isPrivateSupported: true,
-        },
-      },
-    ],
-  },
-  {
-    title: 'Issues & Pull Requests',
-    type: 'issue_or_pr',
-    icon: { family: 'octicon', name: 'issue-opened' },
-    items: [
-      {
-        payload: {
-          icon: { family: 'octicon', name: 'issue-opened' },
-          title: 'Issues',
-          subscription: {
-            type: 'issue_or_pr',
-            subtype: 'ISSUES',
-          },
-          isPrivateSupported: true,
-        },
-      },
-      {
-        payload: {
-          icon: { family: 'octicon', name: 'issue-opened' },
-          title: 'Issues & Pull Requests',
-          subscription: {
-            type: 'issue_or_pr',
-            subtype: undefined,
-          },
-          isPrivateSupported: true,
-        },
-      },
-      {
-        payload: {
-          icon: { family: 'octicon', name: 'git-pull-request' },
-          title: 'Pull Requests',
-          subscription: {
-            type: 'issue_or_pr',
-            subtype: 'PULLS',
-          },
-          isPrivateSupported: true,
-        },
-      },
-    ],
-  },
-  {
-    title: 'Activities',
-    type: 'activity',
-    icon: { family: 'octicon', name: 'note' },
-    items: [
-      {
-        payload: {
-          icon: { family: 'octicon', name: 'person' },
-          title: 'User activity',
-          subscription: {
-            type: 'activity',
-            subtype: 'USER_EVENTS',
-          },
-          isPrivateSupported: false,
-        },
-      },
-      {
-        payload: {
-          icon: { family: 'octicon', name: 'home' },
-          title: 'User dashboard',
-          subscription: {
-            type: 'activity',
-            subtype: 'USER_RECEIVED_EVENTS',
-          },
-          isPrivateSupported: false,
-        },
-      },
-      {
-        payload: {
-          icon: { family: 'octicon', name: 'repo' },
-          title: 'Repository activity',
-          subscription: {
-            type: 'activity',
-            subtype: 'REPO_EVENTS',
-          },
-          isPrivateSupported: true,
-        },
-      },
-      {
-        payload: {
-          icon: { family: 'octicon', name: 'organization' },
-          title: 'Organization activity (public)',
-          subscription: {
-            type: 'activity',
-            subtype: 'ORG_PUBLIC_EVENTS',
-          },
-          isPrivateSupported: false,
-        },
-      },
-      {
-        payload: {
-          icon: { family: 'octicon', name: 'organization' },
-          title: 'Organization dashboard (private)',
-          subscription: {
-            type: 'activity',
-            subtype: 'USER_ORG_EVENTS',
-          },
-          isPrivateSupported: true,
-        },
-      },
-    ],
-  },
-]
+}[] = []
 
 function AddColumnModalItem({
   disabled,
@@ -177,7 +54,7 @@ function AddColumnModalItem({
 }: {
   disabled?: boolean
   icon: IconProp
-  payload: AddColumnDetailsPayload | null
+  payload: any
   title: string
 }) {
   const cacheRef = useRef({
@@ -238,12 +115,7 @@ function AddColumnModalItem({
           ? () =>
               pushModal({
                 name: 'ADD_COLUMN_DETAILS',
-                params: {
-                  ...payload,
-                  title: payload.title
-                    ?.replace(' (private)', '')
-                    .replace(' (public)', ''),
-                },
+                params: undefined,
               })
           : undefined
       }

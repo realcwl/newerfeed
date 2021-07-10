@@ -1,4 +1,4 @@
-import { Column, EnhancedGitHubEvent } from '@devhub/core'
+import { Column, NewsFeedData } from '@devhub/core'
 import React, { useCallback, useMemo } from 'react'
 import { View, ViewProps } from 'react-native'
 
@@ -11,10 +11,10 @@ import { OneList, OneListProps } from '../../libs/one-list'
 import * as selectors from '../../redux/selectors'
 import { sharedStyles } from '../../styles/shared'
 import { EmptyCards, EmptyCardsProps } from './EmptyCards'
-import { EventCard } from './EventCard'
+import { NewsFeedCard } from './NewsFeedCard'
 import { SwipeableCard } from './SwipeableCard'
 
-type ItemT = EnhancedGitHubEvent
+type ItemT = NewsFeedData
 
 export interface EventCardsProps {
   columnId: Column['id']
@@ -29,7 +29,7 @@ export interface EventCardsProps {
   swipeable: boolean
 }
 
-export const EventCards = React.memo((props: EventCardsProps) => {
+export const NewsFeedCards = React.memo((props: EventCardsProps) => {
   const {
     columnId,
     errorMessage,
@@ -58,12 +58,10 @@ export const EventCards = React.memo((props: EventCardsProps) => {
     fixedHeaderComponent,
     footer,
     getItemSize,
-    getOwnerIsKnownByItemOrNodeIdOrId,
     header,
     itemSeparator,
     onVisibleItemsChanged,
     refreshControl,
-    repoIsKnown,
     safeAreaInsets,
     visibleItemIndexesRef,
   } = useCardsProps({
@@ -73,29 +71,19 @@ export const EventCards = React.memo((props: EventCardsProps) => {
     itemNodeIdOrIds,
     lastFetchSuccessAt,
     refresh,
-    type: 'activity',
+    type: 'COLUMN_TYPE_NEWS_FEED',
   })
 
   useCardsKeyboard(listRef, {
     columnId,
     getItemByNodeIdOrId,
-    getOwnerIsKnownByItemOrNodeIdOrId,
     itemNodeIdOrIds:
       OverrideRender && OverrideRender.Component && OverrideRender.overlay
         ? []
         : itemNodeIdOrIds,
-    repoIsKnown,
-    type: 'activity',
+    type: 'COLUMN_TYPE_NEWS_FEED',
     visibleItemIndexesRef,
   })
-
-  const mainSubscription = useReduxState(
-    useCallback(
-      (state) =>
-        selectors.createColumnSubscriptionSelector()(state, columnId || ''),
-      [columnId],
-    ),
-  )
 
   const renderItem = useCallback<
     NonNullable<OneListProps<DataItemT>['renderItem']>
@@ -107,11 +95,9 @@ export const EventCards = React.memo((props: EventCardsProps) => {
         return (
           <View style={{ height }}>
             <SwipeableCard
-              type="activity"
+              type="COLUMN_TYPE_NEWS_FEED"
               columnId={columnId}
               nodeIdOrId={nodeIdOrId}
-              ownerIsKnown={getOwnerIsKnownByItemOrNodeIdOrId(nodeIdOrId)}
-              repoIsKnown={repoIsKnown}
             />
           </View>
         )
@@ -120,17 +106,12 @@ export const EventCards = React.memo((props: EventCardsProps) => {
       return (
         <ErrorBoundary>
           <View style={{ height }}>
-            <EventCard
-              repoIsKnown={repoIsKnown}
-              ownerIsKnown={getOwnerIsKnownByItemOrNodeIdOrId(nodeIdOrId)}
-              nodeIdOrId={nodeIdOrId}
-              columnId={columnId}
-            />
+            <NewsFeedCard nodeIdOrId={nodeIdOrId} columnId={columnId} />
           </View>
         </ErrorBoundary>
       )
     },
-    [getOwnerIsKnownByItemOrNodeIdOrId, repoIsKnown, swipeable],
+    [swipeable],
   )
 
   const ListEmptyComponent = useMemo<
@@ -158,13 +139,7 @@ export const EventCards = React.memo((props: EventCardsProps) => {
         <EmptyCards
           clearMessage="No activity"
           columnId={columnId}
-          disableLoadingIndicator={
-            !!(
-              mainSubscription &&
-              mainSubscription.data &&
-              mainSubscription.data.lastFetchSuccessAt
-            )
-          }
+          disableLoadingIndicator={false}
           errorMessage={errorMessage}
           fetchNextPage={fetchNextPage}
           refresh={refresh}
@@ -237,4 +212,4 @@ export const EventCards = React.memo((props: EventCardsProps) => {
   )
 })
 
-EventCards.displayName = 'EventCards'
+NewsFeedCards.displayName = 'NewsFeedCards'

@@ -1,25 +1,22 @@
 import React, { useState } from 'react'
 import { Alert, View } from 'react-native'
 
-import { constants, GitHubAppType, tryParseOAuthParams } from '@devhub/core'
+import { constants } from '@devhub/core'
 import { useReduxAction } from '../../hooks/use-redux-action'
 import { useReduxState } from '../../hooks/use-redux-state'
 import { analytics } from '../../libs/analytics'
 import { bugsnag } from '../../libs/bugsnag'
-import { executeOAuth } from '../../libs/oauth'
 import * as actions from '../../redux/actions'
 import * as selectors from '../../redux/selectors'
 import { sharedStyles } from '../../styles/shared'
 import { clearOAuthQueryParams } from '../../utils/helpers/auth'
-import { GitHubEmoji } from '../../utils/helpers/github/emojis'
 import { Button } from '../common/Button'
 import { GenericMessageWithButtonView } from './GenericMessageWithButtonView'
 import { QuickFeedbackRow } from '../common/QuickFeedbackRow'
 import { contentPadding } from '../../styles/variables'
 
 export interface NoTokenViewProps {
-  emoji?: GitHubEmoji | null
-  githubAppType: GitHubAppType | 'both'
+  emoji?: null
   subtitle?: string | null
   title?: string | null
 }
@@ -27,7 +24,6 @@ export interface NoTokenViewProps {
 export const NoTokenView = React.memo((props: NoTokenViewProps) => {
   const {
     emoji = 'warning',
-    githubAppType,
     subtitle = 'Required permission is missing',
     title = 'Please login again',
   } = props
@@ -39,18 +35,9 @@ export const NoTokenView = React.memo((props: NoTokenViewProps) => {
 
   async function startOAuth() {
     try {
-      analytics.trackEvent('engagement', `relogin_add_token_${githubAppType}`)
-
       setIsExecutingOAuth(true)
 
-      const params = await executeOAuth(githubAppType, {
-        appToken: existingAppToken,
-        scope:
-          githubAppType === 'oauth' || githubAppType === 'both'
-            ? constants.DEFAULT_GITHUB_OAUTH_SCOPES
-            : undefined,
-      })
-      const { appToken } = tryParseOAuthParams(params)
+      const appToken = 'DUMMY_APP_TOKEN'
       clearOAuthQueryParams()
       if (!appToken) throw new Error('No app token')
 
@@ -81,7 +68,7 @@ export const NoTokenView = React.memo((props: NoTokenViewProps) => {
         <GenericMessageWithButtonView
           buttonView={
             <Button
-              analyticsLabel={`relogin_with_github_${githubAppType}`}
+              analyticsLabel={`dummy_logging_label`}
               loading={isLoggingIn || isExecutingOAuth}
               onPress={() => startOAuth()}
             >

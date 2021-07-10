@@ -1,13 +1,4 @@
-import {
-  constants,
-  getColumnOption,
-  getUserAvatarByUsername,
-  getUserURLFromLogin,
-  isItemRead,
-  isPlanStatusValid,
-  ModalPayload,
-  ThemeColors,
-} from '@devhub/core'
+import { constants, ModalPayload, ThemeColors } from '@devhub/core'
 import React, {
   useCallback,
   useContext,
@@ -53,7 +44,6 @@ import {
   getColumnHeaderThemeColors,
 } from '../columns/ColumnHeader'
 import { useAppLayout } from '../context/LayoutContext'
-import { usePlans } from '../context/PlansContext'
 import { getTheme } from '../context/ThemeContext'
 import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
@@ -164,16 +154,12 @@ export const SidebarOrBottomBar = React.memo(
 
     const { sizename } = useAppLayout()
     const safeAreaInsets = useSafeArea()
-    const { freePlan, paidPlans } = usePlans()
 
     const dispatch = useDispatch()
     const bannerMessage = useReduxState(selectors.bannerMessageSelector)
     const columnIds = useReduxState(selectors.columnIdsSelector)
     const currentOpenedModal = useReduxState(selectors.currentOpenedModal)
     const modalStack = useReduxState(selectors.modalStack)
-    const user = useReduxState(selectors.currentGitHubUserSelector)
-    const userPlan = useReduxState(selectors.currentUserPlanSelector)
-    const isPlanExpired = useReduxState(selectors.isPlanExpiredSelector)
 
     const small = sizename <= '2-medium'
 
@@ -346,30 +332,8 @@ export const SidebarOrBottomBar = React.memo(
                 : undefined
               : dispatch(actions.replaceModal({ name: 'SETTINGS' }))
           }
-          showUnreadIndicator={
-            !!(
-              (isPlanExpired &&
-                !(freePlan && !freePlan.trialPeriodDays) &&
-                paidPlans.length) ||
-              (userPlan &&
-                userPlan.status === 'active' &&
-                userPlan.cancelAtPeriodEnd &&
-                userPlan.cancelAt) ||
-              !isPlanStatusValid(userPlan)
-            )
-          }
-          unreadIndicatorColor={
-            (isPlanExpired &&
-              !(freePlan && !freePlan.trialPeriodDays) &&
-              paidPlans.length) ||
-            (userPlan &&
-              userPlan.status === 'active' &&
-              userPlan.cancelAtPeriodEnd &&
-              userPlan.cancelAt) ||
-            !isPlanStatusValid(userPlan)
-              ? 'red'
-              : undefined
-          }
+          showUnreadIndicator={true}
+          unreadIndicatorColor={'red'}
           selected={isModalOpen('SETTINGS')}
           title="Preferences"
         />
@@ -380,9 +344,6 @@ export const SidebarOrBottomBar = React.memo(
         currentOpenedModal && currentOpenedModal.name === 'SETTINGS',
         columnIds.length === 0,
         isModalOpen('SETTINGS'),
-        userPlan && userPlan.status,
-        userPlan && userPlan.cancelAtPeriodEnd,
-        userPlan && userPlan.cancelAt,
       ],
     )
     const renderPreferencesItemInline = !!(
@@ -422,9 +383,7 @@ export const SidebarOrBottomBar = React.memo(
                   <SidebarOrBottomBarItem horizontal={horizontal} title="">
                     <Link
                       analyticsLabel="sidebar_user_avatar"
-                      href={getUserURLFromLogin(user!.login, {
-                        baseURL: undefined,
-                      })}
+                      href={'https://www.google.com'}
                       openOnNewTab
                       style={[
                         sharedStyles.center,
@@ -434,14 +393,7 @@ export const SidebarOrBottomBar = React.memo(
                     >
                       <Avatar
                         avatarUrl={
-                          user!.avatarUrl ||
-                          getUserAvatarByUsername(
-                            user!.login,
-                            {
-                              baseURL: undefined,
-                            },
-                            PixelRatio.getPixelSizeForLayoutSize,
-                          )
+                          'https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light'
                         }
                         disableLink
                         shape="circle"
@@ -530,16 +482,9 @@ export const SidebarOrBottomBar = React.memo(
                   ]}
                 >
                   <Avatar
-                    avatarUrl={getUserAvatarByUsername(
-                      'devhubapp',
-                      {
-                        baseURL: undefined,
-                      },
-                      PixelRatio.getPixelSizeForLayoutSize,
-                    )}
-                    disableLink
-                    shape="circle"
-                    size={sidebarAvatarSize}
+                    avatarUrl={
+                      'https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light'
+                    }
                   />
                 </Link>
               </SidebarOrBottomBarItem>
@@ -571,7 +516,6 @@ export const SidebarOrBottomBarColumnItem = React.memo(
 
     const dispatch = useDispatch()
     const currentOpenedModal = useReduxState(selectors.currentOpenedModal)
-    const plan = useReduxState(selectors.currentUserPlanSelector)
 
     const small = sizename <= '2-medium'
 
@@ -624,48 +568,9 @@ export const SidebarOrBottomBarColumnItem = React.memo(
       }
     }, [columnId, !!currentOpenedModal, isColumnFocused, small])
 
-    const showUnreadIndicator =
-      hasCrossedColumnsLimit ||
-      (!!column &&
-      getColumnOption(column, 'enableInAppUnreadIndicator', { Platform, plan })
-        .hasAccess &&
-      getColumnOption(column, 'enableInAppUnreadIndicator', { Platform, plan })
-        .platformSupports &&
-      getColumnOption(column, 'enableInAppUnreadIndicator', { Platform, plan })
-        .value
-        ? filteredItems.some((item) => !isItemRead(item))
-        : false)
+    const showUnreadIndicator = true
 
-    const unreadIndicatorColor: keyof ThemeColors | undefined =
-      hasCrossedColumnsLimit
-        ? 'foregroundColorMuted65'
-        : column &&
-          ((getColumnOption(column, 'enableAppIconUnreadIndicator', {
-            Platform,
-            plan,
-          }).hasAccess &&
-            getColumnOption(column, 'enableAppIconUnreadIndicator', {
-              Platform,
-              plan,
-            }).platformSupports &&
-            getColumnOption(column, 'enableAppIconUnreadIndicator', {
-              Platform,
-              plan,
-            }).value) ||
-            (getColumnOption(column, 'enableDesktopPushNotifications', {
-              Platform,
-              plan,
-            }).hasAccess &&
-              getColumnOption(column, 'enableDesktopPushNotifications', {
-                Platform,
-                plan,
-              }).platformSupports &&
-              getColumnOption(column, 'enableDesktopPushNotifications', {
-                Platform,
-                plan,
-              }).value))
-        ? 'lightRed'
-        : undefined
+    const unreadIndicatorColor = 'lightRed'
 
     useEffect(() => {
       columnIndexUnreadMapperRef.current.set(columnIndex, showUnreadIndicator)

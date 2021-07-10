@@ -1,6 +1,6 @@
+import { HeaderDetails } from '@devhub/core'
 import React, { useMemo } from 'react'
 
-import { getColumnHeaderDetails } from '@devhub/core'
 import {
   EventCardsContainer,
   EventCardsContainerProps,
@@ -11,7 +11,7 @@ import { ColumnRenderer, ColumnRendererProps } from './ColumnRenderer'
 export interface EventColumnProps
   extends Omit<EventCardsContainerProps, 'ownerIsKnown' | 'repoIsKnown'> {
   columnIndex: number
-  headerDetails: ReturnType<typeof getColumnHeaderDetails>
+  headerDetails: HeaderDetails
   pagingEnabled?: boolean
 }
 
@@ -49,13 +49,10 @@ export const EventColumn = React.memo((props: EventColumnProps) => {
         headerDetails.avatarProps && headerDetails.avatarProps.linkURL
       }
       columnId={columnId}
-      columnType="activity"
+      columnType="COLUMN_TYPE_NEWS_FEED"
       columnIndex={columnIndex}
       icon={headerDetails.icon as IconProp}
-      owner={headerDetails.owner}
       pagingEnabled={pagingEnabled}
-      repo={headerDetails.repo}
-      repoIsKnown={headerDetails.repoIsKnown}
       subtitle={headerDetails.subtitle}
       title={headerDetails.title}
     >

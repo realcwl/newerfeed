@@ -23,11 +23,7 @@ import { ThemedTouchableOpacity } from '../themed/ThemedTouchableOpacity'
 import { AddColumnDetailsModal } from './AddColumnDetailsModal'
 import { AddColumnModal } from './AddColumnModal'
 import { AdvancedSettingsModal } from './AdvancedSettingsModal'
-import { EnterpriseSetupModal } from './EnterpriseSetupModal'
 import { KeyboardShortcutsModal } from './KeyboardShortcutsModal'
-import { PricingModal } from './PricingModal'
-import { SubscribedModal } from './SubscribedModal'
-import { SubscribeModal } from './SubscribeModal'
 
 function renderModal(modal: ModalPayloadWithIndex) {
   if (!modal) return null
@@ -61,35 +57,6 @@ function renderModal(modal: ModalPayloadWithIndex) {
           {...modal.params}
         />
       )
-
-    case 'PRICING':
-      return (
-        <PricingModal showBackButton={modal.index >= 1} {...modal.params} />
-      )
-
-    case 'SETTINGS':
-      return (
-        <SettingsModal showBackButton={modal.index >= 1} {...modal.params} />
-      )
-
-    case 'SETUP_GITHUB_ENTERPRISE':
-      return (
-        <EnterpriseSetupModal
-          showBackButton={modal.index >= 1}
-          {...modal.params}
-        />
-      )
-
-    case 'SUBSCRIBE':
-      return (
-        <SubscribeModal showBackButton={modal.index >= 1} {...modal.params} />
-      )
-
-    case 'SUBSCRIBED':
-      return (
-        <SubscribedModal showBackButton={modal.index >= 1} {...modal.params} />
-      )
-
     default:
       return null
   }

@@ -1,14 +1,15 @@
-import { EnhancedItem, getFilteredItems, getItemNodeIdOrId } from '@devhub/core'
+import { NewsFeedData } from '@devhub/core'
 import _ from 'lodash'
 import { useCallback, useMemo, useRef } from 'react'
 
 import * as selectors from '../redux/selectors'
 import { EMPTY_ARRAY } from '../utils/constants'
+import { getItemNodeIdOrId } from '../utils/helpers/shared'
 import { useColumn } from './use-column'
 import { usePreviousRef } from './use-previous-ref'
 import { useReduxState } from './use-redux-state'
 
-export function useColumnData<ItemT extends EnhancedItem>(
+export function useColumnData<ItemT extends NewsFeedData>(
   columnId: string,
   {
     mergeSimilar,
@@ -24,7 +25,6 @@ export function useColumnData<ItemT extends EnhancedItem>(
     useColumn(columnId)
 
   const dataByNodeIdOrId = useReduxState(selectors.dataByNodeIdOrId)
-  const plan = useReduxState(selectors.currentUserPlanSelector)
 
   const allItems = useReduxState((state) => {
     if (!(column && column.id)) return EMPTY_ARRAY
@@ -38,15 +38,7 @@ export function useColumnData<ItemT extends EnhancedItem>(
   const allItemsIds = useMemo(() => _allItemsIds, [_allItemsIds.join(',')])
 
   const filteredItems = useMemo(() => {
-    if (!(column && allItems && allItems.length)) return allItems || EMPTY_ARRAY
-
-    const items = getFilteredItems(column.type, allItems, column.filters, {
-      dashboardFromUsername,
-      mergeSimilar: !!mergeSimilar,
-      plan,
-    })
-    if (hasCrossedColumnsLimit) return items.slice(0, 10)
-    return items
+    return allItems
   }, [
     allItems,
     column && column.filters,
@@ -80,8 +72,9 @@ export function useColumnData<ItemT extends EnhancedItem>(
 
   const getItemByNodeIdOrId = useCallback(
     (nodeIdOrId: string) => {
-      return (dataByNodeIdOrId[nodeIdOrId] &&
-        dataByNodeIdOrId[nodeIdOrId]!.item) as ItemT | undefined
+      return (dataByNodeIdOrId[nodeIdOrId] && dataByNodeIdOrId[nodeIdOrId]!) as
+        | ItemT
+        | undefined
     },
     [getItemByNodeIdOrIdChangeCountRef.current],
   )

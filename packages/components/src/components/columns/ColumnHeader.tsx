@@ -1,9 +1,4 @@
-import {
-  constants,
-  formatPriceAndInterval,
-  getColumnOption,
-  ThemeColors,
-} from '@devhub/core'
+import { constants, ThemeColors } from '@devhub/core'
 import React, { ReactNode } from 'react'
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native'
 import { useDispatch } from 'react-redux'
@@ -32,7 +27,6 @@ import { Separator } from '../common/Separator'
 import { Spacer } from '../common/Spacer'
 import { TouchableWithoutFeedback } from '../common/TouchableWithoutFeedback'
 import { useDialog } from '../context/DialogContext'
-import { usePlans } from '../context/PlansContext'
 import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
 import { ThemedView } from '../themed/ThemedView'
@@ -89,21 +83,10 @@ export function ColumnHeader(props: ColumnHeaderProps) {
 
   const safeAreaInsets = useSafeArea()
   const dispatch = useDispatch()
-  const { cheapestPlanWithNotifications } = usePlans()
   const bannerMessage = useReduxState(selectors.bannerMessageSelector)
-  const plan = useReduxState(selectors.currentUserPlanSelector)
   const { column } = useColumn(columnId || '')
   const { enablePushNotifications: enableDesktopPushNotifications } =
     useDesktopOptions()
-
-  const enableDesktopPushNotificationsOption = getColumnOption(
-    column,
-    'enableDesktopPushNotifications',
-    {
-      Platform,
-      plan,
-    },
-  )
 
   return (
     <ThemedView
@@ -194,142 +177,6 @@ export function ColumnHeader(props: ColumnHeaderProps) {
                     </ThemedText>
 
                     <Spacer width={contentPadding / 2} />
-
-                    {Platform.OS === 'web' &&
-                      (!enableDesktopPushNotificationsOption.platformSupports ||
-                        !enableDesktopPushNotificationsOption.hasAccess ||
-                        enableDesktopPushNotificationsOption.value) &&
-                      (() => {
-                        const tooltip =
-                          enableDesktopPushNotificationsOption.hasAccess &&
-                          enableDesktopPushNotificationsOption.value
-                            ? `${
-                                enableDesktopPushNotificationsOption.hasAccess ===
-                                'trial'
-                                  ? '[TRIAL] '
-                                  : ''
-                              }Push Notifications are enabled for this column${
-                                enableDesktopPushNotificationsOption.platformSupports
-                                  ? Platform.isElectron &&
-                                    !enableDesktopPushNotifications
-                                    ? ', but disabled on this device.'
-                                    : '.'
-                                  : ', but not supported on this platform. ' +
-                                    'Download the Desktop app at devhubapp.com to have access to it.' +
-                                    (enableDesktopPushNotificationsOption.hasAccess ===
-                                    'trial'
-                                      ? ' \n\nPS: You are currently on a free trial, enjoy it!'
-                                      : '')
-                              }`
-                            : !enableDesktopPushNotificationsOption.platformSupports
-                            ? 'Push Notifications are not supported on this platform.' +
-                              ' Download the Desktop app at devhubapp.com to have access to it.' +
-                              (enableDesktopPushNotificationsOption.hasAccess ===
-                              'trial'
-                                ? ' \n\nPS: You are currently on a free trial, enjoy it!'
-                                : '')
-                            : !enableDesktopPushNotificationsOption.hasAccess &&
-                              cheapestPlanWithNotifications &&
-                              cheapestPlanWithNotifications.amount
-                            ? `Unlock Push Notifications and other features for ${formatPriceAndInterval(
-                                cheapestPlanWithNotifications,
-                              )}`
-                            : ''
-
-                        const DownloadConfirmationHandler = () => {
-                          Dialog.show('Download Desktop App?', tooltip, [
-                            {
-                              text: 'Download',
-                              onPress: () => {
-                                Browser.openURLOnNewTab(
-                                  constants.DEVHUB_LINKS.DOWNLOAD_PAGE,
-                                )
-                              },
-                              style: 'default',
-                            },
-                            {
-                              text: 'Cancel',
-                              onPress: () => undefined,
-                              style: 'cancel',
-                            },
-                          ])
-                        }
-
-                        return (
-                          <Link
-                            analyticsLabel="column_header_push_notifications_cta"
-                            hitSlop={{
-                              top: contentPadding,
-                              bottom: contentPadding,
-                              left: contentPadding,
-                              right: contentPadding,
-                            }}
-                            onPress={
-                              enableDesktopPushNotificationsOption.platformSupports
-                                ? // platform supports
-
-                                  enableDesktopPushNotificationsOption.hasAccess
-                                  ? // plan supports
-
-                                    enableDesktopPushNotificationsOption.value
-                                    ? // is enabled
-                                      undefined
-                                    : // not enabled
-                                      DownloadConfirmationHandler
-                                  : // plan doesnt support
-                                    () => {
-                                      dispatch(
-                                        actions.pushModal({
-                                          name: 'PRICING',
-                                          params: {
-                                            highlightFeature:
-                                              'enablePushNotifications',
-                                            // initialSelectedPlanId:
-                                            //   cheapestPlanWithNotifications.id,
-                                          },
-                                        }),
-                                      )
-                                    }
-                                : // platform doesnt support
-                                  DownloadConfirmationHandler
-                            }
-                            style={sharedStyles.relative}
-                          >
-                            <ThemedIcon
-                              color="foregroundColorMuted40"
-                              family="octicon"
-                              name="bell"
-                              size={smallerTextSize}
-                              {...Platform.select({ web: { title: tooltip } })}
-                            />
-
-                            {!!(
-                              !enableDesktopPushNotificationsOption.hasAccess ||
-                              !enableDesktopPushNotificationsOption.platformSupports ||
-                              (Platform.isElectron &&
-                                !enableDesktopPushNotifications)
-                            ) && (
-                              <ThemedView
-                                style={[
-                                  StyleSheet.absoluteFill,
-                                  sharedStyles.center,
-                                ]}
-                                pointerEvents="none"
-                              >
-                                <ThemedView
-                                  backgroundColor="lightRed"
-                                  style={{
-                                    width: 1,
-                                    height: smallerTextSize + 4 * scaleFactor,
-                                    transform: [{ rotateZ: '45deg' }],
-                                  }}
-                                  pointerEvents="none"
-                                />
-                              </ThemedView>
-                            )}
-                          </Link>
-                        )
-                      })()}
                   </View>
 
                   <Spacer width={contentPadding / 2} />

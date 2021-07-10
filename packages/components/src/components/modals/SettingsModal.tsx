@@ -1,4 +1,4 @@
-import { constants, isPlanStatusValid } from '@devhub/core'
+import { constants } from '@devhub/core'
 import React from 'react'
 import { View } from 'react-native'
 import { useDispatch } from 'react-redux'
@@ -13,21 +13,16 @@ import {
   normalTextSize,
   scaleFactor,
 } from '../../styles/variables'
-import { openAppStore } from '../../utils/helpers/shared'
 import { ModalColumn } from '../columns/ModalColumn'
 import { AppVersion } from '../common/AppVersion'
 import { Avatar } from '../common/Avatar'
 import { Button } from '../common/Button'
-import { ButtonLink } from '../common/ButtonLink'
 import { Link } from '../common/Link'
 import { Spacer } from '../common/Spacer'
 import { SubHeader } from '../common/SubHeader'
-import { UnreadDot } from '../common/UnreadDot'
 import { useAppLayout } from '../context/LayoutContext'
-import { usePlans } from '../context/PlansContext'
 import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
-import { DesktopPreferences } from '../widgets/DesktopPreferences'
 import { ThemePreference } from '../widgets/ThemePreference'
 
 export interface SettingsModalProps {
@@ -38,25 +33,21 @@ export const SettingsModal = React.memo((props: SettingsModalProps) => {
   const { showBackButton } = props
 
   const { sizename } = useAppLayout()
-  const { freePlan, paidPlans } = usePlans()
 
   const dispatch = useDispatch()
   const appToken = useReduxState(selectors.appTokenSelector)
-  const username = useReduxState(selectors.currentGitHubUsernameSelector)
-  const userPlan = useReduxState(selectors.currentUserPlanSelector)
-  const isPlanExpired = useReduxState(selectors.isPlanExpiredSelector)
 
   return (
     <ModalColumn
       hideCloseButton={sizename <= '2-medium'}
       name="SETTINGS"
       right={
-        sizename <= '2-medium' && username ? (
+        sizename <= '2-medium' && '' ? (
           <Avatar
             backgroundColorLoading=""
             shape="circle"
             size={28 * scaleFactor}
-            username={username}
+            username={''}
           />
         ) : undefined
       }
@@ -64,86 +55,7 @@ export const SettingsModal = React.memo((props: SettingsModalProps) => {
       title="Preferences"
     >
       <>
-        {Platform.OS === 'web' &&
-          !(userPlan?.status === 'active' && !userPlan.interval) &&
-          !(userPlan?.id === 'free' && !paidPlans.length) && (
-            <View>
-              <SubHeader title="Current plan">
-                <Spacer flex={1} />
-
-                <ButtonLink
-                  href={`${constants.DEVHUB_LINKS.ACCOUNT_PAGE}?appToken=${appToken}`}
-                  openOnNewTab
-                  size={32 * scaleFactor}
-                >
-                  <View style={[sharedStyles.center, sharedStyles.horizontal]}>
-                    {/* <ThemedIcon
-                      color="foregroundColor"
-                      family="octicon"
-                      name="pencil"
-                    />
-                    <Spacer width={contentPadding / 2} /> */}
-                    <ThemedText color="foregroundColor">{`${
-                      userPlan
-                        ? userPlan.label || (userPlan.amount ? 'Paid' : 'Free')
-                        : 'None'
-                    }${
-                      isPlanExpired && paidPlans.length
-                        ? ' (expired)'
-                        : userPlan && userPlan.status === 'trialing'
-                        ? (userPlan.label || '').toLowerCase().includes('trial')
-                          ? ''
-                          : userPlan.amount
-                          ? ' (trial)'
-                          : ' trial'
-                        : !isPlanStatusValid(userPlan) &&
-                          userPlan &&
-                          userPlan.status
-                        ? ` (${userPlan.status})`
-                        : ''
-                    } ↗`}</ThemedText>
-                    {!!(
-                      (isPlanExpired &&
-                        !(freePlan && !freePlan.trialPeriodDays) &&
-                        paidPlans.length) ||
-                      (userPlan &&
-                        userPlan.status === 'active' &&
-                        userPlan.cancelAtPeriodEnd &&
-                        userPlan.cancelAt) ||
-                      (userPlan &&
-                        userPlan.status &&
-                        !isPlanStatusValid(userPlan))
-                    ) && (
-                      <>
-                        <Spacer width={contentPadding / 2} />
-                        <UnreadDot backgroundColor="red" borderColor={null} />
-                      </>
-                    )}
-                  </View>
-                </ButtonLink>
-              </SubHeader>
-            </View>
-          )}
-
-        <DesktopPreferences />
-
         <ThemePreference />
-
-        {/* <Spacer height={contentPadding * 2} />
-
-        <View>
-          <SubHeader title="Enterprise" />
-
-          <Button
-            key="setup-github-enterprise-button"
-            analyticsCategory="enterprise"
-            analyticsAction="setup"
-            analyticsLabel={username}
-            onPress={() => pushModal({ name: 'SETUP_GITHUB_ENTERPRISE' })}
-          >
-            Setup GitHub Enterprise
-          </Button>
-        </View> */}
 
         <Spacer height={contentPadding} />
 
@@ -153,7 +65,7 @@ export const SettingsModal = React.memo((props: SettingsModalProps) => {
 
             <Button
               analyticsLabel="rate_app"
-              onPress={() => openAppStore({ showReviewModal: true })}
+              onPress={() => {}}
               size={32 * scaleFactor}
             >
               <ThemedIcon
@@ -170,7 +82,7 @@ export const SettingsModal = React.memo((props: SettingsModalProps) => {
 
             <Button
               analyticsLabel="download_native_app"
-              onPress={() => openAppStore({ showReviewModal: false })}
+              onPress={() => {}}
               size={32 * scaleFactor}
             >
               <ThemedIcon
@@ -205,36 +117,6 @@ export const SettingsModal = React.memo((props: SettingsModalProps) => {
               >
                 Twitter
               </Link>
-
-              {/*
-              <ThemedText
-                color="foregroundColorMuted25"
-                style={{
-                  fontStyle: 'italic',
-                  paddingHorizontal: contentPadding / 2,
-                }}
-              >
-                |
-              </ThemedText>
-
-              <Link
-                analyticsCategory="preferences_link"
-                analyticsLabel="slack"
-                enableForegroundHover
-                href={constants.DEVHUB_LINKS.SLACK_INVITATION}
-                openOnNewTab
-                textProps={{
-                  color: 'foregroundColor',
-                  style: {
-                    fontSize: normalTextSize,
-                    lineHeight: normalTextSize * 1.5,
-                    textAlign: 'center',
-                  },
-                }}
-              >
-                Slack
-              </Link>
-              */}
 
               <ThemedText
                 color="foregroundColorMuted25"

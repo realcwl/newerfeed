@@ -85,25 +85,6 @@ export function DeepLinkProvider(props: DeepLinkProviderProps) {
           break
         }
 
-        case suffixMap.pricing: {
-          const { initialSelectedPlanId, highlightFeature } =
-            getQueryParams(querystring)
-
-          dispatch(
-            actions.pushModal({
-              name: 'PRICING',
-              params: { initialSelectedPlanId, highlightFeature },
-            }),
-          )
-          break
-        }
-
-        case suffixMap.subscribe: {
-          const { planId } = getQueryParams(querystring)
-          dispatch(actions.pushModal({ name: 'SUBSCRIBE', params: { planId } }))
-          break
-        }
-
         default: {
           console.error(`Unhandled deep link url: "${url}"`)
         }

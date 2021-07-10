@@ -1,4 +1,4 @@
-import { Column, getItemNodeIdOrId } from '@devhub/core'
+import { Column } from '@devhub/core'
 import React, { useCallback, useMemo, useRef } from 'react'
 import { StyleSheet, TouchableHighlightProps, View } from 'react-native'
 import { useDispatch } from 'react-redux'
@@ -29,20 +29,11 @@ export interface CardWithLinkProps {
   columnId: string
   isInsideSwipeable?: boolean
   nodeIdOrId: string
-  ownerIsKnown: boolean
-  repoIsKnown: boolean
   type: Column['type']
 }
 
 export const CardWithLink = React.memo((props: CardWithLinkProps) => {
-  const {
-    columnId,
-    isInsideSwipeable,
-    nodeIdOrId,
-    ownerIsKnown,
-    repoIsKnown,
-    type,
-  } = props
+  const { columnId, isInsideSwipeable, nodeIdOrId, type } = props
 
   const ref = useRef<any>(null)
   const focusIndicatorRef = useRef<View>(null)
@@ -50,8 +41,6 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
   const isHoveredRef = useRef(false)
 
   const dispatch = useDispatch()
-  const plan = useReduxState(selectors.currentUserPlanSelector)
-  // const { appViewMode } = useAppViewMode()
 
   const item = useItem(nodeIdOrId)
 
@@ -60,24 +49,20 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
       return {}
     }
 
-    const _cardProps = getCardPropsForItem(type, columnId, item, {
-      ownerIsKnown,
-      plan,
-      repoIsKnown,
-    })
+    const _cardProps = getCardPropsForItem(type, columnId)
 
     return {
       cardProps: _cardProps,
       CardComponent: (
         <BaseCard
-          key={`${type}-base-card-${getItemNodeIdOrId(item)!}`}
+          key={`${type}-base-card-`}
           {..._cardProps}
           // appViewMode={appViewMode}
           columnId={columnId}
         />
       ),
     }
-  }, [/* appViewMode, */ columnId, item, ownerIsKnown, plan, repoIsKnown])
+  }, [/* appViewMode, */ columnId, item])
 
   // const isReadRef = useDynamicRef(!!(cardProps && cardProps.isRead))
 
@@ -87,16 +72,9 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
 
       if (e && e.isDefaultPrevented()) return
 
-      dispatch(
-        actions.openItem({
-          columnType: type,
-          columnId,
-          itemNodeIdOrId: getItemNodeIdOrId(item)!,
-          link: undefined,
-        }),
-      )
+      console.log('CardWithLink on press')
     },
-    [type, columnId, getItemNodeIdOrId(item)!],
+    [type, columnId],
   )
 
   const updateStyles = useCallback(
@@ -148,7 +126,7 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
     [columnId],
   )
 
-  useIsItemFocused(columnId, getItemNodeIdOrId(item)!, handleFocusChange)
+  useIsItemFocused(columnId, '', handleFocusChange)
 
   useHover(
     ref,
@@ -163,13 +141,13 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
 
           emitter.emit('FOCUS_ON_COLUMN_ITEM', {
             columnId,
-            itemNodeIdOrId: getItemNodeIdOrId(item)!,
+            itemNodeIdOrId: '',
           })
         } else {
           updateStyles()
         }
       },
-      [columnId, getItemNodeIdOrId(item)!],
+      [columnId],
     ),
   )
 
@@ -195,22 +173,6 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
       enableForegroundHover={false}
       href={cardProps.link}
       onPress={onPress}
-      // onLongPress={
-      //   swipeableInfoRef
-      //     ? undefined
-      //     : e => {
-      //         if (!Platform.supportsTouch) return
-
-      //         e.preventDefault()
-
-      //         dispatch(
-      //           actions.saveItemsForLater({
-      //             itemNodeIdOrIds: [getItemNodeIdOrId(item)!],
-      //             save: !isSaved,
-      //           }),
-      //         )
-      //       }
-      // }
       openOnNewTab
       style={sharedStyles.relative}
       onFocus={() => {
@@ -221,7 +183,7 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
         if (!Platform.supportsTouch) {
           emitter.emit('FOCUS_ON_COLUMN_ITEM', {
             columnId,
-            itemNodeIdOrId: getItemNodeIdOrId(item)!,
+            itemNodeIdOrId: '',
           })
         }
       }}

@@ -2,21 +2,11 @@ import React from 'react'
 import { PixelRatio, View } from 'react-native'
 
 import {
-  getBaseUrlFromOtherUrl,
-  getGitHubURLForRepo,
-  getGitHubURLForUser,
-  getUserAvatarByAvatarURL,
-  getUserAvatarByEmail,
-  getUserAvatarByUsername,
-  getUsernameIsBot,
-} from '@devhub/core'
-import {
   avatarSize,
   mutedOpacity,
   radius,
   smallAvatarSize,
 } from '../../styles/variables'
-import { fixURL } from '../../utils/helpers/github/url'
 import {
   ThemedImageWithLoading,
   ThemedImageWithLoadingProps,
@@ -63,36 +53,15 @@ export function Avatar(props: AvatarProps) {
   } = props
 
   const finalSize = _size || (small ? smallAvatarSize : avatarSize)
-  const isBot = getUsernameIsBot(_username, {
-    considerProfileBotsAsBots: false,
-  })
+
   const username = (_username || '')
     .replace('[bot]', '')
     .replace('app/', '')
     .split('/')[0]
 
-  const avatarUrl = _avatarUrl
-    ? getUserAvatarByAvatarURL(
-        _avatarUrl,
-        { size: finalSize },
-        PixelRatio.getPixelSizeForLayoutSize,
-      )
-    : ''
+  const avatarUrl = ''
 
-  const uri =
-    avatarUrl ||
-    (username &&
-      getUserAvatarByUsername(
-        username,
-        { baseURL: getBaseUrlFromOtherUrl(linkURL), size: finalSize },
-        PixelRatio.getPixelSizeForLayoutSize,
-      )) ||
-    (email &&
-      getUserAvatarByEmail(
-        email,
-        { baseURL: getBaseUrlFromOtherUrl(linkURL), size: finalSize },
-        PixelRatio.getPixelSizeForLayoutSize,
-      ))
+  const uri = avatarUrl
 
   if (!uri) return null
 
@@ -101,15 +70,7 @@ export function Avatar(props: AvatarProps) {
       ? ''
       : _tooltip || (username && `@${username}`) || ''
 
-  const linkUri = disableLink
-    ? undefined
-    : linkURL && !isBot
-    ? fixURL(linkURL)
-    : username
-    ? repo
-      ? getGitHubURLForRepo(username, repo)
-      : getGitHubURLForUser(username, { isBot })
-    : undefined
+  const linkUri = undefined
 
   return (
     <ConditionalWrap

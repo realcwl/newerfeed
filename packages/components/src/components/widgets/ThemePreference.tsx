@@ -25,26 +25,11 @@ export const ThemePreference = React.memo(() => {
 
   const currentThemeId = useReduxState(selectors.themePairSelector).id
 
-  const preferredDarkTheme = useReduxState(
-    selectors.preferredDarkThemePairSelector,
-  )
-  const preferredLightTheme = useReduxState(
-    selectors.preferredLightThemePairSelector,
-  )
-
   const setTheme = useReduxAction(actions.setTheme)
   const setPreferrableTheme = useReduxAction(actions.setPreferrableTheme)
 
-  const preferredDarkThemeId = preferredDarkTheme && preferredDarkTheme.id
-  const preferredLightThemeId = preferredLightTheme && preferredLightTheme.id
-
   const renderThemeButton = (theme: Theme) => {
-    const selected =
-      currentThemeId === theme.id ||
-      (currentThemeId === 'auto' &&
-        (theme.isDark
-          ? theme.id === preferredDarkThemeId
-          : theme.id === preferredLightThemeId))
+    const selected = currentThemeId === theme.id
 
     return (
       <Checkbox
@@ -104,25 +89,6 @@ export const ThemePreference = React.memo(() => {
         </View>
 
         <Spacer height={contentPadding} />
-
-        <View
-          style={[
-            sharedStyles.horizontal,
-            sharedStyles.alignItemsCenter,
-            sharedStyles.justifyContentSpaceBetween,
-          ]}
-        >
-          <H3>Auto detect system preference</H3>
-          <Switch
-            analyticsLabel="auto_theme"
-            onValueChange={(enableAutoTheme) =>
-              setTheme({
-                id: enableAutoTheme ? 'auto' : lastThemeId.current,
-              })
-            }
-            value={currentThemeId === 'auto'}
-          />
-        </View>
       </View>
     </View>
   )

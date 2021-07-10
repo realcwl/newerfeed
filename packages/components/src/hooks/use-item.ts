@@ -1,10 +1,10 @@
-import { EnhancedItem } from '@devhub/core'
+import { NewsFeedData } from '@devhub/core'
 import { useCallback } from 'react'
 
 import * as selectors from '../redux/selectors'
 import { useReduxState } from './use-redux-state'
 
-export function useItem<T extends EnhancedItem>(
+export function useItem<T extends NewsFeedData>(
   nodeIdOrId: string,
 ): T | undefined {
   const dataItem = useReduxState(
@@ -13,7 +13,7 @@ export function useItem<T extends EnhancedItem>(
       [nodeIdOrId],
     ),
   )
-  if (!(dataItem && dataItem.item)) return undefined
+  if (!dataItem) return undefined
 
-  return dataItem.item as T
+  return dataItem as T
 }

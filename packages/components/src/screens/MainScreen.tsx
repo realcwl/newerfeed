@@ -1,9 +1,7 @@
 import _ from 'lodash'
-import qs from 'qs'
 import React, { useEffect, useMemo, useRef } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { useDispatch } from 'react-redux'
-import url from 'url'
 
 import { AppKeyboardShortcuts } from '../components/AppKeyboardShortcuts'
 import { AppBannerMessage } from '../components/banners/AppBannerMessage'

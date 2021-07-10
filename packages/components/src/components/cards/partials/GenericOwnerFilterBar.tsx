@@ -109,30 +109,8 @@ export const GenericOwnerFilterBar = React.memo(
       (item: OwnerItemT) => {
         vibrateHapticFeedback()
 
-        if (KeyboardKeyIsPressed.alt) {
-          _onItemPressRef.current(
-            item,
-            'set',
-            item.value === false
-              ? columnType === 'issue_or_pr'
-                ? true
-                : null
-              : false,
-          )
-          return
-        }
-
         if (KeyboardKeyIsPressed.meta || KeyboardKeyIsPressed.shift) {
           _onItemPressRef.current(item, 'set', item.value ? null : true)
-          return
-        }
-
-        if (item.value === false) {
-          _onItemPressRef.current(
-            item,
-            'set',
-            columnType === 'issue_or_pr' ? true : null,
-          )
           return
         }
 

@@ -13,7 +13,6 @@ export function getDefaultDevHubHeaders({
     DEVHUB_IS_DEV: __DEV__,
     DEVHUB_IS_LANDING: false,
     DEVHUB_PLATFORM_IS_ELECTRON: Platform.isElectron,
-    DEVHUB_PLATFORM_OS: Platform.OS,
     DEVHUB_PLATFORM_REAL_OS: Platform.realOS,
     DEVHUB_VERSION: constants.APP_VERSION,
   }

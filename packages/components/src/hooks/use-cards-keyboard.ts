@@ -1,42 +1,26 @@
-import {
-  Column,
-  EnhancedItem,
-  getDefaultPaginationPerPage,
-  isItemRead,
-  isItemSaved,
-} from '@devhub/core'
+import { Column, NewsFeedData } from '@devhub/core'
 import { RefObject, useCallback, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { getCardPropsForItem } from '../components/cards/BaseCard.shared'
 import { getCurrentFocusedColumnId } from '../components/context/ColumnFocusContext'
 import { emitter } from '../libs/emitter'
 import { OneList } from '../libs/one-list'
-import * as actions from '../redux/actions'
-import * as selectors from '../redux/selectors'
 import { useEmitter } from './use-emitter'
 import useKeyPressCallback from './use-key-press-callback'
 import useMultiKeyPressCallback from './use-multi-key-press-callback'
-import { useReduxState } from './use-redux-state'
 
-export function useCardsKeyboard<ItemT extends EnhancedItem>(
+export function useCardsKeyboard<ItemT extends NewsFeedData>(
   listRef: RefObject<typeof OneList>,
   {
     columnId,
     getItemByNodeIdOrId,
-    getOwnerIsKnownByItemOrNodeIdOrId,
     itemNodeIdOrIds,
-    repoIsKnown,
     type,
     visibleItemIndexesRef,
   }: {
     columnId: string
     getItemByNodeIdOrId: (nodeIdOrId: string) => ItemT | undefined
-    getOwnerIsKnownByItemOrNodeIdOrId: (
-      itemOrNodeIdOrId: string | ItemT | undefined,
-    ) => boolean
     itemNodeIdOrIds: string[]
-    repoIsKnown: boolean
     type: Column['type']
     visibleItemIndexesRef?: RefObject<{ from: number; to: number }> | undefined
   },
@@ -77,8 +61,6 @@ export function useCardsKeyboard<ItemT extends EnhancedItem>(
   }
 
   const dispatch = useDispatch()
-
-  const plan = useReduxState(selectors.currentUserPlanSelector)
 
   useEmitter(
     'FOCUS_ON_COLUMN',
@@ -254,28 +236,8 @@ export function useCardsKeyboard<ItemT extends EnhancedItem>(
 
       const selectedItem = getItemByNodeIdOrId(selectedItemNodeIdOrId)
       if (!selectedItem) return
-
-      dispatch(
-        actions.openItem({
-          columnType: type,
-          columnId,
-          itemNodeIdOrId: selectedItemNodeIdOrId,
-          link: getCardPropsForItem(type, columnId, selectedItem, {
-            ownerIsKnown: getOwnerIsKnownByItemOrNodeIdOrId(selectedItem),
-            plan,
-            repoIsKnown,
-          }).link,
-        }),
-      )
-    }, [
-      columnId,
-      getItemByNodeIdOrId,
-      getOwnerIsKnownByItemOrNodeIdOrId,
-      itemNodeIdOrIds,
-      plan,
-      repoIsKnown,
-      type,
-    ]),
+      console.log('on input enter')
+    }, [columnId, getItemByNodeIdOrId, itemNodeIdOrIds, type]),
   )
 
   useKeyPressCallback(
@@ -293,12 +255,7 @@ export function useCardsKeyboard<ItemT extends EnhancedItem>(
       const selectedItem = getItemByNodeIdOrId(selectedItemNodeIdOrId)
       if (!selectedItem) return
 
-      dispatch(
-        actions.saveItemsForLater({
-          itemNodeIdOrIds: [selectedItemNodeIdOrIdRef.current!],
-          save: !isItemSaved(selectedItem),
-        }),
-      )
+      console.log('pressed keyboard S')
     }, [getItemByNodeIdOrId, itemNodeIdOrIds]),
   )
 
@@ -317,13 +274,7 @@ export function useCardsKeyboard<ItemT extends EnhancedItem>(
       const selectedItem = getItemByNodeIdOrId(selectedItemNodeIdOrId)
       if (!selectedItem) return
 
-      dispatch(
-        actions.markItemsAsReadOrUnread({
-          type,
-          itemNodeIdOrIds: [selectedItemNodeIdOrIdRef.current!],
-          unread: isItemRead(selectedItem),
-        }),
-      )
+      console.log('pressed keyboard R')
     }, [getItemByNodeIdOrId, itemNodeIdOrIds]),
   )
 
@@ -332,53 +283,8 @@ export function useCardsKeyboard<ItemT extends EnhancedItem>(
     useCallback(() => {
       if (!isColumnFocusedRef.current) return
 
-      const hasOneUnreadItem = itemNodeIdOrIds.some((nodeIdOrId) => {
-        const item = getItemByNodeIdOrId(nodeIdOrId)
-        if (!item) return
-
-        return !isItemRead(item)
-      })
-
-      dispatch(
-        actions.markItemsAsReadOrUnread({
-          type,
-          itemNodeIdOrIds,
-          unread: !hasOneUnreadItem,
-        }),
-      )
+      console.log('item read callback')
     }, [getItemByNodeIdOrId, itemNodeIdOrIds]),
-  )
-
-  useMultiKeyPressCallback(
-    ['Shift', 'd'],
-    useCallback(() => {
-      if (!isColumnFocusedRef.current) return
-
-      const hasItemsToMarkAsDone = itemNodeIdOrIds.some((nodeIdOrId) => {
-        const item = getItemByNodeIdOrId(nodeIdOrId)
-        return !!(item && !isItemSaved(item)) /* && isItemRead(item) */
-      })
-
-      dispatch(
-        actions.setColumnClearedAtFilter({
-          columnId,
-          clearedAt: hasItemsToMarkAsDone ? new Date().toISOString() : null,
-        }),
-      )
-
-      if (!hasItemsToMarkAsDone) {
-        dispatch(
-          actions.fetchColumnSubscriptionRequest({
-            columnId,
-            params: {
-              page: 1,
-              perPage: getDefaultPaginationPerPage(type),
-            },
-            replaceAllItems: false,
-          }),
-        )
-      }
-    }, [getItemByNodeIdOrId, itemNodeIdOrIds, type]),
   )
 
   useKeyPressCallback(

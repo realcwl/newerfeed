@@ -103,13 +103,7 @@ const styles = StyleSheet.create({
 export const LoginScreen = React.memo(() => {
   const dimensions = useDimensions('width')
 
-  const {
-    loginWithGitHub,
-    loginWithGitHubPersonalAccessToken,
-    isLoggingIn,
-    fullAccessRef,
-    isExecutingOAuth,
-  } = useLoginHelpers()
+  const { isLoggingIn } = useLoginHelpers()
 
   useEffect(() => {
     analytics.trackScreenView('LOGIN_SCREEN')
@@ -171,12 +165,10 @@ export const LoginScreen = React.memo(() => {
               return (
                 <GitHubLoginButton
                   analyticsLabel="github_login_public"
-                  disabled={isLoggingIn || isExecutingOAuth}
-                  loading={
-                    !fullAccessRef.current && (isLoggingIn || isExecutingOAuth)
-                  }
+                  disabled={isLoggingIn}
+                  loading={isLoggingIn}
                   onPress={() => {
-                    void loginWithGitHub()
+                    console.log('pressed github login button')
                   }}
                   // rightIcon={{ family: 'octicon', name: 'globe' }}
                   style={styles.button}
@@ -191,85 +183,6 @@ export const LoginScreen = React.memo(() => {
                 />
               )
             })()}
-
-          {SHOW_GITHUB_FULL_ACCESS_LOGIN_BUTTON && (
-            <>
-              <Spacer height={contentPadding / 2} />
-
-              <GitHubLoginButton
-                analyticsLabel="github_login_private"
-                disabled={isLoggingIn || isExecutingOAuth}
-                loading={
-                  !!(fullAccessRef.current && (isLoggingIn || isExecutingOAuth))
-                }
-                onPress={() => {
-                  void loginWithGitHub({ fullAccess: true })
-                }}
-                // rightIcon={{ family: 'octicon', name: 'lock' }}
-                style={styles.button}
-                subtitle="Full access"
-                textProps={{
-                  style: {
-                    textAlign: hasMultipleLoginButtons ? 'left' : 'center',
-                  },
-                }}
-                title="Sign in with GitHub"
-                type="neutral"
-              />
-            </>
-          )}
-
-          {SHOW_GITHUB_PERSONAL_TOKEN_LOGIN_BUTTON && (
-            <>
-              <Spacer height={contentPadding / 2} />
-
-              <GitHubLoginButton
-                analyticsLabel="github_login_personal"
-                disabled={isLoggingIn || isExecutingOAuth}
-                loading={
-                  fullAccessRef.current && (isLoggingIn || isExecutingOAuth)
-                }
-                onPress={() => {
-                  fullAccessRef.current = true
-                  void loginWithGitHubPersonalAccessToken()
-                }}
-                // rightIcon={{ family: 'octicon', name: 'key' }}
-                style={styles.button}
-                subtitle="Personal token"
-                title="Sign in with GitHub"
-                textProps={{
-                  style: {
-                    textAlign: hasMultipleLoginButtons ? 'left' : 'center',
-                  },
-                }}
-                type={Platform.isMacOS ? 'primary' : 'neutral'}
-              />
-            </>
-          )}
-
-          {(SHOW_GITHUB_FULL_ACCESS_LOGIN_BUTTON ||
-            SHOW_GITHUB_PERSONAL_TOKEN_LOGIN_BUTTON) && (
-            <>
-              <Spacer height={contentPadding} />
-
-              <ThemedText
-                color="foregroundColorMuted65"
-                style={[
-                  sharedStyles.textCenter,
-                  { fontSize: smallerTextSize, fontStyle: 'italic' },
-                ]}
-              >
-                {`"Granular permissions" is recommended, but feel free to use the ${[
-                  SHOW_GITHUB_FULL_ACCESS_LOGIN_BUTTON && '"Full access"',
-                  SHOW_GITHUB_PERSONAL_TOKEN_LOGIN_BUTTON && '"Personal token"',
-                ]
-                  .filter(Boolean)
-                  .join(
-                    ' or ',
-                  )} option to easily get access to all private repositories you have access.`}
-              </ThemedText>
-            </>
-          )}
         </View>
 
         <Spacer height={contentPadding} />

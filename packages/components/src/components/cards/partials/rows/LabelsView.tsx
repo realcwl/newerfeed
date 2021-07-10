@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useRef } from 'react'
 import { ScrollView, StyleSheet, ViewProps } from 'react-native'
 
-import { GitHubLabel, Theme, ThemeColors } from '@devhub/core'
+import { Theme, ThemeColors } from '@devhub/core'
 import { sharedStyles } from '../../../../styles/shared'
 import { contentPadding } from '../../../../styles/variables'
 import { fixColorHexWithoutHash } from '../../../../utils/helpers/colors'
@@ -18,8 +18,8 @@ export interface LabelsViewProps
   fragment?: boolean
   labels: {
     key?: string
-    name: GitHubLabel['name']
-    color?: GitHubLabel['color']
+    name: string
+    color?: string
   }[]
   startScrollAtEnd?: boolean
   style?: ViewProps['style']

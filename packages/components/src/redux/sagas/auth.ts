@@ -1,7 +1,6 @@
 import { REHYDRATE } from 'redux-persist'
 import { all, fork, put, select, take, takeLatest } from 'typed-redux-saga'
 
-import * as github from '../../libs/github'
 import { clearOAuthQueryParams } from '../../utils/helpers/auth'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
@@ -32,7 +31,6 @@ function* onLoginFailure(
 ) {}
 
 function onLogout() {
-  github.clearOctokitInstances()
   clearOAuthQueryParams()
 }
 
