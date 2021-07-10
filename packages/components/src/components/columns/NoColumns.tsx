@@ -16,7 +16,7 @@ export function NoColumns(props: NoColumnsProps) {
       <GenericMessageWithButtonView
         buttonView={undefined}
         emoji="wave"
-        title="Welcome to DevHub :)"
+        title="Welcome to NewsFeed :)"
         subtitle={'Add a column by tapping the "+" button'}
       />
     </Column>

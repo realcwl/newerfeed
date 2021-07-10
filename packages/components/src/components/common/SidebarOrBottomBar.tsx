@@ -332,7 +332,7 @@ export const SidebarOrBottomBar = React.memo(
                 : undefined
               : dispatch(actions.replaceModal({ name: 'SETTINGS' }))
           }
-          showUnreadIndicator={true}
+          showUnreadIndicator={false}
           unreadIndicatorColor={'red'}
           selected={isModalOpen('SETTINGS')}
           title="Preferences"

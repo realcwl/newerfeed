@@ -34,6 +34,11 @@ function renderModal(modal: ModalPayloadWithIndex) {
         <AddColumnModal showBackButton={modal.index >= 1} {...modal.params} />
       )
 
+    case 'SETTINGS':
+      return (
+        <SettingsModal showBackButton={modal.index >= 1} {...modal.params} />
+      )
+
     case 'ADD_COLUMN_DETAILS':
       return (
         <AddColumnDetailsModal
