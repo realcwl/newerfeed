@@ -1,4 +1,4 @@
-import { guid, ThemeColors } from '@devhub/core'
+import { ColumnCreation, guid, ThemeColors } from '@devhub/core'
 import { FormikErrors, useFormik } from 'formik'
 import _ from 'lodash'
 import React, { Fragment, useEffect, useRef } from 'react'
@@ -79,12 +79,29 @@ export const AddColumnDetailsModal = React.memo(
     const formikProps = useFormik({
       initialValues: formInitialValues,
       onSubmit(formValues, formikActions) {
-        formikActions.setSubmitting(false)
+        // formikActions.setSubmitting(false)
 
         Keyboard.dismiss()
         dispatch(actions.closeAllModals())
 
-        formikActions.setSubmitting(false)
+        // Create a empty column.
+        const columnCreation: ColumnCreation = {
+          title: 'DUMMY_COLUMN_NAME',
+          type: 'COLUMN_TYPE_NEWS_FEED',
+          id: 'dummy_column_id',
+          itemListIds: [],
+          firstItemId: '',
+          lastItemId: '',
+          sources: [
+            {
+              source: 'DUMMY_SOURCE',
+              subtypes: ['DUMMY_SUBTYPE'],
+            },
+          ],
+        }
+        dispatch(actions.addColumn(columnCreation))
+
+        // formikActions.setSubmitting(false)
       },
       validateOnBlur: true,
       validateOnChange: true,
