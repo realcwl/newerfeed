@@ -20,10 +20,6 @@ export function ColumnsRenderer() {
     (state) => !!selectors.columnIdsSelector(state).length,
   )
 
-  // if (appViewMode === 'single-column' && !focusedColumnId && columnIds.length) {
-  //   return <NoFocusedColumn />
-  // }
-
   const ColumnsComponent = useMemo(() => <Columns key="columns" />, [])
 
   const FiltersComponent = useMemo(

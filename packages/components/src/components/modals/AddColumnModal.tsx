@@ -1,4 +1,8 @@
-import { constants } from '@devhub/core'
+import {
+  NewsFeedColumnType,
+  constants,
+  AddColumnDetailsPayload,
+} from '@devhub/core'
 import { rgba } from 'polished'
 import React, { useCallback, useLayoutEffect, useRef } from 'react'
 import { View } from 'react-native'
@@ -35,16 +39,28 @@ export interface AddColumnModalProps {
 
 const columnTypes: {
   title: string
+  type: NewsFeedColumnType
   icon: IconProp
   items: {
-    payload: {
-      title: string
-      icon: string
-    }
+    payload: AddColumnDetailsPayload
   }[]
   soon?: boolean
   soonLink?: string
-}[] = []
+}[] = [
+  {
+    title: 'News',
+    type: 'COLUMN_TYPE_NEWS_FEED',
+    icon: { family: 'octicon', name: 'bell' },
+    items: [
+      {
+        payload: {
+          icon: { family: 'octicon', name: 'bell' },
+          title: 'News',
+        },
+      },
+    ],
+  },
+]
 
 function AddColumnModalItem({
   disabled,

@@ -1,7 +1,8 @@
 import _ from 'lodash'
 
-import { Column } from '@devhub/core'
+import { Column, normalizeColumns } from '@devhub/core'
 import { Reducer } from '../types'
+import immer from 'immer'
 
 export interface State {
   // All column ids, each id is a hex string. The rendering order will be the
@@ -29,7 +30,34 @@ export const columnsReducer: Reducer<State> = (
   action,
 ) => {
   switch (action.type) {
-    // TODO(chenweilunster): Implement Columns Reducer.
+    case 'ADD_COLUMN':
+      return immer(state, (draft) => {
+        // Initialize state byId it's not already initialized.
+        draft.byId = draft.byId || {}
+
+        // Get normalized state expression for the action payload, which
+        // basically converts from the action payload to actual state.
+        const normalized = normalizeColumns([{ ...action.payload }])
+
+        // Must only contain a single column id, and that ID must be unique.
+        if (!(normalized.allIds.length === 1)) return
+        if (draft.allIds.includes(normalized.allIds[0])) return
+
+        draft.allIds.push(normalized.allIds[0])
+        _.merge(draft.byId, normalized.byId)
+        draft.updatedAt = normalized.updatedAt
+      })
+    case 'DELETE_COLUMN':
+      return immer(state, (draft) => {
+        if (draft.allIds)
+          draft.allIds = draft.allIds.filter(
+            (id) => id !== action.payload.columnId,
+          )
+
+        if (draft.byId) delete draft.byId[action.payload.columnId]
+
+        draft.updatedAt = new Date().toISOString()
+      })
     default:
       return state
   }
