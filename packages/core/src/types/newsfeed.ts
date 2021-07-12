@@ -9,11 +9,7 @@ import { ThemeColors } from './themes'
 // | TrendingSearchColumn;
 export type Column = NewsFeedColumn
 
-<<<<<<< HEAD
 // Newsfeed column type.
-=======
-// Newsfeed column. There might be mu
->>>>>>> 653e03c1607a177071ecd6d29a2047467e7471ec
 export type NewsFeedColumnType = 'COLUMN_TYPE_NEWS_FEED'
 
 // Each column extends the BaseColumn, where some common fields are defined.

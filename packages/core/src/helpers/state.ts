@@ -17,14 +17,6 @@ export function normalizeColumns(
       draft.id = id
       draft.createdAt = column.createdAt || new Date().toISOString()
       draft.updatedAt = column.updatedAt || new Date().toISOString()
-<<<<<<< HEAD
-=======
-      draft.type = column.type
-      draft.itemListIds = column.itemListIds
-      draft.sources = column.sources
-      draft.firstItemId = column.firstItemId
-      draft.lastItemId = column.lastItemId
->>>>>>> 653e03c1607a177071ecd6d29a2047467e7471ec
     }) as Column
 
     return id
