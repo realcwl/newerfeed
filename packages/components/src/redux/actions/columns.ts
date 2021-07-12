@@ -1,3 +1,4 @@
+import { ColumnCreation } from '@devhub/core'
 import { EmitterTypes } from '../../libs/emitter'
 import { createAction } from '../helpers'
 
@@ -22,6 +23,10 @@ export function moveColumn(
   } & Omit<EmitterTypes['FOCUS_ON_COLUMN'], 'focusOnVisibleItem'>,
 ) {
   return createAction('MOVE_COLUMN', payload)
+}
+
+export function addColumn(payload: ColumnCreation) {
+  return createAction('ADD_COLUMN', payload)
 }
 
 export function clearColumnFilters(payload: { columnId: string }) {

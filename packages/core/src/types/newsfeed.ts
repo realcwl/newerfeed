@@ -9,13 +9,13 @@ import { ThemeColors } from './themes'
 // | TrendingSearchColumn;
 export type Column = NewsFeedColumn
 
-// Newsfeed column.
-export type COLUMN_TYPE_NEWS_FEED = 'COLUMN_TYPE_NEWS_FEED'
+// Newsfeed column type.
+export type NewsFeedColumnType = 'COLUMN_TYPE_NEWS_FEED'
 
 // Each column extends the BaseColumn, where some common fields are defined.
 export interface NewsFeedColumn extends BaseColumn {
   // Constant defined in another place.
-  type: COLUMN_TYPE_NEWS_FEED
+  type: NewsFeedColumnType
 
   // itemListIds is a list containing all Newsfeed data that are going to be
   // rendered inside this column. Only data ids are stored, the actual data
@@ -30,7 +30,7 @@ export interface NewsFeedColumn extends BaseColumn {
 
   // Each news column must also have multiple News Sources. Each source is
   // comprised of main type and subtype. E.g. (Weibo, <user_id>).
-  sources: NewsFeedColumnSources
+  sources: NewsFeedColumnSource[]
 
   // Each news column can have a data filter composed of a logical expression.
   // This is stored in the column so that it can pull new data with those
@@ -43,11 +43,6 @@ export interface NewsFeedColumn extends BaseColumn {
   // that is used to quickly filter column data to let user find useful
   // information.
   filters?: ColumnFilter
-}
-
-export interface NewsFeedColumnSources {
-  // A list of source that forms this column.
-  sources: NewsFeedColumnSource[]
 }
 
 export interface NewsFeedColumnSource {
@@ -238,3 +233,28 @@ export interface GenericIconProp {
   name: string
   color?: keyof ThemeColors
 }
+
+export interface AddColumnDetailsPayload {
+  // Title of the sub option.
+  title: string
+
+  // Identifies a single icon for the column details.
+  icon: GenericIconProp
+}
+
+// Identifies a single column creation activity. For not it only extends
+// NewsFeedColumn but in the future there can be multiple column types.
+export type GenericColumnCreation<ColumnType extends NewsFeedColumn> = Omit<
+  ColumnType,
+  'createdAt' | 'updatedAt'
+> & {
+  createdAt?: string
+  updatedAt?: string
+}
+
+// Identifies a column creation activity for a news feed column.
+export type NewsFeedColumnCreation = GenericColumnCreation<NewsFeedColumn>
+
+// Identifies a Column Creation, in the future there can be multiple Column
+// creation types.
+export type ColumnCreation = NewsFeedColumnCreation

@@ -15,6 +15,7 @@ export function memoizeMultipleArgs<FN extends (...args: any[]) => any>(
   return _.memoize(fn, (...args) => JSON.stringify(args))
 }
 
+// Randomly generate a ID, which could be assigned to ColumnId or DataId
 export function guid() {
   const str4 = () =>
     (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1) // eslint-disable-line
