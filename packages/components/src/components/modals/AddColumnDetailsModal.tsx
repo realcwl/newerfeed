@@ -99,7 +99,6 @@ export const AddColumnDetailsModal = React.memo(
             },
           ],
         }
-        dispatch(actions.addColumn(columnCreation))
 
         // formikActions.setSubmitting(false)
       },
