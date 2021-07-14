@@ -16,6 +16,7 @@ import * as actions from '../../redux/actions'
 import * as selectors from '../../redux/selectors'
 import { sharedStyles } from '../../styles/shared'
 import { contentPadding, scaleFactor } from '../../styles/variables'
+import { mapSourceIdToName } from '../../utils/naming'
 import { ModalColumn } from '../columns/ModalColumn'
 import { AccordionView } from '../common/AccordionView'
 import { Button } from '../common/Button'
@@ -64,6 +65,13 @@ export interface AddColumnDetailsModalProps {
 export const AddColumnDetailsModal = React.memo(
   (props: AddColumnDetailsModalProps) => {
     const { showBackButton } = props
+    const idToNameMap = useReduxState(selectors.idToNameMapSelector)
+    const availableNewsFeedSources = useReduxState(
+      selectors.availableNewsFeedSourcesSelector,
+    )
+
+    console.log(idToNameMap)
+    console.log(availableNewsFeedSources)
 
     const dialogRef = useRef<DialogProviderState>()
     const dispatch = useDispatch()
@@ -162,7 +170,7 @@ export const AddColumnDetailsModal = React.memo(
           >
             <View>
               <View style={[sharedStyles.flex, sharedStyles.horizontal]}>
-                <H3>{source.source}</H3>
+                <H3>{mapSourceIdToName(source.source, idToNameMap)}</H3>
                 <Spacer flex={1} />
                 <ThemedIcon
                   color="foregroundColorMuted65"
@@ -182,24 +190,12 @@ export const AddColumnDetailsModal = React.memo(
       )
     }
 
-    // TODO(chenweilunster): This should be fetching from redux store instead
-    // of hard coded here. The Redux state could have some default values.
-    function getSources(): NewsFeedColumnSource[] {
-      return [
-        {
-          source: 'WEIBO',
-          subtypes: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-        },
-        { source: 'CAIXIN', subtypes: ['ABC', 'BCD', 'CDE'] },
-      ]
-    }
-
     function renderContent() {
       return (
         <View style={{ paddingHorizontal: contentPadding }}>
           {
             // TODO(chenweilunster): We should provide something here.
-            getSources().map((formItem, formItemIndex) => {
+            availableNewsFeedSources.map((formItem, formItemIndex) => {
               const content = renderSingleSourceOptions(formItem)
 
               if (!content) {

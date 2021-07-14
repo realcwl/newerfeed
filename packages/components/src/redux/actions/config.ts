@@ -1,6 +1,6 @@
 import { ColorSchemeName } from 'react-native'
 
-import { ThemePair } from '@devhub/core'
+import { NewsFeedColumnSource, ThemePair } from '@devhub/core'
 import { createAction } from '../helpers'
 
 export function setTheme(payload: {
@@ -8,6 +8,10 @@ export function setTheme(payload: {
   color?: ThemePair['color']
 }) {
   return createAction('SET_THEME', payload)
+}
+
+export function setAvailableNewsFeedSources(payload: NewsFeedColumnSource[]) {
+  return createAction('SET_AVAILABLE_NEWS_FEED_SOURCES', payload)
 }
 
 export function setPreferrableTheme(payload: {
