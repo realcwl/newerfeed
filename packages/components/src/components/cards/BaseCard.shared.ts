@@ -1,11 +1,4 @@
-import {
-  Column,
-  constants,
-  ItemPushNotification,
-  stripMarkdown,
-  ThemeColors,
-  trimNewLinesAndSpaces,
-} from '@devhub/core'
+import { Column, constants } from '@devhub/core'
 import { PixelRatio } from 'react-native'
 
 import { Platform } from '../../libs/platform'
