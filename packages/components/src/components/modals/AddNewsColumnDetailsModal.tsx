@@ -148,6 +148,17 @@ export const AddColumnDetailsModal = React.memo(
       )
     }
 
+    // Show the current selection status. e.g. "Twitter (1/10)""
+    function getNumberOfSelectionLabel(
+      selected: string[],
+      source: NewsFeedColumnSource,
+    ) {
+      if (selected.length === 0) {
+        return ''
+      }
+      return ` (${selected.length}/${source.subtypes.length})`
+    }
+
     // Renders Source and Sub sources. For example this could be Weibo with a
     // list of users.
     function renderSingleSourceOptions(
@@ -170,7 +181,13 @@ export const AddColumnDetailsModal = React.memo(
           >
             <View>
               <View style={[sharedStyles.flex, sharedStyles.horizontal]}>
-                <H3>{mapSourceIdToName(source.source, idToNameMap)}</H3>
+                <H3>
+                  {mapSourceIdToName(source.source, idToNameMap) +
+                    getNumberOfSelectionLabel(
+                      formikProps.values[source.source],
+                      source,
+                    )}
+                </H3>
                 <Spacer flex={1} />
                 <ThemedIcon
                   color="foregroundColorMuted65"
