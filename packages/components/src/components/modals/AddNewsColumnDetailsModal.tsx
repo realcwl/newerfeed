@@ -108,8 +108,16 @@ export const AddColumnDetailsModal = React.memo(
       validateOnBlur: true,
       validateOnChange: true,
       validate(values) {
-        const errors: FormikErrors<typeof formInitialValues> = {}
-        return errors
+        // We can't simply iterate over this array and have to define key type
+        // first because of:
+        // https://effectivetypescript.com/2020/05/26/iterate-objects/
+        let key: keyof typeof values
+        for (key in values) {
+          if (values[key].length !== 0) {
+            return {}
+          }
+        }
+        return { err: 'no source selected' }
       },
     })
 
