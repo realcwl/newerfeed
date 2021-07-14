@@ -182,7 +182,7 @@ export const AddColumnDetailsModal = React.memo(
       )
     }
 
-    // TODO(chenweilunster): This should be fetching from redux settings instead
+    // TODO(chenweilunster): This should be fetching from redux store instead
     // of hard coded here. The Redux state could have some default values.
     function getSources(): NewsFeedColumnSource[] {
       return [
