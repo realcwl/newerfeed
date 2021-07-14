@@ -1,5 +1,6 @@
 import {
   ColumnCreation,
+  guid,
   NewsFeedColumnSource,
   NewsFeedSourceType,
 } from '@devhub/core'
@@ -89,16 +90,11 @@ export const AddColumnDetailsModal = React.memo(
         const columnCreation: ColumnCreation = {
           title: 'DUMMY_COLUMN_NAME',
           type: 'COLUMN_TYPE_NEWS_FEED',
-          id: 'dummy_column_id',
+          id: guid(),
           itemListIds: [],
           firstItemId: '',
           lastItemId: '',
-          sources: [
-            {
-              source: 'WEIBO',
-              subtypes: ['DUMMY_SUBTYPE'],
-            },
-          ],
+          sources: getColumnSourcesFromFormValues(formValues),
         }
         console.log(formikProps.values)
         dispatch(actions.addColumn(columnCreation))
@@ -160,11 +156,26 @@ export const AddColumnDetailsModal = React.memo(
     function getNumberOfSelectionLabel(
       selected: string[],
       source: NewsFeedColumnSource,
-    ) {
+    ): string {
       if (selected.length === 0) {
         return ''
       }
       return ` (${selected.length}/${source.subtypes.length})`
+    }
+
+    // When submitting the form, extract sources from the formValues.
+    function getColumnSourcesFromFormValues(
+      formValues: typeof formInitialValues,
+    ): NewsFeedColumnSource[] {
+      let key: keyof typeof formValues
+      const sources: NewsFeedColumnSource[] = []
+      for (key in formValues) {
+        sources.push({
+          source: key,
+          subtypes: formValues[key],
+        })
+      }
+      return sources
     }
 
     // Renders Source and Sub sources. For example this could be Weibo with a
@@ -218,33 +229,30 @@ export const AddColumnDetailsModal = React.memo(
     function renderContent() {
       return (
         <View style={{ paddingHorizontal: contentPadding }}>
-          {
-            // TODO(chenweilunster): We should provide something here.
-            availableNewsFeedSources.map((formItem, formItemIndex) => {
-              const content = renderSingleSourceOptions(formItem)
+          {availableNewsFeedSources.map((formItem, formItemIndex) => {
+            const content = renderSingleSourceOptions(formItem)
 
-              if (!content) {
-                if (__DEV__) {
-                  // eslint-disable-next-line no-console
-                  console.warn(
-                    `[AddColumnDetailsModal] No form defined for "${formItem}"`,
-                  )
-                }
-                return null
+            if (!content) {
+              if (__DEV__) {
+                // eslint-disable-next-line no-console
+                console.warn(
+                  `[AddColumnDetailsModal] No form defined for "${formItem}"`,
+                )
               }
+              return null
+            }
 
-              return (
-                <Fragment
-                  key={`add-column-details-modal-formik-item-${formItem}-${formItemIndex}`}
-                >
-                  {content}
-                  <Spacer height={contentPadding} />
-                  <Separator horizontal />
-                  <Spacer height={contentPadding} />
-                </Fragment>
-              )
-            })
-          }
+            return (
+              <Fragment
+                key={`add-column-details-modal-formik-item-${formItem}-${formItemIndex}`}
+              >
+                {content}
+                <Spacer height={contentPadding} />
+                <Separator horizontal />
+                <Spacer height={contentPadding} />
+              </Fragment>
+            )
+          })}
         </View>
       )
     }
