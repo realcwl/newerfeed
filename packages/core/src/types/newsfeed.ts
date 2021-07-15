@@ -161,7 +161,12 @@ export type ModalPayload =
     }
   | {
       name: 'ADD_COLUMN_DETAILS'
-      params?: undefined
+      params?: {
+        // If columnId is provided, it means we're modifying existing column's
+        // attribute. In this case, the existing settings should be rendered by
+        // default.
+        columnId: string
+      }
     }
   | {
       name: 'ADVANCED_SETTINGS'

@@ -39,10 +39,17 @@ export const columnsReducer: Reducer<State> = (
         // basically converts from the action payload to actual state.
         const normalized = normalizeColumns([{ ...action.payload }])
 
-        // Must only contain a single column id, and that ID must be unique.
+        // Must only contain a single column id.
         if (!(normalized.allIds.length === 1)) return
-        if (draft.allIds.includes(normalized.allIds[0])) return
 
+        // Is id exists, this is an attribute modification and we should replace
+        // the value with new payload and return.
+        if (draft.allIds.includes(normalized.allIds[0])) {
+          draft.byId[normalized.allIds[0]] =
+            normalized.byId[normalized.allIds[0]]
+          draft.updatedAt = normalized.updatedAt
+          return
+        }
         draft.allIds.push(normalized.allIds[0])
         _.merge(draft.byId, normalized.byId)
         draft.updatedAt = normalized.updatedAt

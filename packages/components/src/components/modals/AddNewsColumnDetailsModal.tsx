@@ -1,9 +1,14 @@
-import { ColumnCreation, guid, NewsFeedColumnSource } from '@devhub/core'
+import {
+  ColumnCreation,
+  guid,
+  NewsFeedColumn,
+  NewsFeedColumnSource,
+} from '@devhub/core'
 import { FormikErrors, useFormik } from 'formik'
 import _ from 'lodash'
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { Keyboard, View } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useStore } from 'react-redux'
 import * as Yup from 'yup'
 
 import { useReduxState } from '../../hooks/use-redux-state'
@@ -41,21 +46,53 @@ export interface AddColumnDetailsModalProps {
 export const AddColumnDetailsModal = React.memo(
   (props: AddColumnDetailsModalProps) => {
     const { showBackButton, columnId } = props
+    const store = useStore()
     const idToNameMap = useReduxState(selectors.idToNameMapSelector)
     const availableNewsFeedSources = useReduxState(
       selectors.availableNewsFeedSourcesSelector,
     )
+    // Get all main sources.
+    const allSources = availableNewsFeedSources.map((source) => source.source)
+
+    const newsFeedColumnAttributes = selectors.columnSelector(
+      store.getState(),
+      columnId ? columnId : '',
+    )
+
+    function getFormInitialValues(
+      columnId: string | undefined,
+    ): Record<string, any> {
+      const res: Record<string, any> = {
+        name: '',
+      }
+      for (var source of allSources) {
+        res[source] = []
+      }
+
+      // If no column id is provided, just populate with default value.
+      if (!columnId) return res
+
+      // else.. it must be an existing column and thus we need to pre-populate
+      // form values with existing data.
+
+      if (!newsFeedColumnAttributes) {
+        console.warn('Edit existing column, but attribute is undefined')
+        return res
+      }
+
+      for (var columnSource of newsFeedColumnAttributes.sources) {
+        res[columnSource.source] = columnSource.subtypes
+      }
+      return {
+        ...res,
+        name: newsFeedColumnAttributes.title,
+      }
+    }
 
     // formIntialValues should be empty during the initial column creation, and
     // populated with the column attribute if we're modifying an existing one.
-    const formInitialValues: Record<string, any> = {
-      name: '',
-      WEIBO: [],
-      CAIXIN: [],
-    }
-
-    // Get all main sources.
-    const allSources = availableNewsFeedSources.map((source) => source.source)
+    const formInitialValues: Record<string, any> =
+      getFormInitialValues(columnId)
 
     const dialogRef = useRef<DialogProviderState>()
     const dispatch = useDispatch()
@@ -73,7 +110,7 @@ export const AddColumnDetailsModal = React.memo(
         const columnCreation: ColumnCreation = {
           title: formValues['name'],
           type: 'COLUMN_TYPE_NEWS_FEED',
-          id: guid(),
+          id: columnId ? columnId : guid(),
           itemListIds: [],
           firstItemId: '',
           lastItemId: '',
@@ -322,7 +359,7 @@ export const AddColumnDetailsModal = React.memo(
       <ModalColumn
         name="ADD_COLUMN_DETAILS"
         showBackButton={showBackButton}
-        title="Add News Column"
+        title={columnId ? 'Edit News Column Attribute' : 'Add News Column'}
       >
         <DialogConsumer>
           {(Dialog) => {
@@ -348,11 +385,11 @@ export const AddColumnDetailsModal = React.memo(
 
                 <View style={sharedStyles.paddingHorizontal}>
                   <Button
-                    analyticsLabel="add_column"
+                    analyticsLabel="add_or_set_column"
                     disabled={!formikProps.isValid || formikProps.isSubmitting}
                     onPress={formikProps.submitForm}
                   >
-                    Add Column
+                    {columnId ? 'Save Column Attribute' : 'Add Column'}
                   </Button>
                 </View>
 
