@@ -4,7 +4,6 @@ import { Image, ScrollView, StyleSheet, View } from 'react-native'
 import { constants } from '@devhub/core'
 import logo from '@devhub/components/assets/logo_circle.png'
 
-import { getAppVersionLabel } from '../components/common/AppVersion'
 import { FullHeightScrollView } from '../components/common/FullHeightScrollView'
 import { GitHubLoginButton } from '../components/common/GitHubLoginButton'
 import { Link } from '../components/common/Link'
@@ -200,21 +199,7 @@ export const LoginScreen = React.memo(() => {
         <Spacer height={contentPadding} />
 
         <View style={styles.footer}>
-          <ScrollView horizontal>
-            <Link
-              analyticsCategory="loginscreen"
-              analyticsLabel="app_version"
-              href={`${constants.DEVHUB_LINKS.GITHUB_REPOSITORY}/releases`}
-              openOnNewTab
-              style={styles.footerLink}
-              textProps={{
-                color: 'foregroundColorMuted65',
-                style: styles.footerLinkText,
-              }}
-            >
-              {getAppVersionLabel()}
-            </Link>
-          </ScrollView>
+          <ScrollView horizontal></ScrollView>
         </View>
       </FullHeightScrollView>
     </Screen>

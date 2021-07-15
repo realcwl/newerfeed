@@ -14,7 +14,6 @@ import {
   scaleFactor,
 } from '../../styles/variables'
 import { ModalColumn } from '../columns/ModalColumn'
-import { AppVersion } from '../common/AppVersion'
 import { Avatar } from '../common/Avatar'
 import { Button } from '../common/Button'
 import { Link } from '../common/Link'
