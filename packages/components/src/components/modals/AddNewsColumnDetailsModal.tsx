@@ -1,15 +1,9 @@
-import {
-  ColumnCreation,
-  guid,
-  NewsFeedColumn,
-  NewsFeedColumnSource,
-} from '@devhub/core'
-import { FormikErrors, useFormik } from 'formik'
+import { ColumnCreation, guid, NewsFeedColumnSource } from '@devhub/core'
+import { useFormik } from 'formik'
 import _ from 'lodash'
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { Keyboard, View } from 'react-native'
 import { useDispatch, useStore } from 'react-redux'
-import * as Yup from 'yup'
 
 import { useReduxState } from '../../hooks/use-redux-state'
 import { Platform } from '../../libs/platform'

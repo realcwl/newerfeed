@@ -13,13 +13,14 @@ import {
   ThemedTextInputProps,
 } from '../../themed/ThemedTextInput'
 import { mapSourceIdToName } from '../../../utils/naming'
+import { useFormik } from 'formik'
 
 // We shoud a search bar if there are more than 9 subtypes to be selected.
 const MAX_ITEM_WITHOUT_FILTER = 9
 
 export interface NewsSubtypesWithFilterProps {
   source: NewsFeedColumnSource
-  formikProps: any
+  formikProps: ReturnType<typeof useFormik>
 }
 
 export const NewsSubtypesWithFilter = React.memo(
