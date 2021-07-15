@@ -33,6 +33,7 @@ export type OcticonIconName =
   | (OcticonsLegacy.OcticonIconName & 'keyboard')
   | 'alert'
   | 'archive'
+  | 'article'
   | 'arrow-both'
   | 'arrow-down'
   | 'arrow-down-left'

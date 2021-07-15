@@ -17,6 +17,7 @@ export type MaterialIconName =
   | 'accessible'
   | 'account-balance'
   | 'account-balance-wallet'
+  | 'article'
   | 'account-box'
   | 'account-circle'
   | 'adb'

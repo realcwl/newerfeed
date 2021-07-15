@@ -11,9 +11,10 @@ const s = (state: RootState) => state.config || EMPTY_OBJ
 export const themePairSelector = (state: RootState) =>
   s(state).theme || constants.DEFAULT_THEME_PAIR
 
-const defaultPreferredDarkThemePair: ThemePair = {
-  id: constants.DEFAULT_DARK_THEME,
-}
+export const availableNewsFeedSourcesSelector = (state: RootState) =>
+  s(state).availableNewsFeedSources
+
+export const idToNameMapSelector = (state: RootState) => s(state).idToNameMap
 
 export const themeSelector = createSelector(
   themePairSelector,

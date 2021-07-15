@@ -521,8 +521,8 @@ export const SidebarOrBottomBarColumnItem = React.memo(
         icon:
           (headerDetails && headerDetails.icon) ||
           ({
-            family: 'octicon',
-            name: 'mark-github',
+            family: 'material',
+            name: 'rss-feed',
           } as IconProp),
       }
     }, [
