@@ -98,8 +98,6 @@ export const SettingsModal = React.memo((props: SettingsModalProps) => {
         <Spacer flex={1} minHeight={contentPadding} />
 
         <View style={sharedStyles.paddingHorizontal}>
-          <AppVersion />
-
           <Spacer height={contentPadding / 2} />
 
           <Button
