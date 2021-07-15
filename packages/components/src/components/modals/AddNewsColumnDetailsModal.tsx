@@ -1,9 +1,4 @@
-import {
-  ColumnCreation,
-  guid,
-  NewsFeedColumnSource,
-  NewsFeedSourceType,
-} from '@devhub/core'
+import { ColumnCreation, guid, NewsFeedColumnSource } from '@devhub/core'
 import { FormikErrors, useFormik } from 'formik'
 import _ from 'lodash'
 import React, { Fragment, useEffect, useRef, useState } from 'react'
@@ -29,50 +24,38 @@ import { TouchableWithoutFeedback } from '../common/TouchableWithoutFeedback'
 import { DialogConsumer, DialogProviderState } from '../context/DialogContext'
 import { useAppLayout } from '../context/LayoutContext'
 import { ThemedIcon } from '../themed/ThemedIcon'
+import {
+  ThemedTextInput,
+  ThemedTextInputProps,
+} from '../themed/ThemedTextInput'
 import { NewsSubtypesWithFilter } from './partials/NewsSubtypesWithFilter'
-
-interface initialValueAndSchema {
-  initialValue: { subtypes: string[] }
-  validationSchema: Yup.MixedSchema<any>
-}
-
-// Stores default data for rendering the menu.
-export const formItemsMetadata: {
-  WEIBO: initialValueAndSchema
-  CAIXIN: initialValueAndSchema
-} = {
-  WEIBO: {
-    // We don't defaultly select any source.
-    initialValue: { subtypes: [] },
-    validationSchema: Yup.mixed().required('Required'),
-  },
-  CAIXIN: {
-    initialValue: { subtypes: [] },
-    validationSchema: Yup.mixed().required('Required'),
-  },
-}
-
-export const formInitialValues = _.mapValues(
-  formItemsMetadata,
-  (v) => v.initialValue.subtypes,
-) as {
-  [key in NewsFeedSourceType]: typeof formItemsMetadata[key]['initialValue']['subtypes']
-}
 
 export interface AddColumnDetailsModalProps {
   showBackButton: boolean
+
+  // If we're modifying attribute of an existing column, we should pass the
+  // columnId of that column.
+  columnId?: string
 }
 
 export const AddColumnDetailsModal = React.memo(
   (props: AddColumnDetailsModalProps) => {
-    const { showBackButton } = props
+    const { showBackButton, columnId } = props
     const idToNameMap = useReduxState(selectors.idToNameMapSelector)
     const availableNewsFeedSources = useReduxState(
       selectors.availableNewsFeedSourcesSelector,
     )
 
-    console.log(idToNameMap)
-    console.log(availableNewsFeedSources)
+    // formIntialValues should be empty during the initial column creation, and
+    // populated with the column attribute if we're modifying an existing one.
+    const formInitialValues: Record<string, any> = {
+      name: '',
+      WEIBO: [],
+      CAIXIN: [],
+    }
+
+    // Get all main sources.
+    const allSources = availableNewsFeedSources.map((source) => source.source)
 
     const dialogRef = useRef<DialogProviderState>()
     const dispatch = useDispatch()
@@ -88,7 +71,7 @@ export const AddColumnDetailsModal = React.memo(
 
         // Create a empty column.
         const columnCreation: ColumnCreation = {
-          title: 'DUMMY_COLUMN_NAME',
+          title: formValues['name'],
           type: 'COLUMN_TYPE_NEWS_FEED',
           id: guid(),
           itemListIds: [],
@@ -96,7 +79,6 @@ export const AddColumnDetailsModal = React.memo(
           lastItemId: '',
           sources: getColumnSourcesFromFormValues(formValues),
         }
-        console.log(formikProps.values)
         dispatch(actions.addColumn(columnCreation))
 
         // formikActions.setSubmitting(false)
@@ -104,13 +86,12 @@ export const AddColumnDetailsModal = React.memo(
       validateOnBlur: true,
       validateOnChange: true,
       validate(values) {
-        // We can't simply iterate over this array and have to define key type
-        // first because of:
-        // https://effectivetypescript.com/2020/05/26/iterate-objects/
-        let key: keyof typeof values
-        for (key in values) {
+        if (!values.name) {
+          return { err: 'name is required' }
+        }
+        for (var key of allSources) {
           if (values[key].length !== 0) {
-            return {}
+            return undefined
           }
         }
         return { err: 'no source selected' }
@@ -163,13 +144,14 @@ export const AddColumnDetailsModal = React.memo(
       return ` (${selected.length}/${source.subtypes.length})`
     }
 
-    // When submitting the form, extract sources from the formValues.
+    // When submitting the form, extract sources and subtypes from the
+    // formValues.
     function getColumnSourcesFromFormValues(
       formValues: typeof formInitialValues,
     ): NewsFeedColumnSource[] {
-      let key: keyof typeof formValues
       const sources: NewsFeedColumnSource[] = []
-      for (key in formValues) {
+      for (var key of allSources) {
+        if (formValues[key].length === 0) continue
         sources.push({
           source: key,
           subtypes: formValues[key],
@@ -180,10 +162,7 @@ export const AddColumnDetailsModal = React.memo(
 
     // Renders Source and Sub sources. For example this could be Weibo with a
     // list of users.
-    function renderSingleSourceOptions(
-      source: NewsFeedColumnSource,
-      { required }: { required?: boolean } = {},
-    ) {
+    function renderSingleSourceOptions(source: NewsFeedColumnSource) {
       const isOptionsOpened = openedSource === source.source
 
       return (
@@ -257,6 +236,88 @@ export const AddColumnDetailsModal = React.memo(
       )
     }
 
+    // Render the text input box that let user to name their column.
+    function renderColumnNameTextInput() {
+      const defaultTextInputProps: Partial<ThemedTextInputProps> = {
+        autoCapitalize: 'none',
+        autoCorrect: false,
+        autoFocus: false,
+        blurOnSubmit: false,
+        placeholder: 'Column Name',
+      }
+
+      // Show error if string doesn't have value but is touched.
+      function shouldShowError() {
+        if (!formikProps.touched['name']) {
+          return false
+        }
+        return !formikProps.values['name']
+      }
+
+      return (
+        <>
+          <SubHeader icon={undefined} title={'Column Name'}>
+            {(() => {
+              return (
+                <View style={[sharedStyles.flex, sharedStyles.horizontal]}>
+                  <Spacer flex={1} />
+
+                  <ThemedIcon
+                    color="foregroundColorMuted65"
+                    family="material"
+                    name={'title'}
+                    size={18 * scaleFactor}
+                    {...Platform.select({
+                      web: {
+                        title: 'Column Name',
+                      },
+                    })}
+                  />
+                </View>
+              )
+            })()}
+          </SubHeader>
+
+          <View style={sharedStyles.paddingHorizontal}>
+            <ThemedTextInput
+              textInputKey={`add-column-details-column-name-text-input`}
+              borderThemeColor={
+                shouldShowError()
+                  ? 'lightRed'
+                  : !!formikProps.values['name']
+                  ? 'green'
+                  : undefined
+              }
+              borderHoverThemeColor={
+                shouldShowError()
+                  ? 'lightRed'
+                  : !!formikProps.values['name']
+                  ? 'green'
+                  : undefined
+              }
+              borderFocusThemeColor={
+                shouldShowError()
+                  ? 'lightRed'
+                  : !!formikProps.values['name']
+                  ? 'green'
+                  : undefined
+              }
+              {...defaultTextInputProps}
+              onBlur={() => {
+                formikProps.setFieldTouched('name')
+              }}
+              onChangeText={(value) => {
+                formikProps.setFieldValue('name', value)
+              }}
+              value={formikProps.values['name']}
+            />
+          </View>
+
+          <Spacer height={contentPadding / 2} />
+        </>
+      )
+    }
+
     return (
       <ModalColumn
         name="ADD_COLUMN_DETAILS"
@@ -269,6 +330,7 @@ export const AddColumnDetailsModal = React.memo(
 
             return (
               <>
+                {renderColumnNameTextInput()}
                 {renderHeader('Sources')}
 
                 <Separator horizontal />

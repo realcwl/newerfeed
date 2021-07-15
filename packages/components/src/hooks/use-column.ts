@@ -19,7 +19,7 @@ export function useColumn(columnId: string) {
 
   const headerDetails: HeaderDetails = {
     icon: 'undefiled',
-    title: 'DUMMY_TITLE',
+    title: column ? column.title : '',
   }
 
   const isOverMaxColumnLimit = !!(

@@ -45,13 +45,10 @@ export interface NewsFeedColumn extends BaseColumn {
   filters?: ColumnFilter
 }
 
-// Contains all NewsFeeds souce type
-export type NewsFeedSourceType = 'WEIBO' | 'CAIXIN'
-
 export interface NewsFeedColumnSource {
   // Source is a predefined list of information sources, such as "weibo",
   // "twitter", "caixin".
-  source: NewsFeedSourceType
+  source: string
 
   // Subtypes is a predefined list of subtypes of type string.
   subtypes: string[]
