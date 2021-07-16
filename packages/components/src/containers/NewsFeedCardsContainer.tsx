@@ -1,4 +1,4 @@
-import { capitalizeFirstLetter, constants } from "@devhub/core";
+import { capitalizeFirstLetter, constants, NewsFeedData } from "@devhub/core";
 import React, { useCallback } from "react";
 import { View } from "react-native";
 import { useDispatch } from "react-redux";
@@ -39,6 +39,9 @@ export const NewsFeedCardsContainer = React.memo(
   (props: NewsFeedCardsContainerProps) => {
     const { columnId, ...otherProps } = props;
 
+    const { allItems, filteredItemsIds, getItemByNodeIdOrId } =
+      useColumnData<NewsFeedData>(columnId, { mergeSimilar: false });
+
     const { isLoggingIn } = useLoginHelpers();
 
     const appToken = useReduxState(selectors.appTokenSelector);
@@ -53,14 +56,7 @@ export const NewsFeedCardsContainer = React.memo(
         columnId={columnId}
         errorMessage={""}
         fetchNextPage={() => undefined}
-        getItemByNodeIdOrId={(id) => {
-          return {
-            id: id,
-            message: "dummy_data_message",
-            attachments: undefined,
-            parent: undefined,
-          };
-        }}
+        getItemByNodeIdOrId={getItemByNodeIdOrId}
         isShowingOnlyBookmarks={!!(column.filters && column.filters.saved)}
         itemNodeIdOrIds={["dummyCard"]}
         lastFetchSuccessAt={""}

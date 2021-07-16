@@ -276,9 +276,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         <View style={sharedStyles.horizontal}>
           <View style={styles.avatarContainer}>
             <Avatar
-              avatarUrl={avatar.imageURL}
-              disableLink={avatar.linkURL === link}
-              linkURL={avatar.linkURL}
+              avatarUrl={avatar?.imageURL}
+              disableLink={avatar?.linkURL === link}
+              linkURL={avatar?.linkURL}
               style={styles.avatar}
               size={avatarSize}
             />

@@ -22,7 +22,7 @@ const initialState: State = {
     dummyCard: {
       id: "dummyCard",
       text: "first card!",
-      avatar: { imageUrl: "/logo.png", linkUrl: "/" },
+      avatar: { imageURL: "/static/media/logo.png", linkURL: "/" },
     },
   },
   readIds: [],

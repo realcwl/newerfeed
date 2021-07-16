@@ -1,4 +1,4 @@
-import { Column, constants } from "@devhub/core";
+import { Column, constants, NewsFeedData } from "@devhub/core";
 import { PixelRatio } from "react-native";
 
 import { Platform } from "../../libs/platform";
@@ -69,10 +69,7 @@ export interface BaseCardProps extends AdditionalCardProps {
     };
     text: string;
   };
-  avatar: {
-    imageURL: string;
-    linkURL: string;
-  };
+  avatar?: { imageURL?: string; linkURL?: string };
   date: string;
   icon: IconProp;
   isRead: boolean;
@@ -85,8 +82,10 @@ export interface BaseCardProps extends AdditionalCardProps {
 }
 
 function _getCardPropsForItem(
-  type: string
+  type: string,
+  item: NewsFeedData
 ): Omit<BaseCardProps, keyof AdditionalCardProps> {
+  console.log("what item", item);
   return {
     type: "COLUMN_TYPE_NEWS_FEED",
     link: "",
@@ -95,31 +94,33 @@ function _getCardPropsForItem(
     date: "unknown date",
     icon: { family: "octicon", name: "alert" },
     title: "title",
-    text: "PLACEHOLDER",
-    avatar: { imageURL: "/static/media/logo.png", linkURL: "/" },
+    text: item.text,
+    avatar: item.avatar,
     nodeIdOrId: "node_id",
   };
 }
 
 const _memoizedGetCardPropsForItemFnByColumnId = betterMemoize(
-  (_columnId: string) => (type: string) => _getCardPropsForItem(type),
+  (_columnId: string) => (type: string, item: NewsFeedData) =>
+    _getCardPropsForItem(type, item),
   undefined,
   10
 );
 
 const _memoizedGetCardPropsForItem = betterMemoize(
-  (type: string, columnId: string) =>
-    _memoizedGetCardPropsForItemFnByColumnId(columnId)(type),
+  (type: string, columnId: string, item: NewsFeedData) =>
+    _memoizedGetCardPropsForItemFnByColumnId(columnId)(type, item),
   undefined,
   200
 );
 
 export function getCardPropsForItem(
   type: string,
-  columnId: string
+  columnId: string,
+  item: NewsFeedData
 ): Omit<BaseCardProps, keyof AdditionalCardProps> &
   Pick<AdditionalCardProps, "height"> {
-  const props = _memoizedGetCardPropsForItem(type, columnId);
+  const props = _memoizedGetCardPropsForItem(type, columnId, item);
   return { ...props, height: getCardSizeForProps(props) };
 }
 

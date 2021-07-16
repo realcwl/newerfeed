@@ -120,8 +120,7 @@ export interface NewsFeedData {
   // message shown to user.
   text?: string;
   // user avatar, ex. weibo/twitter
-  // use union type to make sure at least one field is avilable
-  avatar?: { imageUrl: string } | { linkUrl: string };
+  avatar?: { imageURL?: string; linkURL?: string };
   // if this is not null, user can click a card to go to original page.
   url?: string;
   // A list of attachment that will be rendered together with this card.
