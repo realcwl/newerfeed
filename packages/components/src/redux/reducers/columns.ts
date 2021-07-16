@@ -65,6 +65,28 @@ export const columnsReducer: Reducer<State> = (
 
         draft.updatedAt = new Date().toISOString()
       })
+    case 'MOVE_COLUMN':
+      return immer(state, (draft) => {
+        if (!draft.allIds) return
+
+        const currentIndex = draft.allIds.findIndex(
+          (id) => id === action.payload.columnId,
+        )
+        if (!(currentIndex >= 0 && currentIndex < draft.allIds.length)) return
+
+        const newIndex = Math.max(
+          0,
+          Math.min(action.payload.columnIndex, draft.allIds.length - 1),
+        )
+        if (Number.isNaN(newIndex)) return
+
+        // move column inside array
+        const columnId = draft.allIds[currentIndex]
+        draft.allIds = draft.allIds.filter((id) => id !== columnId)
+        draft.allIds.splice(newIndex, 0, columnId)
+
+        draft.updatedAt = new Date().toISOString()
+      })
     default:
       return state
   }
