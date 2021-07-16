@@ -62,7 +62,7 @@ export const EventCardsContainer = React.memo(
           }
         }}
         isShowingOnlyBookmarks={!!(column.filters && column.filters.saved)}
-        itemNodeIdOrIds={['dummy_data_id']}
+        itemNodeIdOrIds={[]}
         lastFetchSuccessAt={''}
         refresh={() => {}}
       />
