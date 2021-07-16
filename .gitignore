@@ -12,9 +12,4 @@ npm-debug.log
 yarn-error.log
 .gitpod.yml
 .nowignore
-.travis.yml
-FUNDING.yml
-tap-release.yml
-.prettierrc.js
-.eslintrc.js
 
