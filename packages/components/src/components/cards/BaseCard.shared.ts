@@ -1,11 +1,11 @@
-import { Column, constants } from '@devhub/core'
-import { PixelRatio } from 'react-native'
+import { Column, constants } from "@devhub/core";
+import { PixelRatio } from "react-native";
 
-import { Platform } from '../../libs/platform'
-import { IconProp } from '../../libs/vector-icons'
-import * as actions from '../../redux/actions'
-import { betterMemoize } from '../../redux/selectors/helpers'
-import { ExtractActionFromActionCreator } from '../../redux/types/base'
+import { Platform } from "../../libs/platform";
+import { IconProp } from "../../libs/vector-icons";
+import * as actions from "../../redux/actions";
+import { betterMemoize } from "../../redux/selectors/helpers";
+import { ExtractActionFromActionCreator } from "../../redux/types/base";
 import {
   avatarSize,
   contentPadding,
@@ -14,26 +14,26 @@ import {
   smallAvatarSize,
   smallerTextSize,
   smallTextSize,
-} from '../../styles/variables'
-import { smallLabelHeight } from '../common/Label'
-import { cardActionsHeight } from './partials/CardActions'
-import { cardItemSeparatorSize } from './partials/CardItemSeparator'
+} from "../../styles/variables";
+import { smallLabelHeight } from "../common/Label";
+import { cardActionsHeight } from "./partials/CardActions";
+import { cardItemSeparatorSize } from "./partials/CardItemSeparator";
 
 // since we moved plans to the server we cant get this statically anymore
 // only via the usePlans hook
 
-const _iconSize = smallAvatarSize - 4 * scaleFactor
-const _iconContainerSize = smallAvatarSize
-const _actionFontSize = smallerTextSize
-const _subitemFontSize = smallTextSize
-const _subitemLineHeight = _subitemFontSize + 2 * scaleFactor
+const _iconSize = smallAvatarSize - 4 * scaleFactor;
+const _iconContainerSize = smallAvatarSize;
+const _actionFontSize = smallerTextSize;
+const _subitemFontSize = smallTextSize;
+const _subitemLineHeight = _subitemFontSize + 2 * scaleFactor;
 export const sizes = {
   cardPaddingVertical: contentPadding,
   cardPaddingHorizontal: contentPadding / 2,
   iconSize: PixelRatio.roundToNearestPixel(_iconSize),
   iconContainerSize: _iconContainerSize,
   avatarContainerWidth: PixelRatio.roundToNearestPixel(
-    avatarSize + _iconContainerSize / 3,
+    avatarSize + _iconContainerSize / 3
   ),
   avatarContainerHeight: PixelRatio.roundToNearestPixel(avatarSize),
   actionContainerHeight: Math.max(_actionFontSize, smallAvatarSize),
@@ -43,139 +43,108 @@ export const sizes = {
   subitemLineHeight: _subitemLineHeight,
   githubAppMessageContainerHeight: Math.max(
     _subitemLineHeight,
-    smallAvatarSize,
+    smallAvatarSize
   ),
   horizontalSpaceSize: contentPadding / 2,
   titleLineHeight: normalTextSize * 1.2,
   subtitleLineHeight: smallerTextSize * 1.2,
   textLineHeight: smallerTextSize * 1.2,
   verticalSpaceSize: contentPadding / 2,
-}
+};
 
 export const renderCardActions =
-  Platform.OS === 'web' || constants.DISABLE_SWIPEABLE_CARDS
+  Platform.OS === "web" || constants.DISABLE_SWIPEABLE_CARDS;
 
 export interface AdditionalCardProps {
   // appViewMode: AppViewMode
-  columnId: string
-  height: number
+  columnId: string;
+  height: number;
 }
 
 export interface BaseCardProps extends AdditionalCardProps {
   action?: {
     avatar: {
-      imageURL: string
-      linkURL: string
-    }
-    text: string
-  }
+      imageURL: string;
+      linkURL: string;
+    };
+    text: string;
+  };
   avatar: {
-    imageURL: string
-    linkURL: string
-  }
-  date: string
-  icon: IconProp
-  isRead: boolean
-  isSaved: boolean
-  labels:
-    | {
-        name: string
-        color?: string
-      }[]
-    | undefined
-  link: string
-  nodeIdOrId: string
-  subitems?: {
-    avatar:
-      | {
-          imageURL: string
-          linkURL: string
-        }
-      | undefined
-    text: string
-  }[]
-  subtitle?: string
-  text?: {
-    text: string
-    repo?: { owner: string; name: string; url: string }
-  }
-  title: string
-  type: Column['type']
+    imageURL: string;
+    linkURL: string;
+  };
+  date: string;
+  icon: IconProp;
+  isRead: boolean;
+  isSaved: boolean;
+  link: string;
+  nodeIdOrId: string;
+  text?: string;
+  title: string;
+  type: Column["type"];
 }
 
 function _getCardPropsForItem(
-  type: string,
+  type: string
 ): Omit<BaseCardProps, keyof AdditionalCardProps> {
   return {
-    type: 'COLUMN_TYPE_NEWS_FEED',
-    link: '',
+    type: "COLUMN_TYPE_NEWS_FEED",
+    link: "",
     isRead: false,
     isSaved: false,
-    date: 'unknown date',
-    icon: { family: 'octicon', name: 'alert' },
-    title: 'title',
-    avatar: { imageURL: 'imageURL', linkURL: 'linkURL' },
-    labels: undefined,
-    nodeIdOrId: 'node_id',
-  }
+    date: "unknown date",
+    icon: { family: "octicon", name: "alert" },
+    title: "title",
+    text: "PLACEHOLDER",
+    avatar: { imageURL: "/static/media/logo.png", linkURL: "/" },
+    nodeIdOrId: "node_id",
+  };
 }
 
 const _memoizedGetCardPropsForItemFnByColumnId = betterMemoize(
   (_columnId: string) => (type: string) => _getCardPropsForItem(type),
   undefined,
-  10,
-)
+  10
+);
 
 const _memoizedGetCardPropsForItem = betterMemoize(
   (type: string, columnId: string) =>
     _memoizedGetCardPropsForItemFnByColumnId(columnId)(type),
   undefined,
-  200,
-)
+  200
+);
 
 export function getCardPropsForItem(
   type: string,
-  columnId: string,
+  columnId: string
 ): Omit<BaseCardProps, keyof AdditionalCardProps> &
-  Pick<AdditionalCardProps, 'height'> {
-  const props = _memoizedGetCardPropsForItem(type, columnId)
-  return { ...props, height: getCardSizeForProps(props) }
+  Pick<AdditionalCardProps, "height"> {
+  const props = _memoizedGetCardPropsForItem(type, columnId);
+  return { ...props, height: getCardSizeForProps(props) };
 }
 
 export function getCardSizeForProps(
-  props: Omit<BaseCardProps, keyof AdditionalCardProps>,
+  props: Omit<BaseCardProps, keyof AdditionalCardProps>
 ): number {
-  if (!props) return 0
+  if (!props) return 0;
 
   return PixelRatio.roundToNearestPixel(
     sizes.cardPaddingVertical * 2 +
       Math.max(
         sizes.avatarContainerHeight,
         (props.title ? sizes.titleLineHeight : 0) +
-          (props.subtitle
-            ? sizes.subtitleLineHeight + sizes.verticalSpaceSize
-            : 0) +
-          (props.text && props.text.text
-            ? sizes.textLineHeight + sizes.verticalSpaceSize
-            : 0),
+          (props.text ? sizes.textLineHeight + sizes.verticalSpaceSize : 0)
       ) +
       (props.action && props.action.text
         ? sizes.actionContainerHeight + sizes.verticalSpaceSize
         : 0) +
-      (props.labels && props.labels.length
-        ? smallLabelHeight + sizes.verticalSpaceSize
-        : 0) +
-      (props.subitems && props.subitems.length
-        ? props.subitems.length *
-          (sizes.subitemContainerHeight + sizes.verticalSpaceSize)
-        : 0) +
       (renderCardActions ? cardActionsHeight + sizes.verticalSpaceSize : 0) +
-      cardItemSeparatorSize,
-  )
+      cardItemSeparatorSize
+  );
 }
 
 export function getCardSizeForItem(
   ...args: Parameters<typeof getCardPropsForItem>
 ): number {
-  return getCardSizeForProps(getCardPropsForItem(...args))
+  return getCardSizeForProps(getCardPropsForItem(...args));
 }

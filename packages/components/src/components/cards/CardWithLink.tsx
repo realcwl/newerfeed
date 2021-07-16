@@ -1,55 +1,55 @@
-import { Column } from '@devhub/core'
-import React, { useCallback, useMemo, useRef } from 'react'
-import { StyleSheet, TouchableHighlightProps, View } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { Column } from "@devhub/core";
+import React, { useCallback, useMemo, useRef } from "react";
+import { StyleSheet, TouchableHighlightProps, View } from "react-native";
+import { useDispatch } from "react-redux";
 
-import { useHover } from '../../hooks/use-hover'
-import { useIsItemFocused } from '../../hooks/use-is-item-focused'
-import { useItem } from '../../hooks/use-item'
-import { getLastUsedInputType } from '../../hooks/use-last-input-type'
-import { useReduxState } from '../../hooks/use-redux-state'
-import { emitter } from '../../libs/emitter'
-import { Platform } from '../../libs/platform'
-import * as actions from '../../redux/actions'
-import * as selectors from '../../redux/selectors'
-import { sharedStyles } from '../../styles/shared'
-import { tryFocus } from '../../utils/helpers/shared'
-import { getCardBackgroundThemeColor } from '../columns/ColumnRenderer'
-import { Link, LinkProps } from '../common/Link'
-import { getTheme, useTheme } from '../context/ThemeContext'
+import { useHover } from "../../hooks/use-hover";
+import { useIsItemFocused } from "../../hooks/use-is-item-focused";
+import { useItem } from "../../hooks/use-item";
+import { getLastUsedInputType } from "../../hooks/use-last-input-type";
+import { useReduxState } from "../../hooks/use-redux-state";
+import { emitter } from "../../libs/emitter";
+import { Platform } from "../../libs/platform";
+import * as actions from "../../redux/actions";
+import * as selectors from "../../redux/selectors";
+import { sharedStyles } from "../../styles/shared";
+import { tryFocus } from "../../utils/helpers/shared";
+import { getCardBackgroundThemeColor } from "../columns/ColumnRenderer";
+import { Link, LinkProps } from "../common/Link";
+import { getTheme, useTheme } from "../context/ThemeContext";
 import {
   ThemedTouchableHighlight,
   ThemedTouchableHighlightProps,
-} from '../themed/ThemedTouchableHighlight'
-import { ThemedView } from '../themed/ThemedView'
-import { BaseCard } from './BaseCard'
-import { getCardPropsForItem } from './BaseCard.shared'
+} from "../themed/ThemedTouchableHighlight";
+import { ThemedView } from "../themed/ThemedView";
+import { BaseCard } from "./BaseCard";
+import { getCardPropsForItem } from "./BaseCard.shared";
 
 export interface CardWithLinkProps {
-  columnId: string
-  isInsideSwipeable?: boolean
-  nodeIdOrId: string
-  type: Column['type']
+  columnId: string;
+  isInsideSwipeable?: boolean;
+  nodeIdOrId: string;
+  type: Column["type"];
 }
 
 export const CardWithLink = React.memo((props: CardWithLinkProps) => {
-  const { columnId, isInsideSwipeable, nodeIdOrId, type } = props
+  const { columnId, isInsideSwipeable, nodeIdOrId, type } = props;
 
-  const ref = useRef<any>(null)
-  const focusIndicatorRef = useRef<View>(null)
-  const isFocusedRef = useRef(false)
-  const isHoveredRef = useRef(false)
+  const ref = useRef<any>(null);
+  const focusIndicatorRef = useRef<View>(null);
+  const isFocusedRef = useRef(false);
+  const isHoveredRef = useRef(false);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const item = useItem(nodeIdOrId)
+  const item = useItem(nodeIdOrId);
 
   const { CardComponent, cardProps } = useMemo(() => {
     if (!item) {
-      return {}
+      return {};
     }
 
-    const _cardProps = getCardPropsForItem(type, columnId)
+    const _cardProps = getCardPropsForItem(type, columnId);
 
     return {
       cardProps: _cardProps,
@@ -61,26 +61,26 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
           columnId={columnId}
         />
       ),
-    }
-  }, [/* appViewMode, */ columnId, item])
+    };
+  }, [/* appViewMode, */ columnId, item]);
 
   // const isReadRef = useDynamicRef(!!(cardProps && cardProps.isRead))
 
-  const onPress = useCallback<NonNullable<LinkProps['onPress']>>(
+  const onPress = useCallback<NonNullable<LinkProps["onPress"]>>(
     (e) => {
-      isHoveredRef.current = false
+      isHoveredRef.current = false;
 
-      if (e && e.isDefaultPrevented()) return
+      if (e && e.isDefaultPrevented()) return;
 
-      console.log('CardWithLink on press')
+      console.log("CardWithLink on press");
     },
-    [type, columnId],
-  )
+    [type, columnId]
+  );
 
   const updateStyles = useCallback(
     () => {
       if (ref.current) {
-        const theme = getTheme()
+        const theme = getTheme();
 
         ref.current.setNativeProps({
           style: {
@@ -93,65 +93,65 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
                 })
               ],
           },
-        })
+        });
       }
 
       if (focusIndicatorRef.current) {
         focusIndicatorRef.current.setNativeProps({
           style: {
             opacity:
-              getLastUsedInputType() === 'keyboard' && isFocusedRef.current
+              getLastUsedInputType() === "keyboard" && isFocusedRef.current
                 ? 0.1
                 : 0,
           },
-        })
+        });
       }
     },
     [
       /*appViewMode*/
-    ],
-  )
+    ]
+  );
 
   const handleFocusChange = useCallback(
     (value, disableDomFocus?: boolean) => {
-      const changed = isFocusedRef.current !== value
-      isFocusedRef.current = value
+      const changed = isFocusedRef.current !== value;
+      isFocusedRef.current = value;
 
-      if (Platform.OS === 'web' && value && changed && !disableDomFocus) {
-        tryFocus(ref.current)
+      if (Platform.OS === "web" && value && changed && !disableDomFocus) {
+        tryFocus(ref.current);
       }
 
-      updateStyles()
+      updateStyles();
     },
-    [columnId],
-  )
+    [columnId]
+  );
 
-  useIsItemFocused(columnId, '', handleFocusChange)
+  useIsItemFocused(columnId, "", handleFocusChange);
 
   useHover(
     ref,
     useCallback(
       (isHovered) => {
-        if (isHoveredRef.current === isHovered) return
-        isHoveredRef.current = isHovered
+        if (isHoveredRef.current === isHovered) return;
+        isHoveredRef.current = isHovered;
 
-        const isAlreadyFocused = isFocusedRef.current
+        const isAlreadyFocused = isFocusedRef.current;
         if (isHovered && !isAlreadyFocused) {
-          handleFocusChange(true)
+          handleFocusChange(true);
 
-          emitter.emit('FOCUS_ON_COLUMN_ITEM', {
+          emitter.emit("FOCUS_ON_COLUMN_ITEM", {
             columnId,
-            itemNodeIdOrId: '',
-          })
+            itemNodeIdOrId: "",
+          });
         } else {
-          updateStyles()
+          updateStyles();
         }
       },
-      [columnId],
-    ),
-  )
+      [columnId]
+    )
+  );
 
-  if (!(item && cardProps)) return null
+  if (!(item && cardProps)) return null;
 
   // const isSaved = isItemSaved(item)
 
@@ -176,19 +176,19 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
       openOnNewTab
       style={sharedStyles.relative}
       onFocus={() => {
-        if (isFocusedRef.current) return
+        if (isFocusedRef.current) return;
 
-        handleFocusChange(true, true)
+        handleFocusChange(true, true);
 
         if (!Platform.supportsTouch) {
-          emitter.emit('FOCUS_ON_COLUMN_ITEM', {
+          emitter.emit("FOCUS_ON_COLUMN_ITEM", {
             columnId,
-            itemNodeIdOrId: '',
-          })
+            itemNodeIdOrId: "",
+          });
         }
       }}
       onBlur={() => {
-        handleFocusChange(false, true)
+        handleFocusChange(false, true);
       }}
     >
       <ThemedView
@@ -198,7 +198,7 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
           StyleSheet.absoluteFill,
           {
             opacity:
-              getLastUsedInputType() === 'keyboard' && isFocusedRef.current
+              getLastUsedInputType() === "keyboard" && isFocusedRef.current
                 ? 0.1
                 : 0,
           },
@@ -215,22 +215,22 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
         />
       )} */}
     </Link>
-  )
-})
+  );
+});
 
-CardWithLink.displayName = 'CardWithLink'
+CardWithLink.displayName = "CardWithLink";
 
 const GestureHandlerTouchableHighlight = Platform.select({
-  android: () => require('react-native-gesture-handler').TouchableHighlight,
-  ios: () => require('react-native-gesture-handler').TouchableHighlight,
-  default: () => require('../common/TouchableHighlight').TouchableHighlight,
-})()
+  android: () => require("react-native-gesture-handler").TouchableHighlight,
+  ios: () => require("react-native-gesture-handler").TouchableHighlight,
+  default: () => require("../common/TouchableHighlight").TouchableHighlight,
+})();
 
 const GestureHandlerCardTouchable = React.forwardRef<
   View,
   TouchableHighlightProps
 >((props, ref) => {
-  const theme = useTheme()
+  const theme = useTheme();
 
   return (
     <View ref={ref} style={props.style}>
@@ -248,14 +248,14 @@ const GestureHandlerCardTouchable = React.forwardRef<
         {...props}
         style={StyleSheet.flatten([
           props.style,
-          { backgroundColor: 'transparent' },
+          { backgroundColor: "transparent" },
         ])}
       >
         <View>{props.children}</View>
       </GestureHandlerTouchableHighlight>
     </View>
-  )
-})
+  );
+});
 
 const NormalCardTouchable = React.forwardRef<
   ThemedTouchableHighlight,
@@ -281,5 +281,5 @@ const NormalCardTouchable = React.forwardRef<
         <View>{props.children}</View>
       </ThemedTouchableHighlight>
     </View>
-  )
-})
+  );
+});
