@@ -1,32 +1,32 @@
-import { Column, NewsFeedData } from "@devhub/core";
-import React, { useCallback, useMemo } from "react";
-import { View, ViewProps } from "react-native";
+import { Column, NewsFeedData } from '@devhub/core'
+import React, { useCallback, useMemo } from 'react'
+import { View, ViewProps } from 'react-native'
 
-import { useCardsKeyboard } from "../../hooks/use-cards-keyboard";
-import { DataItemT, useCardsProps } from "../../hooks/use-cards-props";
-import { useReduxState } from "../../hooks/use-redux-state";
-import { BlurView } from "../../libs/blur-view/BlurView";
-import { ErrorBoundary } from "../../libs/bugsnag";
-import { OneList, OneListProps } from "../../libs/one-list";
-import * as selectors from "../../redux/selectors";
-import { sharedStyles } from "../../styles/shared";
-import { EmptyCards, EmptyCardsProps } from "./EmptyCards";
-import { NewsFeedCard } from "./NewsFeedCard";
-import { SwipeableCard } from "./SwipeableCard";
+import { useCardsKeyboard } from '../../hooks/use-cards-keyboard'
+import { DataItemT, useCardsProps } from '../../hooks/use-cards-props'
+import { useReduxState } from '../../hooks/use-redux-state'
+import { BlurView } from '../../libs/blur-view/BlurView'
+import { ErrorBoundary } from '../../libs/bugsnag'
+import { OneList, OneListProps } from '../../libs/one-list'
+import * as selectors from '../../redux/selectors'
+import { sharedStyles } from '../../styles/shared'
+import { EmptyCards, EmptyCardsProps } from './EmptyCards'
+import { NewsFeedCard } from './NewsFeedCard'
+import { SwipeableCard } from './SwipeableCard'
 
-type ItemT = NewsFeedData;
+type ItemT = NewsFeedData
 
 export interface EventCardsProps {
-  columnId: Column["id"];
-  errorMessage: EmptyCardsProps["errorMessage"];
-  fetchNextPage: (() => void) | undefined;
-  getItemByNodeIdOrId: (nodeIdOrId: string) => ItemT | undefined;
-  isShowingOnlyBookmarks: boolean;
-  itemNodeIdOrIds: string[];
-  lastFetchSuccessAt: string | undefined;
-  pointerEvents?: ViewProps["pointerEvents"];
-  refresh: EmptyCardsProps["refresh"];
-  swipeable: boolean;
+  columnId: Column['id']
+  errorMessage: EmptyCardsProps['errorMessage']
+  fetchNextPage: (() => void) | undefined
+  getItemByNodeIdOrId: (nodeIdOrId: string) => ItemT | undefined
+  isShowingOnlyBookmarks: boolean
+  itemNodeIdOrIds: string[]
+  lastFetchSuccessAt: string | undefined
+  pointerEvents?: ViewProps['pointerEvents']
+  refresh: EmptyCardsProps['refresh']
+  swipeable: boolean
 }
 
 export const NewsFeedCards = React.memo((props: EventCardsProps) => {
@@ -41,16 +41,16 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
     pointerEvents,
     refresh,
     swipeable,
-  } = props;
+  } = props
 
-  const listRef = React.useRef<typeof OneList>(null);
+  const listRef = React.useRef<typeof OneList>(null)
 
   const getItemKey = useCallback(
     (nodeIdOrId: DataItemT, index: number) => {
-      return `event-card-${nodeIdOrId || index}`;
+      return `event-card-${nodeIdOrId || index}`
     },
-    [getItemByNodeIdOrId]
-  );
+    [getItemByNodeIdOrId],
+  )
 
   const {
     OverrideRender,
@@ -71,8 +71,8 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
     itemNodeIdOrIds,
     lastFetchSuccessAt,
     refresh,
-    type: "COLUMN_TYPE_NEWS_FEED",
-  });
+    type: 'COLUMN_TYPE_NEWS_FEED',
+  })
 
   useCardsKeyboard(listRef, {
     columnId,
@@ -81,16 +81,16 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
       OverrideRender && OverrideRender.Component && OverrideRender.overlay
         ? []
         : itemNodeIdOrIds,
-    type: "COLUMN_TYPE_NEWS_FEED",
+    type: 'COLUMN_TYPE_NEWS_FEED',
     visibleItemIndexesRef,
-  });
+  })
 
   const renderItem = useCallback<
-    NonNullable<OneListProps<DataItemT>["renderItem"]>
+    NonNullable<OneListProps<DataItemT>['renderItem']>
   >(
     ({ item: nodeIdOrId, index }) => {
-      const height = getItemSize(nodeIdOrId, index);
-      console.log("ok", nodeIdOrId, index, swipeable);
+      const height = getItemSize(nodeIdOrId, index)
+      console.log('ok', nodeIdOrId, index, swipeable)
 
       return (
         <ErrorBoundary>
@@ -98,17 +98,17 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
             <NewsFeedCard nodeIdOrId={nodeIdOrId} columnId={columnId} />
           </View>
         </ErrorBoundary>
-      );
+      )
     },
-    [swipeable]
-  );
+    [swipeable],
+  )
 
   const ListEmptyComponent = useMemo<
-    NonNullable<OneListProps<DataItemT>["ListEmptyComponent"]>
+    NonNullable<OneListProps<DataItemT>['ListEmptyComponent']>
   >(
     () => () => {
       if (OverrideRender && OverrideRender.Component && OverrideRender.overlay)
-        return null;
+        return null
 
       if (isShowingOnlyBookmarks) {
         return (
@@ -121,7 +121,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
             fetchNextPage={fetchNextPage}
             refresh={refresh}
           />
-        );
+        )
       }
 
       return (
@@ -133,7 +133,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
           fetchNextPage={fetchNextPage}
           refresh={refresh}
         />
-      );
+      )
     },
     [
       itemNodeIdOrIds.length ? undefined : columnId,
@@ -148,11 +148,11 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
             OverrideRender.Component &&
             OverrideRender.overlay
           ),
-    ]
-  );
+    ],
+  )
 
   if (OverrideRender && OverrideRender.Component && !OverrideRender.overlay)
-    return <OverrideRender.Component />;
+    return <OverrideRender.Component />
 
   return (
     <View style={[sharedStyles.relative, sharedStyles.flex]}>
@@ -180,7 +180,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
         overscanCount={1}
         pointerEvents={
           OverrideRender && OverrideRender.Component && OverrideRender.overlay
-            ? "none"
+            ? 'none'
             : pointerEvents
         }
         refreshControl={refreshControl}
@@ -198,7 +198,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
         </BlurView>
       )}
     </View>
-  );
-});
+  )
+})
 
-NewsFeedCards.displayName = "NewsFeedCards";
+NewsFeedCards.displayName = 'NewsFeedCards'

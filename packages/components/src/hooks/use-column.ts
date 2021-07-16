@@ -1,33 +1,33 @@
-import { constants, HeaderDetails } from "@devhub/core";
-import _ from "lodash";
-import { useCallback, useMemo } from "react";
+import { constants, HeaderDetails } from '@devhub/core'
+import _ from 'lodash'
+import { useCallback, useMemo } from 'react'
 
-import * as selectors from "../redux/selectors";
-import { useReduxState } from "./use-redux-state";
+import * as selectors from '../redux/selectors'
+import { useReduxState } from './use-redux-state'
 
 export function useColumn(columnId: string) {
   const column = useReduxState(
     useCallback(
       (state) => selectors.columnSelector(state, columnId),
-      [columnId]
-    )
-  );
+      [columnId],
+    ),
+  )
 
   const columnIndex = useReduxState(selectors.columnIdsSelector).indexOf(
-    columnId
-  );
+    columnId,
+  )
 
   const headerDetails: HeaderDetails = {
-    title: column ? column.title : "",
-  };
+    title: column ? column.title : '',
+  }
 
   const isOverMaxColumnLimit = !!(
     columnIndex >= 0 && columnIndex + 1 > constants.COLUMNS_LIMIT
-  );
+  )
 
-  const hasCrossedColumnsLimit = isOverMaxColumnLimit;
+  const hasCrossedColumnsLimit = isOverMaxColumnLimit
 
-  const dashboardFromUsername = undefined;
+  const dashboardFromUsername = undefined
 
   return useMemo(
     () => ({
@@ -45,6 +45,6 @@ export function useColumn(columnId: string) {
       hasCrossedColumnsLimit,
       headerDetails,
       isOverMaxColumnLimit,
-    ]
-  );
+    ],
+  )
 }

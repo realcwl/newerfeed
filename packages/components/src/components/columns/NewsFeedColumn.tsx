@@ -1,18 +1,18 @@
-import { HeaderDetails } from "@devhub/core";
-import React, { useMemo } from "react";
+import { HeaderDetails } from '@devhub/core'
+import React, { useMemo } from 'react'
 
 import {
   NewsFeedCardsContainer,
   NewsFeedCardsContainerProps,
-} from "../../containers/NewsFeedCardsContainer";
-import { IconProp } from "../../libs/vector-icons";
-import { ColumnRenderer, ColumnRendererProps } from "./ColumnRenderer";
+} from '../../containers/NewsFeedCardsContainer'
+import { IconProp } from '../../libs/vector-icons'
+import { ColumnRenderer, ColumnRendererProps } from './ColumnRenderer'
 
 export interface EventColumnProps
-  extends Omit<NewsFeedCardsContainerProps, "ownerIsKnown" | "repoIsKnown"> {
-  columnIndex: number;
-  headerDetails: HeaderDetails;
-  pagingEnabled?: boolean;
+  extends Omit<NewsFeedCardsContainerProps, 'ownerIsKnown' | 'repoIsKnown'> {
+  columnIndex: number
+  headerDetails: HeaderDetails
+  pagingEnabled?: boolean
 }
 
 export const EventColumn = React.memo((props: EventColumnProps) => {
@@ -23,9 +23,9 @@ export const EventColumn = React.memo((props: EventColumnProps) => {
     pagingEnabled,
     pointerEvents,
     swipeable,
-  } = props;
+  } = props
 
-  const Children = useMemo<ColumnRendererProps["children"]>(
+  const Children = useMemo<ColumnRendererProps['children']>(
     () => (
       <NewsFeedCardsContainer
         key={`event-cards-container-${columnId}`}
@@ -34,10 +34,10 @@ export const EventColumn = React.memo((props: EventColumnProps) => {
         swipeable={swipeable}
       />
     ),
-    [columnId, columnIndex, pointerEvents, swipeable]
-  );
+    [columnId, columnIndex, pointerEvents, swipeable],
+  )
 
-  if (!headerDetails) return null;
+  if (!headerDetails) return null
 
   return (
     <ColumnRenderer
@@ -58,7 +58,7 @@ export const EventColumn = React.memo((props: EventColumnProps) => {
     >
       {Children}
     </ColumnRenderer>
-  );
-});
+  )
+})
 
-EventColumn.displayName = "EventColumn";
+EventColumn.displayName = 'EventColumn'
