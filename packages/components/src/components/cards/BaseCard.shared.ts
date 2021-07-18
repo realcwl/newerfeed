@@ -1,4 +1,4 @@
-import { Column, constants } from '@devhub/core'
+import { Column, constants, NewsFeedData } from '@devhub/core'
 import { PixelRatio } from 'react-native'
 
 import { Platform } from '../../libs/platform'
@@ -69,43 +69,23 @@ export interface BaseCardProps extends AdditionalCardProps {
     }
     text: string
   }
-  avatar: {
-    imageURL: string
-    linkURL: string
-  }
+  avatar?: { imageURL?: string; linkURL?: string }
   date: string
   icon: IconProp
   isRead: boolean
   isSaved: boolean
-  labels:
-    | {
-        name: string
-        color?: string
-      }[]
-    | undefined
   link: string
   nodeIdOrId: string
-  subitems?: {
-    avatar:
-      | {
-          imageURL: string
-          linkURL: string
-        }
-      | undefined
-    text: string
-  }[]
-  subtitle?: string
-  text?: {
-    text: string
-    repo?: { owner: string; name: string; url: string }
-  }
+  text?: string
   title: string
   type: Column['type']
 }
 
 function _getCardPropsForItem(
   type: string,
+  item: NewsFeedData,
 ): Omit<BaseCardProps, keyof AdditionalCardProps> {
+  console.log('what item', item)
   return {
     type: 'COLUMN_TYPE_NEWS_FEED',
     link: '',
@@ -114,21 +94,22 @@ function _getCardPropsForItem(
     date: 'unknown date',
     icon: { family: 'octicon', name: 'alert' },
     title: 'title',
-    avatar: { imageURL: 'imageURL', linkURL: 'linkURL' },
-    labels: undefined,
+    text: item.text,
+    avatar: item.avatar,
     nodeIdOrId: 'node_id',
   }
 }
 
 const _memoizedGetCardPropsForItemFnByColumnId = betterMemoize(
-  (_columnId: string) => (type: string) => _getCardPropsForItem(type),
+  (_columnId: string) => (type: string, item: NewsFeedData) =>
+    _getCardPropsForItem(type, item),
   undefined,
   10,
 )
 
 const _memoizedGetCardPropsForItem = betterMemoize(
-  (type: string, columnId: string) =>
-    _memoizedGetCardPropsForItemFnByColumnId(columnId)(type),
+  (type: string, columnId: string, item: NewsFeedData) =>
+    _memoizedGetCardPropsForItemFnByColumnId(columnId)(type, item),
   undefined,
   200,
 )
@@ -136,9 +117,10 @@ const _memoizedGetCardPropsForItem = betterMemoize(
 export function getCardPropsForItem(
   type: string,
   columnId: string,
+  item: NewsFeedData,
 ): Omit<BaseCardProps, keyof AdditionalCardProps> &
   Pick<AdditionalCardProps, 'height'> {
-  const props = _memoizedGetCardPropsForItem(type, columnId)
+  const props = _memoizedGetCardPropsForItem(type, columnId, item)
   return { ...props, height: getCardSizeForProps(props) }
 }
 
@@ -152,22 +134,10 @@ export function getCardSizeForProps(
       Math.max(
         sizes.avatarContainerHeight,
         (props.title ? sizes.titleLineHeight : 0) +
-          (props.subtitle
-            ? sizes.subtitleLineHeight + sizes.verticalSpaceSize
-            : 0) +
-          (props.text && props.text.text
-            ? sizes.textLineHeight + sizes.verticalSpaceSize
-            : 0),
+          (props.text ? sizes.textLineHeight + sizes.verticalSpaceSize : 0),
       ) +
       (props.action && props.action.text
         ? sizes.actionContainerHeight + sizes.verticalSpaceSize
-        : 0) +
-      (props.labels && props.labels.length
-        ? smallLabelHeight + sizes.verticalSpaceSize
-        : 0) +
-      (props.subitems && props.subitems.length
-        ? props.subitems.length *
-          (sizes.subitemContainerHeight + sizes.verticalSpaceSize)
         : 0) +
       (renderCardActions ? cardActionsHeight + sizes.verticalSpaceSize : 0) +
       cardItemSeparatorSize,

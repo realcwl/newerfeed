@@ -1,4 +1,4 @@
-import { capitalizeFirstLetter, constants } from '@devhub/core'
+import { capitalizeFirstLetter, constants, NewsFeedData } from '@devhub/core'
 import React, { useCallback } from 'react'
 import { View } from 'react-native'
 import { useDispatch } from 'react-redux'
@@ -20,7 +20,7 @@ import { useReduxState } from '../hooks/use-redux-state'
 import { useLoginHelpers } from '../components/context/LoginHelpersContext'
 import * as selectors from '../redux/selectors'
 
-export interface EventCardsContainerProps
+export interface NewsFeedCardsContainerProps
   extends Omit<
     EventCardsProps,
     | 'column'
@@ -35,9 +35,12 @@ export interface EventCardsContainerProps
   columnId: string
 }
 
-export const EventCardsContainer = React.memo(
-  (props: EventCardsContainerProps) => {
+export const NewsFeedCardsContainer = React.memo(
+  (props: NewsFeedCardsContainerProps) => {
     const { columnId, ...otherProps } = props
+
+    const { allItems, filteredItemsIds, getItemByNodeIdOrId } =
+      useColumnData<NewsFeedData>(columnId, { mergeSimilar: false })
 
     const { isLoggingIn } = useLoginHelpers()
 
@@ -52,22 +55,15 @@ export const EventCardsContainer = React.memo(
         key={`event-cards-${columnId}`}
         columnId={columnId}
         errorMessage={''}
-        fetchNextPage={() => {}}
-        getItemByNodeIdOrId={(id) => {
-          return {
-            id: id,
-            message: 'dummy_data_message',
-            attachments: undefined,
-            parent: undefined,
-          }
-        }}
+        fetchNextPage={() => undefined}
+        getItemByNodeIdOrId={getItemByNodeIdOrId}
         isShowingOnlyBookmarks={!!(column.filters && column.filters.saved)}
-        itemNodeIdOrIds={[]}
+        itemNodeIdOrIds={['dummyCard']}
         lastFetchSuccessAt={''}
-        refresh={() => {}}
+        refresh={() => undefined}
       />
     )
   },
 )
 
-EventCardsContainer.displayName = 'EventCardsContainer'
+NewsFeedCardsContainer.displayName = 'NewsFeedCardsContainer'

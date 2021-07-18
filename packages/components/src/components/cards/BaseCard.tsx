@@ -195,7 +195,6 @@ const styles = StyleSheet.create({
 export const BaseCard = React.memo((props: BaseCardProps) => {
   const {
     action,
-    // appViewMode,
     height,
 
     avatar,
@@ -204,11 +203,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     icon,
     isRead,
     isSaved,
-    labels,
     link,
     nodeIdOrId,
-    subitems,
-    subtitle,
     text,
     title,
     type,
@@ -216,12 +212,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   if (!link)
     console.error(
-      `No link for ${type} card: ${nodeIdOrId}, ${title}, ${text && text.text}`, // eslint-disable-line
+      `No link for ${type} card: ${nodeIdOrId}, ${title}, ${text}`, // eslint-disable-line
     )
   if (link && link.includes('api.github.com'))
     console.error(
       `Wrong link for ${type} card: ${nodeIdOrId}, ${title}, ${
-        text && text.text // eslint-disable-line
+        text // eslint-disable-line
       }`,
       link,
     )
@@ -237,11 +233,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     })
 
   const dispatch = useDispatch()
-
-  const textIsOnlyIssueNumber =
-    text && text.text && text.text.match(/^#([0-9]+)$/)
-  const issueNumber =
-    textIsOnlyIssueNumber && Number(text!.text.match(/^#([0-9]+)$/)![1])
 
   return (
     <View
@@ -285,9 +276,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         <View style={sharedStyles.horizontal}>
           <View style={styles.avatarContainer}>
             <Avatar
-              avatarUrl={avatar.imageURL}
-              disableLink={avatar.linkURL === link}
-              linkURL={avatar.linkURL}
+              avatarUrl={avatar?.imageURL}
+              disableLink={avatar?.linkURL === link}
+              linkURL={avatar?.linkURL}
               style={styles.avatar}
               size={avatarSize}
             />
@@ -368,24 +359,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               )}
             </View>
 
-            {!!subtitle && (
-              <>
-                <Spacer height={sizes.verticalSpaceSize} />
-
-                <ThemedText
-                  color={isRead ? 'foregroundColorMuted65' : 'foregroundColor'}
-                  numberOfLines={1}
-                  style={[
-                    styles.subtitle,
-                    { fontWeight: isMuted ? '300' : '400' },
-                  ]}
-                >
-                  {subtitle}
-                </ThemedText>
-              </>
-            )}
-
-            {!!(text && text.text) && (
+            {!!text && (
               <>
                 <Spacer height={sizes.verticalSpaceSize} />
 
@@ -398,92 +372,13 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                     { height: sizes.textLineHeight },
                   ]}
                 >
-                  {text.repo &&
-                  text.repo.owner &&
-                  text.repo.name &&
-                  columnId ? (
-                    <ConditionalWrap
-                      condition={Platform.OS !== 'web'}
-                      wrap={(c) => (
-                        <View
-                          style={[sharedStyles.flex, sharedStyles.flexWrap]}
-                        >
-                          {c}
-                        </View>
-                      )}
-                    >
-                      <Link
-                        TouchableComponent={GestureHandlerTouchableOpacity}
-                        enableUnderlineHover
-                        href={'javascript:void(0)'}
-                        openOnNewTab={false}
-                        onPress={(() => {
-                          if (textIsOnlyIssueNumber && issueNumber) {
-                            return () => {
-                              vibrateHapticFeedback()
-
-                              const removeIfAlreadySet = !(
-                                KeyboardKeyIsPressed.meta ||
-                                KeyboardKeyIsPressed.shift
-                              )
-
-                              const removeOthers = !(
-                                KeyboardKeyIsPressed.alt ||
-                                KeyboardKeyIsPressed.meta ||
-                                KeyboardKeyIsPressed.shift
-                              )
-
-                              dispatch(
-                                actions.changeIssueNumberFilter({
-                                  columnId,
-                                  issueNumber,
-                                  removeIfAlreadySet,
-                                  removeOthers,
-                                  value: KeyboardKeyIsPressed.alt
-                                    ? false
-                                    : true,
-                                }),
-                              )
-                            }
-                          }
-
-                          return () => {
-                            vibrateHapticFeedback()
-
-                            dispatch(
-                              actions.setColumnRepoFilter({
-                                columnId,
-                                owner: text.repo!.owner,
-                                repo: text.repo!.name,
-                                value: KeyboardKeyIsPressed.alt ? false : true,
-                                // removeIfAlreadySet,
-                                // removeOthers,
-                              }),
-                            )
-                          }
-                        })()}
-                        style={[
-                          sharedStyles.flexShrink1,
-                          sharedStyles.flexNoGrow,
-                        ]}
-                        textProps={{
-                          color: 'foregroundColorMuted65',
-                          numberOfLines: 1,
-                          style: styles.text,
-                        }}
-                      >
-                        {text.text}
-                      </Link>
-                    </ConditionalWrap>
-                  ) : (
-                    <ThemedText
-                      color="foregroundColorMuted65"
-                      numberOfLines={1}
-                      style={[styles.text, sharedStyles.flex]}
-                    >
-                      {text.text}
-                    </ThemedText>
-                  )}
+                  <ThemedText
+                    color="foregroundColorMuted65"
+                    numberOfLines={1}
+                    style={[styles.text, sharedStyles.flex]}
+                  >
+                    {text}
+                  </ThemedText>
 
                   {!!columnId && (
                     <View
@@ -534,120 +429,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             )}
           </View>
         </View>
-
-        {!!(labels && labels.length) && (
-          <>
-            <Spacer height={sizes.verticalSpaceSize} />
-
-            <View
-              style={[
-                sharedStyles.fullWidth,
-                sharedStyles.fullMaxWidth,
-                sharedStyles.horizontal,
-                { height: smallLabelHeight },
-              ]}
-            >
-              <Spacer
-                width={sizes.avatarContainerWidth + sizes.horizontalSpaceSize}
-              />
-
-              <ScrollView
-                alwaysBounceHorizontal={false}
-                alwaysBounceVertical={false}
-                data-scrollbar={false}
-                horizontal
-                style={sharedStyles.flex}
-              >
-                {labels.map((label, index) => (
-                  <Fragment key={`${label.name}-${label.color}`}>
-                    <Link
-                      TouchableComponent={GestureHandlerTouchableOpacity}
-                      enableUnderlineHover={false}
-                      href="javascript:void(0)"
-                      openOnNewTab={false}
-                      onPress={
-                        !columnId
-                          ? undefined
-                          : (() => {
-                              return () => {
-                                vibrateHapticFeedback()
-
-                                const removeIfAlreadySet = !(
-                                  KeyboardKeyIsPressed.meta ||
-                                  KeyboardKeyIsPressed.shift
-                                )
-
-                                const removeOthers = !(
-                                  KeyboardKeyIsPressed.alt ||
-                                  KeyboardKeyIsPressed.meta ||
-                                  KeyboardKeyIsPressed.shift
-                                )
-
-                                dispatch(
-                                  actions.setColumnLabelFilter({
-                                    columnId,
-                                    label: label.name,
-                                    value: KeyboardKeyIsPressed.alt
-                                      ? false
-                                      : true,
-                                    removeIfAlreadySet,
-                                    removeOthers,
-                                  }),
-                                )
-                              }
-                            })()
-                      }
-                      style={sharedStyles.flexShrink1}
-                    >
-                      <Label
-                        colorThemeColor={fixColorHexWithoutHash(label.color)}
-                        disableEmojis
-                        small
-                      >
-                        {label.name.toLowerCase()}
-                      </Label>
-                    </Link>
-
-                    {index < labels.length - 1 && (
-                      <Spacer width={contentPadding / 2} />
-                    )}
-                  </Fragment>
-                ))}
-              </ScrollView>
-            </View>
-          </>
-        )}
-
-        {!!(subitems && subitems.length) &&
-          subitems.map((subitem, index) => (
-            <Fragment key={`base-card-subitem-${index}`}>
-              <Spacer height={sizes.verticalSpaceSize} />
-
-              <View style={styles.subitemContainer}>
-                <View style={styles.smallAvatarContainer}>
-                  {subitem.avatar && subitem.avatar.imageURL && (
-                    <Avatar
-                      avatarUrl={subitem.avatar.imageURL}
-                      disableLink={subitem.avatar.linkURL === link}
-                      linkURL={subitem.avatar.linkURL}
-                      style={styles.avatar}
-                      size={smallAvatarSize}
-                    />
-                  )}
-                </View>
-
-                <Spacer width={sizes.horizontalSpaceSize} />
-
-                <ThemedText
-                  color="foregroundColorMuted65"
-                  numberOfLines={1}
-                  style={styles.subitem}
-                >
-                  {subitem.text}
-                </ThemedText>
-              </View>
-            </Fragment>
-          ))}
 
         {!!renderCardActions && (
           <>

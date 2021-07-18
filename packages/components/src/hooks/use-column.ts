@@ -18,7 +18,6 @@ export function useColumn(columnId: string) {
   )
 
   const headerDetails: HeaderDetails = {
-    icon: 'undefiled',
     title: column ? column.title : '',
   }
 

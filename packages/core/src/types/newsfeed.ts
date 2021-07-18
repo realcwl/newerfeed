@@ -118,7 +118,9 @@ export interface ColumnFilter {
 export interface NewsFeedData {
   id: string
   // message shown to user.
-  message?: string
+  text?: string
+  // user avatar, ex. weibo/twitter
+  avatar?: { imageURL?: string; linkURL?: string }
   // if this is not null, user can click a card to go to original page.
   url?: string
   // A list of attachment that will be rendered together with this card.
@@ -132,7 +134,7 @@ export interface NewsFeedData {
   repostedFrom?: NewsFeedData
   // When this field is a string,
   // which is the parent data ID, don't render it
-  parent: string | undefined
+  parentId?: string
   // Put all deplicate children messages.
   duplicateIds?: string[]
 }
@@ -183,7 +185,7 @@ export type ModalPayload =
 
 export interface HeaderDetails {
   avatarProps?: { imageURL: string; linkURL: string }
-  icon: string
+  icon?: GenericIconProp
   subtitle?: string
   title: string
 }

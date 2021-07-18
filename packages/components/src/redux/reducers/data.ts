@@ -17,8 +17,14 @@ export interface State {
 }
 
 const initialState: State = {
-  allIds: [],
-  byId: {},
+  allIds: ['dummyCard'],
+  byId: {
+    dummyCard: {
+      id: 'dummyCard',
+      text: 'first card!',
+      avatar: { imageURL: '/static/media/logo.png', linkURL: '/' },
+    },
+  },
   readIds: [],
   savedIds: [],
   updatedAt: undefined,

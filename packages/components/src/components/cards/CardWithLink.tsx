@@ -49,7 +49,7 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
       return {}
     }
 
-    const _cardProps = getCardPropsForItem(type, columnId)
+    const _cardProps = getCardPropsForItem(type, columnId, item)
 
     return {
       cardProps: _cardProps,

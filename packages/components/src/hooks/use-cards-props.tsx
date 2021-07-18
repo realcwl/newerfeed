@@ -71,7 +71,7 @@ export function useCardsProps<ItemT extends NewsFeedData>({
       const item = getItemByNodeIdOrId(nodeIdOrId)
       if (!item) return 0
 
-      const itemCardProps = getCardPropsForItem(type, columnId || '')
+      const itemCardProps = getCardPropsForItem(type, columnId || '', item)
       if (!itemCardProps) return 0
 
       return getCardSizeForProps(itemCardProps)

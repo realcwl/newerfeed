@@ -17,6 +17,9 @@ export function normalizeColumns(
       draft.id = id
       draft.createdAt = column.createdAt || new Date().toISOString()
       draft.updatedAt = column.updatedAt || new Date().toISOString()
+
+      // BONINGTODO: delete after card testing is done
+      draft.itemListIds = ['dummyCard']
     }) as Column
 
     return id

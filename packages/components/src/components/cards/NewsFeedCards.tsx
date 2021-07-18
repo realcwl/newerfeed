@@ -90,18 +90,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
   >(
     ({ item: nodeIdOrId, index }) => {
       const height = getItemSize(nodeIdOrId, index)
-
-      if (swipeable) {
-        return (
-          <View style={{ height }}>
-            <SwipeableCard
-              type="COLUMN_TYPE_NEWS_FEED"
-              columnId={columnId}
-              nodeIdOrId={nodeIdOrId}
-            />
-          </View>
-        )
-      }
+      console.log('ok', nodeIdOrId, index, swipeable)
 
       return (
         <ErrorBoundary>
