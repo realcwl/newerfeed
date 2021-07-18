@@ -86,28 +86,33 @@ export const DataExpressionEditor = React.memo(
         return undefined
       }
 
-      let headerWording = undefined
+      let headerComponent = undefined
       if (isAllOf(exprWrapper.expr)) {
-        headerWording = renderButtonByTextAndKey('AllOf', 'yellow', true)
+        headerComponent = renderButtonByTextAndKey({
+          text: 'AllOf',
+          color: 'yellow',
+          disabled: true,
+          onDelete: () => deleteExpressionById(exprWrapper.id),
+        })
       } else if (isAnyOf(exprWrapper.expr)) {
-        headerWording = renderButtonByTextAndKey('AnyOf', 'green', true)
+        headerComponent = renderButtonByTextAndKey({
+          text: 'AnyOf',
+          color: 'green',
+          disabled: true,
+          onDelete: () => deleteExpressionById(exprWrapper.id),
+        })
       } else if (isNotTrue(exprWrapper.expr)) {
-        headerWording = renderButtonByTextAndKey('Not', 'red', true)
+        headerComponent = renderButtonByTextAndKey({
+          text: 'Not',
+          color: 'lightRed',
+          disabled: true,
+          onDelete: () => deleteExpressionById(exprWrapper.id),
+        })
       }
 
       return (
         <View style={[sharedStyles.flex, sharedStyles.horizontal]}>
-          <H3>{headerWording}</H3>
-          <Spacer width={20} />
-          <IconButton
-            color="red"
-            family="material"
-            name={'remove-circle'}
-            size={18 * scaleFactor}
-            onPress={() => {
-              deleteExpressionById(exprWrapper.id)
-            }}
-          />
+          {headerComponent}
         </View>
       )
     }
@@ -161,21 +166,12 @@ export const DataExpressionEditor = React.memo(
       )
     } else {
       // Handling Predicate Type.
-      return (
-        <View style={[sharedStyles.flex, sharedStyles.horizontal]}>
-          <H3>{dataExpressionWrapper.expr?.param}</H3>
-          <Spacer width={contentPadding} />
-          <IconButton
-            color="red"
-            family="material"
-            name={'remove-circle'}
-            size={18 * scaleFactor}
-            onPress={() => {
-              deleteExpressionById(dataExpressionWrapper.id)
-            }}
-          />
-        </View>
-      )
+      return renderButtonByTextAndKey({
+        text: dataExpressionWrapper.expr?.param || '',
+        disabled: false,
+        color: 'gray',
+        onDelete: () => deleteExpressionById(dataExpressionWrapper.id),
+      })
     }
 
     return (
@@ -187,7 +183,7 @@ export const DataExpressionEditor = React.memo(
             style={{
               borderColor: LINE_COLOR,
               borderRightWidth: 1,
-              marginLeft: columnHeaderItemContentSize * 1.5,
+              marginLeft: columnHeaderItemContentSize * 1,
             }}
           >
             <H3>{null}</H3>
