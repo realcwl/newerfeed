@@ -129,7 +129,7 @@ export interface NewsFeedData {
   postTimestamp?: Date
   // We might not be able to get postTimestamp
   // in which case we use crawledTimestamp as alternative
-  crawledTimestamp?: Date
+  crawledTimestamp: Date
   // It is a linked list of all repost/retweet
   repostedFrom?: NewsFeedData
   // When this field is a string,

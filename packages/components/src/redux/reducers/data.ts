@@ -23,6 +23,7 @@ const initialState: State = {
       id: 'dummyCard',
       text: 'first card!',
       avatar: { imageURL: '/static/media/logo.png', linkURL: '/' },
+      crawledTimestamp: new Date(),
     },
   },
   readIds: [],

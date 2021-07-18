@@ -199,7 +199,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
     avatar,
     columnId,
-    date,
+    timestamp,
     icon,
     isRead,
     isSaved,
@@ -308,12 +308,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 numberOfLines={1}
                 style={[styles.title, { fontWeight: isMuted ? '300' : '500' }]}
               >
-                {title}
+                {text}
               </ThemedText>
 
-              <IntervalRefresh date={date}>
+              <IntervalRefresh date={timestamp}>
                 {() => {
-                  const dateText = getDateSmallText(date)
+                  const dateText = getDateSmallText(timestamp)
                   if (!dateText) return null
 
                   return (
@@ -324,7 +324,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                         numberOfLines={1}
                         style={styles.timestampText}
                         {...Platform.select({
-                          web: { title: getFullDateText(date) },
+                          web: { title: getFullDateText(timestamp) },
                         })}
                       >
                         {dateText.toLowerCase()}
@@ -374,7 +374,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 >
                   <ThemedText
                     color="foregroundColorMuted65"
-                    numberOfLines={1}
+                    // numberOfLines={1}
                     style={[styles.text, sharedStyles.flex]}
                   >
                     {text}
