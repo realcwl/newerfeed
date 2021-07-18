@@ -115,12 +115,17 @@ export interface ColumnFilter {
   // more filters when needed...
 }
 
+export interface Avatar {
+  imageURL?: string
+  linkURL?: string
+}
+
 export interface NewsFeedData {
   id: string
   // message shown to user.
   text?: string
   // user avatar, ex. weibo/twitter
-  avatar?: { imageURL?: string; linkURL?: string }
+  avatar?: Avatar
   // if this is not null, user can click a card to go to original page.
   url?: string
   // A list of attachment that will be rendered together with this card.
@@ -129,7 +134,7 @@ export interface NewsFeedData {
   postTimestamp?: Date
   // We might not be able to get postTimestamp
   // in which case we use crawledTimestamp as alternative
-  crawledTimestamp?: Date
+  crawledTimestamp: Date
   // It is a linked list of all repost/retweet
   repostedFrom?: NewsFeedData
   // When this field is a string,
