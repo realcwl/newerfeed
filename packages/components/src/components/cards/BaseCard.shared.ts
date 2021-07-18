@@ -71,7 +71,6 @@ export interface BaseCardProps extends AdditionalCardProps {
   }
   avatar?: { imageURL?: string; linkURL?: string }
   timestamp: Date
-  icon: IconProp
   isRead: boolean
   isSaved: boolean
   link: string
@@ -91,7 +90,6 @@ function _getCardPropsForItem(
     isRead: false,
     isSaved: false,
     timestamp: item.postTimestamp ?? item.crawledTimestamp,
-    icon: { family: 'octicon', name: 'alert' },
     title: 'title',
     text: item.text,
     avatar: item.avatar,

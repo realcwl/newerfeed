@@ -21,8 +21,12 @@ const initialState: State = {
   byId: {
     dummyCard: {
       id: 'dummyCard',
-      text: 'first card!',
-      avatar: { imageURL: '/static/media/logo.png', linkURL: '/' },
+      text: 'first card with some real real long description and real long text and see if it works!',
+      avatar: {
+        imageURL:
+          'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
+        linkURL: '/',
+      },
       crawledTimestamp: new Date(),
     },
   },
