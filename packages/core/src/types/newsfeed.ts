@@ -117,15 +117,22 @@ export interface ColumnFilter {
 
 export interface Avatar {
   imageURL?: string
-  linkURL?: string
+}
+
+export interface Author {
+  avatar?: Avatar
+  name: string
+  profileURL?: string
 }
 
 export interface NewsFeedData {
   id: string
   // message shown to user.
+  title?: string
+  // message shown to user.
   text?: string
-  // user avatar, ex. weibo/twitter
-  avatar?: Avatar
+  // author info, ex. weibo/twitter users
+  author?: Author
   // if this is not null, user can click a card to go to original page.
   url?: string
   // A list of attachment that will be rendered together with this card.

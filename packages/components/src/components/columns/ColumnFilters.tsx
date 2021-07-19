@@ -19,7 +19,6 @@ import { sharedStyles } from '../../styles/shared'
 import { contentPadding } from '../../styles/variables'
 import { vibrateHapticFeedback } from '../../utils/helpers/shared'
 import { columnHeaderItemContentSize } from '../columns/ColumnHeader'
-import { Avatar } from '../common/Avatar'
 import { Button } from '../common/Button'
 import {
   Checkbox,
