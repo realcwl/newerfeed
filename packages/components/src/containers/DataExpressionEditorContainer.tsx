@@ -6,7 +6,6 @@ import { View } from 'react-native-web'
 import { Separator } from '../components/common/Separator'
 import { Spacer } from '../components/common/Spacer'
 import { DataExpressionEditor } from '../components/modals/partials/DataExpressionEditor'
-import { LogicalExpressionButtons } from '../components/modals/partials/LogicalExpressionButtons'
 import { contentPadding } from '../styles/variables'
 import { isAllOf, isAnyOf, isNotTrue } from '../utils/types'
 
@@ -149,9 +148,6 @@ export const DataExpressionEditorContainer = React.memo(
         )
       }
 
-      console.warn(
-        "Should never reach here because predicate type doesn't have children",
-      )
       return false
     }
 
