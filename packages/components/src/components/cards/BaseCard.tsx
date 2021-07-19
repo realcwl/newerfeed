@@ -24,7 +24,6 @@ import { Avatar } from '../common/Avatar'
 import { ConditionalWrap } from '../common/ConditionalWrap'
 import { IntervalRefresh } from '../common/IntervalRefresh'
 import { Label, smallLabelHeight } from '../common/Label'
-import { Link } from '../common/Link'
 import { Spacer } from '../common/Spacer'
 import { Text } from '../common/Text'
 import { ThemedIcon } from '../themed/ThemedIcon'
@@ -208,20 +207,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     title,
     type,
   } = props
-
-  if (!link)
-    console.error(
-      `No link for ${type} card: ${nodeIdOrId}, ${title}, ${text}`, // eslint-disable-line
-    )
-  if (link && link.includes('api.github.com'))
-    console.error(
-      `Wrong link for ${type} card: ${nodeIdOrId}, ${title}, ${
-        text // eslint-disable-line
-      }`,
-      link,
-    )
-
-  const baseURL = 'https://www.google.com'
 
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
 
