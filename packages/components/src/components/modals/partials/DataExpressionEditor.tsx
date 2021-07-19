@@ -11,7 +11,10 @@ import { StyleSheet } from 'react-native'
 import { ThemedIcon } from '../../themed/ThemedIcon'
 import { isAllOf, isAnyOf, isNotTrue } from '../../../utils/types'
 import { IconButton } from '../../common/IconButton'
-import { renderButtonByTextAndKey } from './LogicalExpressionButtons'
+import {
+  LiteralPredicateButton,
+  renderButtonByTextAndKey,
+} from './LogicalExpressionButtons'
 
 // All color combinations.
 // TODO(chenweilunster): Put this into a shared place if this color is needed in
@@ -22,7 +25,7 @@ export interface DataExpressionEditorProps {
   dataExpressionWrapper: NewsFeedDataExpressionWrapper
   setFocusId: (id: string) => void
   deleteExpressionById: (id: string | undefined) => boolean
-  addExpressionWrapper: (payload: NewsFeedDataExpressionWrapper) => boolean
+  setExpressionWrapper: (payload: NewsFeedDataExpressionWrapper) => boolean
 }
 
 // Before rendering anything, render a dashline in relative position to denote
@@ -57,7 +60,7 @@ export const DataExpressionEditor = React.memo(
       dataExpressionWrapper,
       deleteExpressionById,
       setFocusId,
-      addExpressionWrapper,
+      setExpressionWrapper,
     } = props
     if (!dataExpressionWrapper || !dataExpressionWrapper.id) return null
 
@@ -89,6 +92,7 @@ export const DataExpressionEditor = React.memo(
       let headerComponent = undefined
       if (isAllOf(exprWrapper.expr)) {
         headerComponent = renderButtonByTextAndKey({
+          id: exprWrapper.id || '',
           text: 'AllOf',
           color: 'yellow',
           disabled: true,
@@ -96,6 +100,7 @@ export const DataExpressionEditor = React.memo(
         })
       } else if (isAnyOf(exprWrapper.expr)) {
         headerComponent = renderButtonByTextAndKey({
+          id: exprWrapper.id || '',
           text: 'AnyOf',
           color: 'green',
           disabled: true,
@@ -103,6 +108,7 @@ export const DataExpressionEditor = React.memo(
         })
       } else if (isNotTrue(exprWrapper.expr)) {
         headerComponent = renderButtonByTextAndKey({
+          id: exprWrapper.id || '',
           text: 'Not',
           color: 'lightRed',
           disabled: true,
@@ -129,7 +135,7 @@ export const DataExpressionEditor = React.memo(
               dataExpressionWrapper={exprWrapper}
               deleteExpressionById={deleteExpressionById}
               setFocusId={setFocusId}
-              addExpressionWrapper={addExpressionWrapper}
+              setExpressionWrapper={setExpressionWrapper}
             />
             <Spacer height={contentPadding / 2} />
           </ExpressionEntryIndicator>
@@ -146,7 +152,7 @@ export const DataExpressionEditor = React.memo(
               dataExpressionWrapper={exprWrapper}
               deleteExpressionById={deleteExpressionById}
               setFocusId={setFocusId}
-              addExpressionWrapper={addExpressionWrapper}
+              setExpressionWrapper={setExpressionWrapper}
             />
             <Spacer height={contentPadding / 2} />
           </ExpressionEntryIndicator>
@@ -159,19 +165,24 @@ export const DataExpressionEditor = React.memo(
             dataExpressionWrapper={dataExpressionWrapper.expr.notTrue}
             deleteExpressionById={deleteExpressionById}
             setFocusId={setFocusId}
-            addExpressionWrapper={addExpressionWrapper}
+            setExpressionWrapper={setExpressionWrapper}
           />
           <Spacer height={contentPadding / 2} />
         </ExpressionEntryIndicator>
       )
     } else {
       // Handling Predicate Type.
-      return renderButtonByTextAndKey({
-        text: dataExpressionWrapper.expr?.param || '',
-        disabled: false,
-        color: 'gray',
-        onDelete: () => deleteExpressionById(dataExpressionWrapper.id),
-      })
+      return (
+        <LiteralPredicateButton
+          text={dataExpressionWrapper.expr?.param || ''}
+          id={dataExpressionWrapper.id}
+          disabled={false}
+          color={'gray'}
+          onDelete={() => deleteExpressionById(dataExpressionWrapper.id)}
+          setExpressionWrapper={setExpressionWrapper}
+          setFocusId={setFocusId}
+        />
+      )
     }
 
     return (

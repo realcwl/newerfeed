@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { View, StyleSheet } from 'react-native-web'
 import { Button } from '../../common/Button'
 import { sharedStyles } from '../../../styles/shared'
-import { ThemeColors } from '@devhub/core'
+import { NewsFeedDataExpressionWrapper, ThemeColors } from '@devhub/core'
 import { contentPadding, scaleFactor } from '../../../styles/variables'
 import { TagToken } from '../../common/TagToken'
 import { vibrateHapticFeedback } from '../../../utils/helpers/shared'
 import { Spacer } from '../../common/Spacer'
+import { TextInput } from '../../common/TextInput'
+import { LiteralPredicateTextInput } from './LiteralPredicateTextInput'
 
 const styles = StyleSheet.create({
   container: {
@@ -17,16 +19,29 @@ const styles = StyleSheet.create({
 export interface LogicalExpressionButtonsProps {}
 
 export interface renderButtonSettings {
+  id?: string
   text: string
   color: keyof ThemeColors
   disabled: boolean
   disableDelete?: boolean
-  onPress?: () => boolean
+  onPress?: () => void
   onDelete?: () => boolean
+  setFocusId?: (id: string) => void
+  setExpressionWrapper?: (payload: NewsFeedDataExpressionWrapper) => boolean
 }
 
-export function renderButtonByTextAndKey(settings: renderButtonSettings) {
-  const { text, color, disabled, onDelete, disableDelete } = settings
+export function renderButtonByTextAndKey(props: renderButtonSettings) {
+  const {
+    id,
+    text,
+    color,
+    disabled,
+    onDelete,
+    onPress,
+    disableDelete,
+    setFocusId,
+    setExpressionWrapper,
+  } = props
 
   return (
     <View
@@ -42,23 +57,45 @@ export function renderButtonByTextAndKey(settings: renderButtonSettings) {
           foregroundHoverThemeColor: 'black',
         }}
         onPress={() => {
+          if (!onPress) return
           vibrateHapticFeedback()
-
-          console.log('pressed with haptic feedback')
+          onPress()
         }}
         onRemove={
           onDelete
             ? () => {
+                vibrateHapticFeedback()
                 onDelete()
               }
             : undefined
         }
-        size={30 * scaleFactor}
+        size={25 * scaleFactor}
         disabled={disabled}
       />
     </View>
   )
 }
+
+// Return a literal predicate button that change to text input when user clicks.
+export const LiteralPredicateButton = React.memo(
+  (props: renderButtonSettings) => {
+    const { text, id, onDelete, setExpressionWrapper, setFocusId } = props
+    const [isEditing, setIsEditing] = useState(false)
+    return !isEditing ? (
+      renderButtonByTextAndKey({
+        ...props,
+        onPress: () => setIsEditing(true),
+      })
+    ) : (
+      <LiteralPredicateTextInput
+        onDelete={onDelete}
+        id={id || ''}
+        text={text}
+        setExpressionWrapper={setExpressionWrapper}
+      />
+    )
+  },
+)
 
 export const LogicalExpressionButtons = React.memo(
   (props: LogicalExpressionButtonsProps) => {

@@ -1,14 +1,7 @@
-import {
-  NewsFeedDataExpressionWrapper,
-  AllOf,
-  AnyOf,
-  NotTrue,
-  Predicate,
-  guid,
-} from '@devhub/core'
+import { NewsFeedDataExpressionWrapper, guid } from '@devhub/core'
 import { useFormik } from 'formik'
-import _, { filter } from 'lodash'
-import React, { Children, useState } from 'react'
+import _ from 'lodash'
+import React, { useState } from 'react'
 import { View } from 'react-native-web'
 import { Separator } from '../components/common/Separator'
 import { Spacer } from '../components/common/Spacer'
@@ -46,50 +39,6 @@ function FilterChildrenById(
   if (isNotTrue(expr)) {
     delete expr.notTrue.expr
   }
-}
-
-// Try to add a news wrapper to the array of the parentWrapper, return addition
-// result. Also populate a new Creator expression if addition is successful.
-function addExpressionToChildrenIfApplicable(
-  parentWrapper: NewsFeedDataExpressionWrapper,
-  candidate: NewsFeedDataExpressionWrapper,
-): boolean {
-  if (!parentWrapper.expr || !candidate.expr) return false
-
-  let expr = parentWrapper.expr
-  if (isAllOf(expr)) {
-    let creator = expr.allOf[expr.allOf.length - 1]
-    if (creator.id === candidate.id && !creator.expr) {
-      creator.expr = candidate.expr
-
-      expr.allOf.push({
-        id: guid(),
-      })
-      return true
-    }
-  }
-
-  if (isAnyOf(expr)) {
-    let creator = expr.anyOf[expr.anyOf.length - 1]
-    if (creator.id === candidate.id && !creator.expr) {
-      creator.expr = candidate.expr
-
-      expr.anyOf.push({
-        id: guid(),
-      })
-      return true
-    }
-  }
-
-  if (isNotTrue(expr)) {
-    let creator = expr.notTrue
-    if (creator.id === candidate.id && !creator.expr) {
-      creator.expr = candidate.expr
-      return true
-    }
-  }
-
-  return false
 }
 
 // Expression Addition and Deletion are handled centrally in this top level
@@ -213,14 +162,23 @@ export const DataExpressionEditorContainer = React.memo(
 
     // Add a dataExpressionWrapper at the specified place, denoted by id. Return
     // true if added successfully, false if fail.
-    function addExpressionWrapper(
+    function setExpressionWrapper(
       payloadWrapper: NewsFeedDataExpressionWrapper,
     ): boolean {
       // Cannot add a Creator expression directly.
       if (!payloadWrapper.expr) {
         return false
       }
-      const added = addExpressionWrapperByIdInternal(
+      // If we're changing the top level wrapper directly, we directly modify
+      // its data.
+      if (dataExpressionWrapper.id === payloadWrapper.id) {
+        dataExpressionWrapper.expr = payloadWrapper.expr
+        return true
+      }
+
+      // Otherwise, it must be one of the children, we must find it and set it
+      // correctly.
+      const added = setExpressionWrapperByIdInternal(
         dataExpressionWrapper,
         payloadWrapper,
       )
@@ -236,38 +194,52 @@ export const DataExpressionEditorContainer = React.memo(
     // for the next addition. The Creator expression within exprWrapper is
     // handled by action dispatcher, while the new Creator in the same array as
     // exprWrapper should be handled by this function.
-    function addExpressionWrapperByIdInternal(
+    function setExpressionWrapperByIdInternal(
       parentWrapper: NewsFeedDataExpressionWrapper,
       payloadWrapper: NewsFeedDataExpressionWrapper,
     ): boolean {
-      if (addExpressionToChildrenIfApplicable(parentWrapper, payloadWrapper)) {
-        return true
-      }
-
       if (!parentWrapper.expr) return false
       let expr = parentWrapper.expr
 
       if (isAllOf(expr)) {
         for (var innerWrapper of expr.allOf) {
-          if (addExpressionWrapperByIdInternal(innerWrapper, payloadWrapper))
+          if (innerWrapper.id === payloadWrapper.id) {
+            const isCreator = !innerWrapper.expr
+            innerWrapper.expr = payloadWrapper.expr
+            if (isCreator) {
+              expr.allOf.push({ id: guid() })
+            }
             return true
+          } else if (
+            setExpressionWrapperByIdInternal(innerWrapper, payloadWrapper)
+          ) {
+            return true
+          }
         }
-        return false
       }
       if (isAnyOf(expr)) {
         for (var innerWrapper of expr.anyOf) {
-          if (addExpressionWrapperByIdInternal(innerWrapper, payloadWrapper))
+          if (innerWrapper.id === payloadWrapper.id) {
+            const isCreator = !innerWrapper.expr
+            innerWrapper.expr = payloadWrapper.expr
+            if (isCreator) {
+              expr.anyOf.push({ id: guid() })
+            }
             return true
+          } else if (
+            setExpressionWrapperByIdInternal(innerWrapper, payloadWrapper)
+          ) {
+            return true
+          }
         }
-        return false
       }
       if (isNotTrue(expr)) {
-        return addExpressionWrapperByIdInternal(parentWrapper, payloadWrapper)
+        if (expr.notTrue.id === payloadWrapper.id) {
+          expr.notTrue.expr = payloadWrapper.expr
+          return true
+        }
       }
 
-      console.warn(
-        "Should never reach here because predicate type doesn't have children",
-      )
       return false
     }
 
@@ -276,7 +248,7 @@ export const DataExpressionEditorContainer = React.memo(
         <DataExpressionEditor
           dataExpressionWrapper={dataExpressionWrapper}
           setFocusId={setFocusId}
-          addExpressionWrapper={addExpressionWrapper}
+          setExpressionWrapper={setExpressionWrapper}
           deleteExpressionById={deleteExpressionById}
         />
         <Spacer height={contentPadding} />
