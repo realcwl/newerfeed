@@ -21,7 +21,6 @@ function FilterChildrenById(
   id: string,
   exprWrapper: NewsFeedDataExpressionWrapper,
 ) {
-  console.log('filter id in parentwrapper: ', id, exprWrapper)
   if (!exprWrapper.expr) return
   const expr = exprWrapper.expr
   if (isAllOf(expr)) {
@@ -73,8 +72,6 @@ export const DataExpressionEditorContainer = React.memo(
     // Traverse the data expression in DFS order, delete the expression by id.
     // Return true if sucessfully deleted an expression, false if not found.
     function deleteExpressionById(id: string | undefined): boolean {
-      console.log('hit here')
-      console.log(id)
       if (!id) return false
 
       // If this is the top level expression, we should remove the expression
@@ -91,7 +88,6 @@ export const DataExpressionEditorContainer = React.memo(
         dataExpressionWrapper,
         /*parentWrapper=*/ {},
       )
-      console.log('deleted? ', deleted)
       if (deleted) {
         flush()
       }
@@ -112,7 +108,6 @@ export const DataExpressionEditorContainer = React.memo(
         return false
       }
 
-      console.log('checking wrapper: ', dataExpressionWrapper)
       if (dataExpressionWrapper.id === id) {
         FilterChildrenById(id, parentWrapper)
         return true
@@ -247,16 +242,11 @@ export const DataExpressionEditorContainer = React.memo(
       <View>
         <DataExpressionEditor
           dataExpressionWrapper={dataExpressionWrapper}
+          focusId={focusId}
           setFocusId={setFocusId}
           setExpressionWrapper={setExpressionWrapper}
           deleteExpressionById={deleteExpressionById}
         />
-        <Spacer height={contentPadding} />
-        <Separator horizontal />
-        <Spacer height={contentPadding} />
-
-        {focusId ? <LogicalExpressionButtons /> : null}
-
         <Spacer height={contentPadding} />
         <Separator horizontal />
         <Spacer height={contentPadding} />

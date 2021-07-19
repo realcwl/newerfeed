@@ -348,8 +348,6 @@ export const AddColumnDetailsModal = React.memo(
     }
 
     function renderDataExpressionEditor() {
-      console.log('render Editor Again')
-      console.log(formikProps.values['dataExpression'])
       return (
         <View style={{ paddingHorizontal: contentPadding }}>
           <DataExpressionEditorContainer formikProps={formikProps} />

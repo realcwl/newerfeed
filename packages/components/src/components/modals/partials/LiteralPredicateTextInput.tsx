@@ -9,11 +9,12 @@ export interface LiteralPredicateTextInputProps {
   id: string
   setExpressionWrapper?: (payload: NewsFeedDataExpressionWrapper) => boolean
   onDelete?: () => boolean
+  setFocusId?: (id: string) => void
 }
 
 export const LiteralPredicateTextInput = React.memo(
   React.forwardRef((props: LiteralPredicateTextInputProps, ref) => {
-    const { text, id, setExpressionWrapper, onDelete } = props
+    const { text, id, setExpressionWrapper, onDelete, setFocusId } = props
 
     // Unfortunatly, we cannot simply use a value state to denote the input
     // value, and have to do it the hard way by using formik. This is because
@@ -23,7 +24,7 @@ export const LiteralPredicateTextInput = React.memo(
       onSubmit(formValues, formikActions) {
         if (!formValues['text']) {
           // If we empty this text input, this should be considered as a
-          // deletion and we should remove this node, and also clear focus.
+          // deletion and we should remove this node.
           if (onDelete) onDelete()
         } else {
           // Otherwise we're setting it to a new value. We reuse the same id.
@@ -36,6 +37,13 @@ export const LiteralPredicateTextInput = React.memo(
           }
           if (setExpressionWrapper) setExpressionWrapper(newWrapperPayload)
         }
+
+        // Clear the focus id if setFocusId is provided. We need to delay this
+        // function focus reset by a very small amount of time because this
+        // reset will unmount the 3 logical gate buttons, and onClick event on
+        // those 3 buttons will not be tracked correctly if onBlur happens
+        // first.
+        if (setFocusId) setTimeout(() => setFocusId(''), 120)
       },
       validateOnBlur: true,
       validateOnChange: true,
@@ -56,7 +64,7 @@ export const LiteralPredicateTextInput = React.memo(
         autoCorrect={false}
         onSubmitEditing={() => formikProps.submitForm()}
         onBlur={() => formikProps.submitForm()}
-        blurOnSubmit={false}
+        blurOnSubmit={true}
         placeholder={'Literal or logical gate'}
       />
     )

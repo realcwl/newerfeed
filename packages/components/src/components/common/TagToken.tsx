@@ -61,7 +61,7 @@ export const TagToken = React.memo((props: TagTokenProps) => {
     marginTop: (icon ? 2 : -1) * scaleFactor,
     lineHeight: smallTextSize + (5 + (icon ? 4 : 0)) * scaleFactor,
     fontSize: smallTextSize + (icon ? 4 : 0) * scaleFactor,
-    fontWeight: '300',
+    fontWeight: '600',
     textAlign: 'center',
     textDecorationLine: strikethrough && !icon ? 'line-through' : 'none',
   }

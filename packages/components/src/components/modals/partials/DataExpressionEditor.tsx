@@ -12,6 +12,7 @@ import { ThemedIcon } from '../../themed/ThemedIcon'
 import { isAllOf, isAnyOf, isNotTrue } from '../../../utils/types'
 import { IconButton } from '../../common/IconButton'
 import {
+  AddNewPredicateButton,
   LiteralPredicateButton,
   renderButtonByTextAndKey,
 } from './LogicalExpressionButtons'
@@ -23,6 +24,7 @@ const LINE_COLOR = '#B2B1B9'
 
 export interface DataExpressionEditorProps {
   dataExpressionWrapper: NewsFeedDataExpressionWrapper
+  focusId: string
   setFocusId: (id: string) => void
   deleteExpressionById: (id: string | undefined) => boolean
   setExpressionWrapper: (payload: NewsFeedDataExpressionWrapper) => boolean
@@ -59,6 +61,7 @@ export const DataExpressionEditor = React.memo(
     const {
       dataExpressionWrapper,
       deleteExpressionById,
+      focusId,
       setFocusId,
       setExpressionWrapper,
     } = props
@@ -66,19 +69,14 @@ export const DataExpressionEditor = React.memo(
 
     const expressionId: string = dataExpressionWrapper.id
 
-    // This is a Creator expression, we should render it as a plus button, and
-    // bind it with the creation callback as well as onFocus callback.
+    // This is a Creator expression, we should render it as a plus button.
     if (!dataExpressionWrapper.expr) {
       return (
-        <IconButton
-          color="green"
-          family="material"
-          name={'add-circle'}
-          size={18 * scaleFactor}
-          onPress={() => {
-            console.log('pressed add')
-            setFocusId(expressionId)
-          }}
+        <AddNewPredicateButton
+          setFocusId={setFocusId}
+          focusId={focusId || ''}
+          setExpressionWrapper={setExpressionWrapper}
+          id={dataExpressionWrapper.id}
         />
       )
     }
@@ -93,23 +91,23 @@ export const DataExpressionEditor = React.memo(
       if (isAllOf(exprWrapper.expr)) {
         headerComponent = renderButtonByTextAndKey({
           id: exprWrapper.id || '',
-          text: 'AllOf',
-          color: 'yellow',
+          text: 'AND',
+          color: 'orange',
           disabled: true,
           onDelete: () => deleteExpressionById(exprWrapper.id),
         })
       } else if (isAnyOf(exprWrapper.expr)) {
         headerComponent = renderButtonByTextAndKey({
           id: exprWrapper.id || '',
-          text: 'AnyOf',
-          color: 'green',
+          text: 'OR',
+          color: 'white',
           disabled: true,
           onDelete: () => deleteExpressionById(exprWrapper.id),
         })
       } else if (isNotTrue(exprWrapper.expr)) {
         headerComponent = renderButtonByTextAndKey({
           id: exprWrapper.id || '',
-          text: 'Not',
+          text: 'NOT',
           color: 'lightRed',
           disabled: true,
           onDelete: () => deleteExpressionById(exprWrapper.id),
@@ -134,6 +132,7 @@ export const DataExpressionEditor = React.memo(
             <DataExpressionEditor
               dataExpressionWrapper={exprWrapper}
               deleteExpressionById={deleteExpressionById}
+              focusId={focusId}
               setFocusId={setFocusId}
               setExpressionWrapper={setExpressionWrapper}
             />
@@ -151,6 +150,7 @@ export const DataExpressionEditor = React.memo(
             <DataExpressionEditor
               dataExpressionWrapper={exprWrapper}
               deleteExpressionById={deleteExpressionById}
+              focusId={focusId}
               setFocusId={setFocusId}
               setExpressionWrapper={setExpressionWrapper}
             />
@@ -164,6 +164,7 @@ export const DataExpressionEditor = React.memo(
           <DataExpressionEditor
             dataExpressionWrapper={dataExpressionWrapper.expr.notTrue}
             deleteExpressionById={deleteExpressionById}
+            focusId={focusId}
             setFocusId={setFocusId}
             setExpressionWrapper={setExpressionWrapper}
           />
@@ -194,7 +195,7 @@ export const DataExpressionEditor = React.memo(
             style={{
               borderColor: LINE_COLOR,
               borderRightWidth: 1,
-              marginLeft: columnHeaderItemContentSize * 1,
+              marginLeft: columnHeaderItemContentSize / 2,
             }}
           >
             <H3>{null}</H3>
