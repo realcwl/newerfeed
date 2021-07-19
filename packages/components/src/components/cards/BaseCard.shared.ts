@@ -70,8 +70,7 @@ export interface BaseCardProps extends AdditionalCardProps {
     text: string
   }
   avatar?: { imageURL?: string; linkURL?: string }
-  date: string
-  icon: IconProp
+  timestamp: Date
   isRead: boolean
   isSaved: boolean
   link: string
@@ -85,14 +84,12 @@ function _getCardPropsForItem(
   type: string,
   item: NewsFeedData,
 ): Omit<BaseCardProps, keyof AdditionalCardProps> {
-  console.log('what item', item)
   return {
     type: 'COLUMN_TYPE_NEWS_FEED',
     link: '',
     isRead: false,
     isSaved: false,
-    date: 'unknown date',
-    icon: { family: 'octicon', name: 'alert' },
+    timestamp: item.postTimestamp ?? item.crawledTimestamp,
     title: 'title',
     text: item.text,
     avatar: item.avatar,

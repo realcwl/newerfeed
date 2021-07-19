@@ -58,7 +58,6 @@ export function CardActions(props: CardActionsProps) {
           left: contentPadding / 4,
           right: contentPadding / 4,
         }}
-        href="javascript:void(0)"
         onPress={() => {
           console.log('UNIMPLEMENTED_PRESS')
         }}
@@ -85,7 +84,6 @@ export function CardActions(props: CardActionsProps) {
           left: contentPadding / 4,
           right: contentPadding / 4,
         }}
-        href="javascript:void(0)"
         onPress={() => {
           console.log('UNIMPLEMENTED_PRESS')
         }}
@@ -112,7 +110,6 @@ export function CardActions(props: CardActionsProps) {
                 left: contentPadding / 4,
                 right: contentPadding / 4,
               }}
-              href={undefined}
               onPress={
                 typeof commentsLink === 'function' ? commentsLink : undefined
               }

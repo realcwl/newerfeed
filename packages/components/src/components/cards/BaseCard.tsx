@@ -24,7 +24,6 @@ import { Avatar } from '../common/Avatar'
 import { ConditionalWrap } from '../common/ConditionalWrap'
 import { IntervalRefresh } from '../common/IntervalRefresh'
 import { Label, smallLabelHeight } from '../common/Label'
-import { Link } from '../common/Link'
 import { Spacer } from '../common/Spacer'
 import { Text } from '../common/Text'
 import { ThemedIcon } from '../themed/ThemedIcon'
@@ -199,8 +198,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
     avatar,
     columnId,
-    date,
-    icon,
+    timestamp,
     isRead,
     isSaved,
     link,
@@ -209,20 +207,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     title,
     type,
   } = props
-
-  if (!link)
-    console.error(
-      `No link for ${type} card: ${nodeIdOrId}, ${title}, ${text}`, // eslint-disable-line
-    )
-  if (link && link.includes('api.github.com'))
-    console.error(
-      `Wrong link for ${type} card: ${nodeIdOrId}, ${title}, ${
-        text // eslint-disable-line
-      }`,
-      link,
-    )
-
-  const baseURL = 'https://www.google.com'
 
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
 
@@ -282,21 +266,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               style={styles.avatar}
               size={avatarSize}
             />
-
-            <ThemedView
-              backgroundColor={backgroundThemeColor}
-              borderColor={backgroundThemeColor}
-              style={styles.iconContainer}
-            >
-              <ThemedIcon
-                {...icon}
-                color={
-                  icon.color ||
-                  (isRead ? 'foregroundColorMuted65' : 'foregroundColor')
-                }
-                style={styles.icon}
-              />
-            </ThemedView>
           </View>
 
           <Spacer width={sizes.horizontalSpaceSize} />
@@ -304,16 +273,16 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
             <View style={sharedStyles.horizontalAndVerticallyAligned}>
               <ThemedText
-                color={isRead ? 'foregroundColorMuted65' : 'foregroundColor'}
-                numberOfLines={1}
-                style={[styles.title, { fontWeight: isMuted ? '300' : '500' }]}
+                color="foregroundColorMuted65"
+                // numberOfLines={1}
+                style={[styles.text, sharedStyles.flex]}
               >
-                {title}
+                {text}
               </ThemedText>
 
-              <IntervalRefresh date={date}>
+              <IntervalRefresh date={timestamp}>
                 {() => {
-                  const dateText = getDateSmallText(date)
+                  const dateText = getDateSmallText(timestamp)
                   if (!dateText) return null
 
                   return (
@@ -324,7 +293,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                         numberOfLines={1}
                         style={styles.timestampText}
                         {...Platform.select({
-                          web: { title: getFullDateText(date) },
+                          web: { title: getFullDateText(timestamp) },
                         })}
                       >
                         {dateText.toLowerCase()}
@@ -359,74 +328,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               )}
             </View>
 
-            {!!text && (
-              <>
-                <Spacer height={sizes.verticalSpaceSize} />
-
-                <View
-                  style={[
-                    sharedStyles.horizontalAndVerticallyAligned,
-                    sharedStyles.justifyContentSpaceBetween,
-                    sharedStyles.fullWidth,
-                    sharedStyles.fullMaxWidth,
-                    { height: sizes.textLineHeight },
-                  ]}
-                >
-                  <ThemedText
-                    color="foregroundColorMuted65"
-                    numberOfLines={1}
-                    style={[styles.text, sharedStyles.flex]}
-                  >
-                    {text}
-                  </ThemedText>
-
-                  {!!columnId && (
-                    <View
-                      style={[
-                        sharedStyles.horizontalAndVerticallyAligned,
-                        sharedStyles.flexShrink0,
-                      ]}
-                    >
-                      <Spacer width={contentPadding / 2} />
-
-                      <Link
-                        TouchableComponent={GestureHandlerTouchableOpacity}
-                        enableUnderlineHover
-                        href="javascript:void(0)"
-                        openOnNewTab={false}
-                        onPress={() => {
-                          vibrateHapticFeedback()
-
-                          const removeIfAlreadySet = !(
-                            KeyboardKeyIsPressed.meta ||
-                            KeyboardKeyIsPressed.shift
-                          )
-
-                          const removeOthers = !(
-                            KeyboardKeyIsPressed.alt ||
-                            KeyboardKeyIsPressed.meta ||
-                            KeyboardKeyIsPressed.shift
-                          )
-
-                          console.log('Clicked this link')
-                        }}
-                        style={sharedStyles.flexShrink0}
-                        textProps={{
-                          color: 'foregroundColorMuted65',
-                          numberOfLines: 1,
-                          style: [styles.reason],
-                        }}
-                        {...Platform.select({
-                          web: { title: 'reason.tooltip' },
-                        })}
-                      >
-                        {'reason.text'}
-                      </Link>
-                    </View>
-                  )}
-                </View>
-              </>
-            )}
+            <Spacer height={sizes.verticalSpaceSize} />
           </View>
         </View>
 
