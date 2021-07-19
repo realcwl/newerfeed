@@ -32,7 +32,8 @@ const composeFn: typeof composeWithDevTools = __DEV__
 
 export function configureStore(key = 'root') {
   const persistConfig: PersistConfig<any> = {
-    blacklist: ['navigation'],
+    // TODO: add persist back
+    blacklist: ['navigation', 'data', 'column'],
     key,
     migrate: async (state, currentVersion) => {
       if (!state && Platform.OS === 'web') {
