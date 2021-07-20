@@ -1,16 +1,13 @@
 import React, { useState } from 'react'
 import { View, StyleSheet } from 'react-native-web'
-import { Button } from '../../common/Button'
 import { sharedStyles } from '../../../styles/shared'
 import { guid, NewsFeedDataExpressionWrapper, ThemeColors } from '@devhub/core'
 import { contentPadding, scaleFactor } from '../../../styles/variables'
 import { TagToken } from '../../common/TagToken'
 import { vibrateHapticFeedback } from '../../../utils/helpers/shared'
 import { Spacer } from '../../common/Spacer'
-import { TextInput } from '../../common/TextInput'
 import { LiteralPredicateTextInput } from './LiteralPredicateTextInput'
 import { getTheme } from '../../context/ThemeContext'
-import { ThemedTextInput } from '../../themed/ThemedTextInput'
 
 const styles = StyleSheet.create({
   container: {
@@ -21,7 +18,7 @@ const styles = StyleSheet.create({
 export interface renderButtonSettings {
   id?: string
   text: string
-  color: keyof ThemeColors | undefined
+  color?: keyof ThemeColors
   disabled: boolean
   disableDelete?: boolean
   onPress?: () => void
@@ -31,17 +28,7 @@ export interface renderButtonSettings {
 }
 
 export function renderButtonByTextAndKey(props: renderButtonSettings) {
-  const {
-    id,
-    text,
-    color,
-    disabled,
-    onDelete,
-    onPress,
-    disableDelete,
-    setFocusId,
-    setExpressionWrapper,
-  } = props
+  const { text, color, disabled, onDelete, onPress } = props
 
   const theme = getTheme()
 
