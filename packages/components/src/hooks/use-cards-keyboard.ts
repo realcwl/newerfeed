@@ -236,7 +236,6 @@ export function useCardsKeyboard<ItemT extends NewsFeedData>(
 
       const selectedItem = getItemByNodeIdOrId(selectedItemNodeIdOrId)
       if (!selectedItem) return
-      console.log('on input enter')
     }, [columnId, getItemByNodeIdOrId, itemNodeIdOrIds, type]),
   )
 
@@ -255,7 +254,6 @@ export function useCardsKeyboard<ItemT extends NewsFeedData>(
       const selectedItem = getItemByNodeIdOrId(selectedItemNodeIdOrId)
       if (!selectedItem) return
 
-      console.log('pressed keyboard S')
     }, [getItemByNodeIdOrId, itemNodeIdOrIds]),
   )
 
@@ -274,7 +272,6 @@ export function useCardsKeyboard<ItemT extends NewsFeedData>(
       const selectedItem = getItemByNodeIdOrId(selectedItemNodeIdOrId)
       if (!selectedItem) return
 
-      console.log('pressed keyboard R')
     }, [getItemByNodeIdOrId, itemNodeIdOrIds]),
   )
 
@@ -283,7 +280,6 @@ export function useCardsKeyboard<ItemT extends NewsFeedData>(
     useCallback(() => {
       if (!isColumnFocusedRef.current) return
 
-      console.log('item read callback')
     }, [getItemByNodeIdOrId, itemNodeIdOrIds]),
   )
 

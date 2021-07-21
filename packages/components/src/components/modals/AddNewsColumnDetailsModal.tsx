@@ -33,7 +33,6 @@ import {
   ThemedTextInput,
   ThemedTextInputProps,
 } from '../themed/ThemedTextInput'
-import { DataExpressionEditor } from './partials/DataExpressionEditor'
 import { NewsSubtypesWithFilter } from './partials/NewsSubtypesWithFilter'
 
 export interface AddColumnDetailsModalProps {
@@ -42,74 +41,6 @@ export interface AddColumnDetailsModalProps {
   // If we're modifying attribute of an existing column, we should pass the
   // columnId of that column.
   columnId?: string
-}
-
-// TODO(chenweilunster): Clean this up once the data expression is rendered.
-const dummyDataExpression: NewsFeedDataExpressionWrapper = {
-  id: 'all_of_expression',
-  expr: {
-    allOf: [
-      {
-        id: 'bitcoin_literal',
-        expr: {
-          type: 'LITERAL',
-          param: 'bitcoin',
-        },
-      },
-      {
-        id: 'not_true_expression',
-        expr: {
-          notTrue: {
-            id: 'china_literal',
-            expr: {
-              type: 'LITERAL',
-              param: 'china',
-            },
-          },
-        },
-      },
-      {
-        id: 'any_of_expression',
-        expr: {
-          anyOf: [
-            {
-              id: 'elon_literal',
-              expr: {
-                type: 'LITERAL',
-                param: 'elon',
-              },
-            },
-            {
-              id: 'any_of_not_true_expression',
-              expr: {
-                notTrue: {
-                  id: 'musk_literal',
-                  expr: {
-                    type: 'LITERAL',
-                    param: 'musk',
-                  },
-                },
-              },
-            },
-            {
-              id: 'any_of_not_true_expression_creator',
-              expr: {
-                notTrue: {
-                  id: 'not_true_creator',
-                },
-              },
-            },
-            {
-              id: 'any_of_creator',
-            },
-          ],
-        },
-      },
-      {
-        id: 'creator_allof',
-      },
-    ],
-  },
 }
 
 export const AddColumnDetailsModal = React.memo(
@@ -136,7 +67,10 @@ export const AddColumnDetailsModal = React.memo(
     ): Record<string, any> {
       const res: Record<string, any> = {
         name: '',
-        dataExpression: undefined,
+        // Create a creator expression by default.
+        dataExpression: {
+          id: guid(),
+        },
       }
       for (var source of allSources) {
         res[source] = []
@@ -188,7 +122,7 @@ export const AddColumnDetailsModal = React.memo(
           firstItemId: '',
           lastItemId: '',
           sources: getColumnSourcesFromFormValues(formValues),
-          dataExpression: dummyDataExpression,
+          dataExpression: formValues['dataExpression'],
         }
         dispatch(actions.addColumn(columnCreation))
 
@@ -348,8 +282,6 @@ export const AddColumnDetailsModal = React.memo(
     }
 
     function renderDataExpressionEditor() {
-      console.log('render Editor Again')
-      console.log(formikProps.values['dataExpression'])
       return (
         <View style={{ paddingHorizontal: contentPadding }}>
           <DataExpressionEditorContainer formikProps={formikProps} />
