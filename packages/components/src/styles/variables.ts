@@ -12,7 +12,7 @@ export const scaleFactor =
     ? 1.1
     : 1) * (PixelRatio.getFontScale() || 1)
 
-export const avatarSize = 30 * scaleFactor
+export const avatarSize = 40 * scaleFactor
 export const smallAvatarSize = 18 * scaleFactor
 
 export const contentPadding = 16 * scaleFactor
