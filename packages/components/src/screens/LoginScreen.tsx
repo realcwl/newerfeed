@@ -21,6 +21,7 @@ import {
 } from '../styles/variables'
 import { useDispatch } from 'react-redux'
 import { loginSuccess } from '../redux/actions'
+import { ThemedTextInput } from '../components/themed/ThemedTextInput'
 
 const SHOW_GITHUB_GRANULAR_OAUTH_LOGIN_BUTTON =
   constants.ENABLE_GITHUB_OAUTH_SUPPORT && !Platform.isMacOS
@@ -80,9 +81,29 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  invitation: {
+    fontSize: normalTextSize + 2 * scaleFactor,
+    fontWeight: 'bold',
+    lineHeight: normalTextSize + 4 * scaleFactor,
+    textAlign: 'center',
+  },
+
+  invitationLinkText: {
+    fontSize: normalTextSize + 2 * scaleFactor,
+    fontWeight: 'bold',
+    lineHeight: normalTextSize + 4 * scaleFactor,
+    textAlign: 'center',
+  },
+
   button: {
     alignSelf: 'stretch',
     marginTop: contentPadding / 2,
+  },
+
+  input: {
+    alignSelf: 'stretch',
+    marginTop: contentPadding / 2,
+    height: 45 * scaleFactor,
   },
 
   footerLink: {},
@@ -156,6 +177,39 @@ export const LoginScreen = React.memo(() => {
 
           <Spacer height={contentPadding * 2} />
 
+          <ThemedText color="foregroundColorMuted65" style={styles.invitation}>
+            {'Have invitation? '}
+            <ThemedText
+              onPress={() => console.log('sign up panel')}
+              color="orange"
+              style={styles.invitationLinkText}
+            >
+              Sign up
+            </ThemedText>
+          </ThemedText>
+
+          <Spacer height={contentPadding} />
+
+          <ThemedTextInput
+            style={styles.input}
+            borderThemeColor={'foregroundColorMuted65'}
+            placeholder={'Email address'}
+            borderHoverThemeColor={'foregroundColorMuted65'}
+            textInputKey={`sign-in-username-input-box`}
+          />
+
+          <Spacer height={contentPadding * 2} />
+
+          <ThemedTextInput
+            style={styles.input}
+            borderThemeColor={'foregroundColorMuted65'}
+            placeholder={'Password (8+ charactors)'}
+            borderHoverThemeColor={'foregroundColorMuted65'}
+            textInputKey={`sign-in-password-input-box`}
+          />
+
+          <Spacer height={contentPadding * 2} />
+
           {SHOW_GITHUB_GRANULAR_OAUTH_LOGIN_BUTTON &&
             (() => {
               const subtitle = hasMultipleLoginButtons
@@ -168,6 +222,8 @@ export const LoginScreen = React.memo(() => {
                   disabled={isLoggingIn}
                   loading={isLoggingIn}
                   onPress={() => {
+                    
+
                     dispatch(
                       // TODO(chenweilunster): Change this login logic to actually call backend.
                       loginSuccess({
