@@ -35,6 +35,7 @@ export function IconButton(props: IconButtonProps) {
     onPressOut,
     size = defaultIconButtonSize,
     style,
+    color,
     type = 'neutral',
     ...touchableProps
   } = props
@@ -170,6 +171,7 @@ export function IconButton(props: IconButtonProps) {
             name={name as any}
             selectable={false}
             size={size}
+            color={color}
             style={sharedStyles.textCenter}
           />
         </ThemedText>

@@ -254,7 +254,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             {author?.name}
           </ThemedText>
           {/* <Spacer width={sizes.horizontalSpaceSize} /> */}
-          <View style={sharedStyles.horizontal}>
+          <View
+            style={[
+              sharedStyles.horizontal,
+              sharedStyles.marginVerticalQuarter,
+            ]}
+          >
             <IntervalRefresh interval={5000} date={timestamp}>
               {() => {
                 const dateText = getDateSmallText(timestamp)
@@ -305,7 +310,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
         <Separator horizontal backgroundThemeColor="backgroundColorLighther2" />
 
-        <View style={sharedStyles.horizontal}>
+        <View
+          style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
+        >
           <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
             <View style={sharedStyles.horizontalAndVerticallyAligned}>
               <ThemedText

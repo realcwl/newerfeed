@@ -22,9 +22,7 @@ const initialState: State = {
     dummyCard: {
       id: 'dummyCard',
       title: `I am dummyCard's dummy title with more than one line as well`,
-      text: `first card with some real real real long descriptions and real long text and see if it works!
-It is multi-line.
-Has a lot of text.`,
+      text: `first card with some real real real long descriptions and real long text and see if it works!`,
       author: {
         avatar: {
           imageURL:

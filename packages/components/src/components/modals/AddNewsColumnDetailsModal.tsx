@@ -1,9 +1,15 @@
-import { ColumnCreation, guid, NewsFeedColumnSource } from '@devhub/core'
+import {
+  ColumnCreation,
+  guid,
+  NewsFeedColumnSource,
+  NewsFeedDataExpressionWrapper,
+} from '@devhub/core'
 import { useFormik } from 'formik'
 import _ from 'lodash'
 import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { Keyboard, View } from 'react-native'
 import { useDispatch, useStore } from 'react-redux'
+import { DataExpressionEditorContainer } from '../../containers/DataExpressionEditorContainer'
 
 import { useReduxState } from '../../hooks/use-redux-state'
 import { Platform } from '../../libs/platform'
@@ -53,13 +59,20 @@ export const AddColumnDetailsModal = React.memo(
       columnId ? columnId : '',
     )
 
+    // Construct form's initial value. It's either empty, when we're adding a
+    // brand new column, or populated with existing column's attribute, when we
+    // are modifying attributes of one existing column.
     function getFormInitialValues(
       columnId: string | undefined,
     ): Record<string, any> {
       const res: Record<string, any> = {
         name: '',
+        // Create a creator expression by default.
+        dataExpression: {
+          id: guid(),
+        },
       }
-      for (var source of allSources) {
+      for (const source of allSources) {
         res[source] = []
       }
 
@@ -68,23 +81,23 @@ export const AddColumnDetailsModal = React.memo(
 
       // else.. it must be an existing column and thus we need to pre-populate
       // form values with existing data.
-
       if (!newsFeedColumnAttributes) {
         console.warn('Edit existing column, but attribute is undefined')
         return res
       }
 
-      for (var columnSource of newsFeedColumnAttributes.sources) {
+      for (const columnSource of newsFeedColumnAttributes.sources) {
         res[columnSource.source] = columnSource.subtypes
       }
       return {
         ...res,
         name: newsFeedColumnAttributes.title,
+        // Make a deepcopy, otherwise every addtion or removal is happening on
+        // the real redux object.
+        dataExpression: _.cloneDeep(newsFeedColumnAttributes.dataExpression),
       }
     }
 
-    // formIntialValues should be empty during the initial column creation, and
-    // populated with the column attribute if we're modifying an existing one.
     const formInitialValues: Record<string, any> =
       getFormInitialValues(columnId)
 
@@ -109,6 +122,7 @@ export const AddColumnDetailsModal = React.memo(
           firstItemId: '',
           lastItemId: '',
           sources: getColumnSourcesFromFormValues(formValues),
+          dataExpression: formValues['dataExpression'],
         }
         dispatch(actions.addColumn(columnCreation))
 
@@ -120,7 +134,7 @@ export const AddColumnDetailsModal = React.memo(
         if (!values.name) {
           return { err: 'name is required' }
         }
-        for (var key of allSources) {
+        for (const key of allSources) {
           if (values[key].length !== 0) {
             return undefined
           }
@@ -181,7 +195,7 @@ export const AddColumnDetailsModal = React.memo(
       formValues: typeof formInitialValues,
     ): NewsFeedColumnSource[] {
       const sources: NewsFeedColumnSource[] = []
-      for (var key of allSources) {
+      for (const key of allSources) {
         if (formValues[key].length === 0) continue
         sources.push({
           source: key,
@@ -236,7 +250,7 @@ export const AddColumnDetailsModal = React.memo(
       )
     }
 
-    function renderContent() {
+    function renderSourceAndSubtypesSelectors() {
       return (
         <View style={{ paddingHorizontal: contentPadding }}>
           {availableNewsFeedSources.map((formItem, formItemIndex) => {
@@ -263,6 +277,14 @@ export const AddColumnDetailsModal = React.memo(
               </Fragment>
             )
           })}
+        </View>
+      )
+    }
+
+    function renderDataExpressionEditor() {
+      return (
+        <View style={{ paddingHorizontal: contentPadding }}>
+          <DataExpressionEditorContainer formikProps={formikProps} />
         </View>
       )
     }
@@ -367,14 +389,13 @@ export const AddColumnDetailsModal = React.memo(
                 <Separator horizontal />
                 <Spacer height={contentPadding} />
 
-                <View
-                  style={
-                    sizename <= '2-medium'
-                      ? sharedStyles.flex
-                      : sharedStyles.fullWidth
-                  }
-                >
-                  {renderContent()}
+                <View style={sharedStyles.fullWidth}>
+                  {renderSourceAndSubtypesSelectors()}
+                </View>
+
+                {renderHeader('News Expression (Optional)')}
+                <View style={sharedStyles.fullWidth}>
+                  {renderDataExpressionEditor()}
                 </View>
 
                 <View style={sharedStyles.paddingHorizontal}>

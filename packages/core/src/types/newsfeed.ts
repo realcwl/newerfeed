@@ -37,7 +37,7 @@ export interface NewsFeedColumn extends BaseColumn {
   // expression from backend. Note that frondend doesn't actually use this
   // expression, this expression is passed to backend as part of the pull
   // request, and backend filters data based on this expression.
-  dataExpression?: NewsFeedDataExpression
+  dataExpression?: NewsFeedDataExpressionWrapper
 
   // Different from NewsFeedDataExpression, filter is a purely frontend data
   // that is used to quickly filter column data to let user find useful
@@ -68,16 +68,32 @@ export interface BaseColumn {
   updatedAt: string
 }
 
-export interface NewsFeedDataExpression {
-  // Expression can be any of the following type.
-  expr: AllOf | AnyOf | NotTrue | Predicate
+// Contains the actual news feed data expression.
+export type NewsFeedDataExpression = AllOf | AnyOf | NotTrue | Predicate
+
+// Wrap it up so we could achieve OneOf.
+export interface NewsFeedDataExpressionWrapper {
+  // id for this data expression, this is used to uniquely identity each
+  // expression so that deletion of an expression can simply specify this id
+  // without taking ownership of the parent. This id must be global unique so
+  // that the deletion will not be dubious.
+  id?: string
+
+  // Expression can be any of the following:
+  // 1. AnyOf
+  // 2. AllOf
+  // 3. NotTrue
+  // 4. Predicate
+  // 5. undefined. When this field is undefined, this is a very special type of
+  // DataExpressionWrapper, where this wrapper is a place holder that should be
+  // filled by a later expression created by user. We call this expression
+  // Creator Expression.
+  expr?: NewsFeedDataExpression
 }
 
 export type PredicateType = 'LITERAL'
 
-export interface LiteralPredicateParam {
-  str: string
-}
+export type LiteralPredicateParam = string
 
 export type PredicateParam = LiteralPredicateParam
 
@@ -91,18 +107,18 @@ export interface Predicate {
 export interface AllOf {
   // AllOf contains a list of objects. A content is valid if all of the
   // expressions are evaluated to true.
-  allOf: NewsFeedDataExpression[]
+  allOf: NewsFeedDataExpressionWrapper[]
 }
 
 export interface AnyOf {
   // AnyOf contains a list of objects. A content is valid if any of the
   // expression is evaluated to true.
-  anyOf: NewsFeedDataExpression[]
+  anyOf: NewsFeedDataExpressionWrapper[]
 }
 
 export interface NotTrue {
   // A content is valid if the expression is evaluated false.
-  notTrue: NewsFeedDataExpression
+  notTrue: NewsFeedDataExpressionWrapper
 }
 
 export interface ColumnFilter {
