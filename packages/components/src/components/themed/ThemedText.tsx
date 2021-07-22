@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleProp, TextProps, TextStyle } from 'react-native'
+import { StyleProp, TextProps, TextStyle, View } from 'react-native'
 
 import { Theme, ThemeColors, ThemeTransformer } from '@devhub/core'
 import { Text } from '../common/Text'
@@ -34,6 +34,28 @@ export const ThemedText = React.forwardRef<Text, ThemedTextProps>(
 ThemedText.displayName = 'ThemedText'
 
 export type ThemedText = Text
+
+export interface ThemedCollapsableText extends ThemedTextProps {
+  truncatedText: string
+  text: string
+}
+
+export const CollapsableThemedText = ({
+  truncatedText,
+  text,
+  ...otherProps
+}: ThemedCollapsableText) => {
+  const [more, setMore] = React.useState(false)
+
+  return (
+    <View>
+      <Text>{!more ? `${truncatedText}...` : text}</Text>
+      <ThemedText {...otherProps} onPress={() => setMore(!more)}>
+        {more ? 'show less' : 'show more'}
+      </ThemedText>
+    </View>
+  )
+}
 
 function getStyle(
   theme: Theme,

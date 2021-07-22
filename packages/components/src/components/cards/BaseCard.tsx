@@ -1,5 +1,5 @@
-import React, { Fragment } from 'react'
-import { PixelRatio, ScrollView, StyleSheet, View } from 'react-native'
+import React, { Fragment, useCallback, useState } from 'react'
+import { PixelRatio, ScrollView, StyleSheet, View, Text } from 'react-native'
 import { useDispatch } from 'react-redux'
 
 import { getDateSmallText, getFullDateText, Theme } from '@devhub/core'
@@ -21,7 +21,6 @@ import { Avatar } from '../common/Avatar'
 import { IntervalRefresh } from '../common/IntervalRefresh'
 import { smallLabelHeight } from '../common/Label'
 import { Spacer } from '../common/Spacer'
-import { Text } from '../common/Text'
 import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
 import { BaseCardProps, renderCardActions, sizes } from './BaseCard.shared'
@@ -36,6 +35,33 @@ const GestureHandlerTouchableOpacity = Platform.select({
   ios: () => require('react-native-gesture-handler').TouchableOpacity,
   default: () => require('../common/TouchableOpacity').TouchableOpacity,
 })()
+
+const NUM_OF_LINES = 2
+
+const MoreInfo = (text: string, linesToTruncate: number) => {
+  const [clippedText, setClippedText] = React.useState('')
+  return (
+    <Text
+      numberOfLines={linesToTruncate}
+      ellipsizeMode={'tail'}
+      onTextLayout={(event) => {
+        //get all lines
+        const { lines } = event.nativeEvent
+        //get lines after it truncate
+        const text = lines
+          .splice(0, linesToTruncate)
+          .map((line) => line.text)
+          .join('')
+        //substring with some random digit, this might need more work here based on the font size
+        //
+        console.log(event)
+        setClippedText(text.substr(0, text.length - 9))
+      }}
+    >
+      {text}
+    </Text>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -212,13 +238,31 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
 
-  const backgroundThemeColor = (theme: Theme) =>
-    getCardBackgroundThemeColor({
-      isDark: theme.isDark,
-      isMuted,
-    })
+  // const backgroundThemeColor = (theme: Theme) =>
+  //   getCardBackgroundThemeColor({
+  //     isDark: theme.isDark,
+  //     isMuted,
+  //   })
 
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
+
+  const [textShown, setTextShown] = useState(false)
+  const toggleShowMoreText = () => {
+    setTextShown(!textShown)
+  }
+
+  const [hasMore, setHasMore] = useState(false)
+  const checkHasMore = useCallback(
+    ({
+      nativeEvent: {
+        layout: { height },
+      },
+    }) => {
+      console.log('what', height, textShown)
+      height > 17 * NUM_OF_LINES ? setHasMore(true) : setHasMore(false)
+    },
+    [],
+  )
 
   return (
     <View
@@ -310,7 +354,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             <View style={sharedStyles.horizontalAndVerticallyAligned}>
               <ThemedText
                 color="foregroundColor"
-                style={[styles.title, sharedStyles.flex]}
+                style={[
+                  styles.title,
+                  sharedStyles.flex,
+                  sharedStyles.marginVerticalQuarter,
+                ]}
               >
                 {title}
               </ThemedText>
@@ -323,11 +371,28 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             <View style={sharedStyles.horizontalAndVerticallyAligned}>
               <ThemedText
                 color="foregroundColorMuted65"
-                style={[styles.text, sharedStyles.flex]}
+                numberOfLines={textShown ? undefined : NUM_OF_LINES}
+                // BONINGTODO: figure out why onTextLayout not called
+                onTextLayout={(e) => {
+                  console.log('textLayout', e)
+                }}
+                onLayout={(e) => {
+                  console.log('layout', e)
+                }}
               >
                 {text}
               </ThemedText>
             </View>
+            {/* {MoreInfo('aaabbbcccddd:', 1)} */}
+            {/* {hasMore && ( */}
+            <ThemedText
+              color="primaryBackgroundColor"
+              onPress={toggleShowMoreText}
+              style={[styles.text, sharedStyles.flex]}
+            >
+              {textShown ? 'show less' : 'show more'}
+            </ThemedText>
+            {/* )} */}
           </View>
         </View>
 
