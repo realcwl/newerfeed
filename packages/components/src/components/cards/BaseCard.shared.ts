@@ -1,4 +1,4 @@
-import { Column, constants, NewsFeedData } from '@devhub/core'
+import { Author, Column, constants, NewsFeedData } from '@devhub/core'
 import { PixelRatio } from 'react-native'
 
 import { Platform } from '../../libs/platform'
@@ -29,7 +29,7 @@ const _subitemFontSize = smallTextSize
 const _subitemLineHeight = _subitemFontSize + 2 * scaleFactor
 export const sizes = {
   cardPaddingVertical: contentPadding,
-  cardPaddingHorizontal: contentPadding / 2,
+  cardPaddingHorizontal: contentPadding,
   iconSize: PixelRatio.roundToNearestPixel(_iconSize),
   iconContainerSize: _iconContainerSize,
   avatarContainerWidth: PixelRatio.roundToNearestPixel(
@@ -69,14 +69,14 @@ export interface BaseCardProps extends AdditionalCardProps {
     }
     text: string
   }
-  avatar?: { imageURL?: string; linkURL?: string }
+  author?: Author
   timestamp: Date
   isRead: boolean
   isSaved: boolean
   link: string
   nodeIdOrId: string
   text?: string
-  title: string
+  title?: string
   type: Column['type']
 }
 
@@ -85,14 +85,14 @@ function _getCardPropsForItem(
   item: NewsFeedData,
 ): Omit<BaseCardProps, keyof AdditionalCardProps> {
   return {
+    title: item.title,
     type: 'COLUMN_TYPE_NEWS_FEED',
     link: '',
     isRead: false,
     isSaved: false,
     timestamp: item.postTimestamp ?? item.crawledTimestamp,
-    title: 'title',
     text: item.text,
-    avatar: item.avatar,
+    author: item.author,
     nodeIdOrId: 'node_id',
   }
 }

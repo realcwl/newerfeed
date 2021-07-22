@@ -90,7 +90,6 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
   >(
     ({ item: nodeIdOrId, index }) => {
       const height = getItemSize(nodeIdOrId, index)
-      console.log('ok', nodeIdOrId, index, swipeable)
 
       return (
         <ErrorBoundary>
@@ -169,7 +168,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
         }
         data={data}
         estimatedItemSize={getItemSize(data[0], 0) || 123}
-        footer={footer}
+        // footer={footer}
         forceRerenderOnRefChange={getItemByNodeIdOrId}
         getItemKey={getItemKey}
         getItemSize={getItemSize}

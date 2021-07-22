@@ -46,7 +46,7 @@ export function CardActions(props: CardActionsProps) {
 
   return (
     <View style={sharedStyles.horizontal}>
-      {leftSpacing > 0 && <Spacer width={leftSpacing} />}
+      {/* {leftSpacing > 0 && <Spacer width={leftSpacing} />} */}
 
       <Link
         analyticsCategory="card_action"

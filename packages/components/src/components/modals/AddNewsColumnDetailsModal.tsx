@@ -72,7 +72,7 @@ export const AddColumnDetailsModal = React.memo(
           id: guid(),
         },
       }
-      for (var source of allSources) {
+      for (const source of allSources) {
         res[source] = []
       }
 
@@ -86,7 +86,7 @@ export const AddColumnDetailsModal = React.memo(
         return res
       }
 
-      for (var columnSource of newsFeedColumnAttributes.sources) {
+      for (const columnSource of newsFeedColumnAttributes.sources) {
         res[columnSource.source] = columnSource.subtypes
       }
       return {
@@ -134,7 +134,7 @@ export const AddColumnDetailsModal = React.memo(
         if (!values.name) {
           return { err: 'name is required' }
         }
-        for (var key of allSources) {
+        for (const key of allSources) {
           if (values[key].length !== 0) {
             return undefined
           }
@@ -195,7 +195,7 @@ export const AddColumnDetailsModal = React.memo(
       formValues: typeof formInitialValues,
     ): NewsFeedColumnSource[] {
       const sources: NewsFeedColumnSource[] = []
-      for (var key of allSources) {
+      for (const key of allSources) {
         if (formValues[key].length === 0) continue
         sources.push({
           source: key,

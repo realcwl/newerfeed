@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import { getDateSmallText, getFullDateText, Theme } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
-import * as actions from '../../redux/actions'
+import { Separator } from '../common/Separator'
 import { sharedStyles } from '../../styles/shared'
 import {
   avatarSize,
@@ -16,19 +16,14 @@ import {
   smallerTextSize,
   smallTextSize,
 } from '../../styles/variables'
-import { fixColorHexWithoutHash } from '../../utils/helpers/colors'
-import { vibrateHapticFeedback } from '../../utils/helpers/shared'
-import { KeyboardKeyIsPressed } from '../AppKeyboardShortcuts'
 import { getCardBackgroundThemeColor } from '../columns/ColumnRenderer'
 import { Avatar } from '../common/Avatar'
-import { ConditionalWrap } from '../common/ConditionalWrap'
 import { IntervalRefresh } from '../common/IntervalRefresh'
-import { Label, smallLabelHeight } from '../common/Label'
+import { smallLabelHeight } from '../common/Label'
 import { Spacer } from '../common/Spacer'
 import { Text } from '../common/Text'
 import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
-import { ThemedView } from '../themed/ThemedView'
 import { BaseCardProps, renderCardActions, sizes } from './BaseCard.shared'
 import { CardActions } from './partials/CardActions'
 import {
@@ -57,16 +52,24 @@ const styles = StyleSheet.create({
 
   smallAvatarContainer: {
     position: 'relative',
-    alignItems: 'flex-end',
-    width: sizes.avatarContainerWidth,
+    // width: avatarSize,
     height: smallAvatarSize,
-    paddingRight: sizes.avatarContainerWidth - avatarSize - smallAvatarSize / 2,
+    paddingRight: '10px',
   },
 
   avatarContainer: {
     position: 'relative',
     width: sizes.avatarContainerWidth,
     height: sizes.avatarContainerHeight,
+  },
+
+  authorName: {
+    lineHeight: sizes.titleLineHeight,
+    fontSize: smallerTextSize,
+    // width: '300',
+    flexGrow: 1,
+    overflow: 'hidden',
+    // ...Platform.select({ web: { fontFeatureSettings: '"tnum"' } }),
   },
 
   avatar: {},
@@ -95,11 +98,11 @@ const styles = StyleSheet.create({
 
   title: {
     flex: 1,
-    height: sizes.titleLineHeight,
+    // height: sizes.titleLineHeight,
     lineHeight: sizes.titleLineHeight,
     fontSize: normalTextSize,
     // fontWeight: '500',
-    overflow: 'hidden',
+    // overflow: 'hidden',
   },
 
   subtitle: {
@@ -196,8 +199,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     action,
     height,
 
-    avatar,
-    columnId,
+    author,
     timestamp,
     isRead,
     isSaved,
@@ -221,114 +223,118 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   return (
     <View
       key={`base-card-container-${type}-${nodeIdOrId}-inner`}
-      style={[styles.container, { height }]}
+      style={[styles.container]}
     >
       <View
         style={[
           styles.innerContainer,
-          { height: height - cardItemSeparatorSize },
+          // { height: height - cardItemSeparatorSize },
         ]}
       >
-        {!!(action && action.text) && (
-          <>
-            <View style={styles.actionContainer}>
-              <View style={styles.smallAvatarContainer}>
-                <Avatar
-                  avatarUrl={action.avatar.imageURL}
-                  disableLink={action.avatar.linkURL === link}
-                  linkURL={action.avatar.linkURL}
-                  style={styles.avatar}
-                  size={smallAvatarSize}
-                />
-              </View>
-
-              <Spacer width={sizes.horizontalSpaceSize} />
-
-              <ThemedText
-                color="foregroundColorMuted65"
-                numberOfLines={1}
-                style={styles.action}
-              >
-                Subtitle For Event Card
-              </ThemedText>
-            </View>
-
-            <Spacer height={sizes.verticalSpaceSize} />
-          </>
-        )}
-
-        <View style={sharedStyles.horizontal}>
-          <View style={styles.avatarContainer}>
+        <View
+          style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
+        >
+          <View style={styles.smallAvatarContainer}>
             <Avatar
-              avatarUrl={avatar?.imageURL}
-              disableLink={avatar?.linkURL === link}
-              linkURL={avatar?.linkURL}
+              avatarUrl={author?.avatar?.imageURL}
+              disableLink={author?.profileURL === link}
+              linkURL={author?.profileURL}
               style={styles.avatar}
-              size={avatarSize}
+              size={smallAvatarSize}
             />
           </View>
+          <ThemedText
+            color="foregroundColorMuted65"
+            numberOfLines={1}
+            style={[styles.authorName]}
+            {...Platform.select({
+              web: { title: getFullDateText(timestamp) },
+            })}
+          >
+            {author?.name}
+          </ThemedText>
+          {/* <Spacer width={sizes.horizontalSpaceSize} /> */}
+          <View
+            style={[
+              sharedStyles.horizontal,
+              sharedStyles.marginVerticalQuarter,
+            ]}
+          >
+            <IntervalRefresh interval={5000} date={timestamp}>
+              {() => {
+                const dateText = getDateSmallText(timestamp)
+                if (!dateText) return null
 
-          <Spacer width={sizes.horizontalSpaceSize} />
+                return (
+                  <>
+                    <Text>{'  '}</Text>
+                    <ThemedText
+                      color="foregroundColorMuted65"
+                      numberOfLines={1}
+                      style={styles.timestampText}
+                      {...Platform.select({
+                        web: { title: getFullDateText(timestamp) },
+                      })}
+                    >
+                      {dateText.toLowerCase()}
+                    </ThemedText>
+                  </>
+                )
+              }}
+            </IntervalRefresh>
+            {!!isSaved && (
+              <>
+                <Text>{'  '}</Text>
+                <ThemedIcon
+                  family="octicon"
+                  name="bookmark"
+                  color="orange"
+                  size={smallTextSize}
+                />
+              </>
+            )}
 
+            {!isRead && (
+              <>
+                <Text>{'  '}</Text>
+                <ThemedIcon
+                  family="octicon"
+                  name="dot-fill"
+                  color={'primaryBackgroundColor'}
+                  size={smallTextSize}
+                />
+              </>
+            )}
+          </View>
+        </View>
+
+        <Separator horizontal backgroundThemeColor="backgroundColorLighther2" />
+
+        <View
+          style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
+        >
+          <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
+            <View style={sharedStyles.horizontalAndVerticallyAligned}>
+              <ThemedText
+                color="foregroundColor"
+                style={[styles.title, sharedStyles.flex]}
+              >
+                {title}
+              </ThemedText>
+            </View>
+          </View>
+        </View>
+
+        <View style={sharedStyles.horizontal}>
           <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
             <View style={sharedStyles.horizontalAndVerticallyAligned}>
               <ThemedText
                 color="foregroundColorMuted65"
-                // numberOfLines={1}
                 style={[styles.text, sharedStyles.flex]}
               >
                 {text}
               </ThemedText>
-
-              <IntervalRefresh date={timestamp}>
-                {() => {
-                  const dateText = getDateSmallText(timestamp)
-                  if (!dateText) return null
-
-                  return (
-                    <>
-                      <Text>{'  '}</Text>
-                      <ThemedText
-                        color="foregroundColorMuted65"
-                        numberOfLines={1}
-                        style={styles.timestampText}
-                        {...Platform.select({
-                          web: { title: getFullDateText(timestamp) },
-                        })}
-                      >
-                        {dateText.toLowerCase()}
-                      </ThemedText>
-                    </>
-                  )
-                }}
-              </IntervalRefresh>
-
-              {!!isSaved && (
-                <>
-                  <Text>{'  '}</Text>
-                  <ThemedIcon
-                    family="octicon"
-                    name="bookmark"
-                    color="orange"
-                    size={smallTextSize}
-                  />
-                </>
-              )}
-
-              {!isRead && (
-                <>
-                  <Text>{'  '}</Text>
-                  <ThemedIcon
-                    family="octicon"
-                    name="dot-fill"
-                    color={'primaryBackgroundColor'}
-                    size={smallTextSize}
-                  />
-                </>
-              )}
             </View>
-
-            <Spacer height={sizes.verticalSpaceSize} />
           </View>
         </View>
 
@@ -347,6 +353,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               itemNodeIdOrIds={[nodeIdOrId]}
               type={type}
             />
+
+            <Spacer height={sizes.verticalSpaceSize} />
           </>
         )}
 

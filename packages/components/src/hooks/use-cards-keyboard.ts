@@ -253,7 +253,6 @@ export function useCardsKeyboard<ItemT extends NewsFeedData>(
 
       const selectedItem = getItemByNodeIdOrId(selectedItemNodeIdOrId)
       if (!selectedItem) return
-
     }, [getItemByNodeIdOrId, itemNodeIdOrIds]),
   )
 
@@ -271,7 +270,6 @@ export function useCardsKeyboard<ItemT extends NewsFeedData>(
 
       const selectedItem = getItemByNodeIdOrId(selectedItemNodeIdOrId)
       if (!selectedItem) return
-
     }, [getItemByNodeIdOrId, itemNodeIdOrIds]),
   )
 
@@ -279,7 +277,6 @@ export function useCardsKeyboard<ItemT extends NewsFeedData>(
     ['Shift', 'r'],
     useCallback(() => {
       if (!isColumnFocusedRef.current) return
-
     }, [getItemByNodeIdOrId, itemNodeIdOrIds]),
   )
 

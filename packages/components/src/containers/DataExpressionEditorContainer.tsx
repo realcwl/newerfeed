@@ -65,7 +65,7 @@ export const DataExpressionEditorContainer = React.memo(
     }
 
     const { formikProps } = props
-    let dataExpressionWrapper: NewsFeedDataExpressionWrapper =
+    const dataExpressionWrapper: NewsFeedDataExpressionWrapper =
       formikProps.values['dataExpression']
 
     // Traverse the data expression in DFS order, delete the expression by id.
@@ -112,10 +112,10 @@ export const DataExpressionEditorContainer = React.memo(
         return true
       }
 
-      let expr = dataExpressionWrapper.expr
+      const expr = dataExpressionWrapper.expr
 
       if (isAllOf(expr)) {
-        for (var innerWrapper of expr.allOf) {
+        for (const innerWrapper of expr.allOf) {
           if (
             deleteExpressionByIdInternal(
               id,
@@ -128,7 +128,7 @@ export const DataExpressionEditorContainer = React.memo(
         return false
       }
       if (isAnyOf(expr)) {
-        for (var innerWrapper of expr.anyOf) {
+        for (const innerWrapper of expr.anyOf) {
           if (
             deleteExpressionByIdInternal(
               id,
@@ -190,10 +190,10 @@ export const DataExpressionEditorContainer = React.memo(
       payloadWrapper: NewsFeedDataExpressionWrapper,
     ): boolean {
       if (!parentWrapper.expr) return false
-      let expr = parentWrapper.expr
+      const expr = parentWrapper.expr
 
       if (isAllOf(expr)) {
-        for (var innerWrapper of expr.allOf) {
+        for (const innerWrapper of expr.allOf) {
           if (innerWrapper.id === payloadWrapper.id) {
             const isCreator = !innerWrapper.expr
             innerWrapper.expr = payloadWrapper.expr
@@ -209,7 +209,7 @@ export const DataExpressionEditorContainer = React.memo(
         }
       }
       if (isAnyOf(expr)) {
-        for (var innerWrapper of expr.anyOf) {
+        for (const innerWrapper of expr.anyOf) {
           if (innerWrapper.id === payloadWrapper.id) {
             const isCreator = !innerWrapper.expr
             innerWrapper.expr = payloadWrapper.expr
