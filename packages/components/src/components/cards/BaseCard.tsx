@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import { getDateSmallText, getFullDateText, Theme } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
-import * as actions from '../../redux/actions'
+import { Separator } from '../common/Separator'
 import { sharedStyles } from '../../styles/shared'
 import {
   avatarSize,
@@ -52,10 +52,9 @@ const styles = StyleSheet.create({
 
   smallAvatarContainer: {
     position: 'relative',
-    alignItems: 'flex-end',
-    width: sizes.avatarContainerWidth,
+    // width: avatarSize,
     height: smallAvatarSize,
-    paddingRight: sizes.avatarContainerWidth - avatarSize - smallAvatarSize / 2,
+    paddingRight: '10px',
   },
 
   avatarContainer: {
@@ -232,8 +231,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           // { height: height - cardItemSeparatorSize },
         ]}
       >
-        <View style={sharedStyles.horizontal}>
-          <View style={styles.avatarContainer}>
+        <View
+          style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
+        >
+          <View style={styles.smallAvatarContainer}>
             <Avatar
               avatarUrl={author?.avatar?.imageURL}
               disableLink={author?.profileURL === link}
@@ -301,6 +302,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             )}
           </View>
         </View>
+
+        <Separator horizontal backgroundThemeColor="backgroundColorLighther2" />
 
         <View style={sharedStyles.horizontal}>
           <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
