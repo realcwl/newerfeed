@@ -167,24 +167,11 @@ export const LoginForm = React.memo(() => {
         loading={isLoggingIn}
         onPress={() => {
           // Indicate that we're login.
-          dispatch(loginRequest())
-
-          // wait for 5 s to mimic the actual auth latency.
-          setTimeout(
-            () =>
-              dispatch(
-                // TODO(chenweilunster): Change this login logic to actually call backend.
-                loginSuccess({
-                  appToken: 'DUMMY_APP_TOKEN',
-                  user: {
-                    id: 'DUMMY_USER_ID',
-                    name: 'DUMMY_USER_NAME',
-                    avatarUrl:
-                      'https://gravatar.com/avatar/80139cbc27fcec1066bc45100d992c79?s=400&d=robohash&r=x',
-                  },
-                }),
-              ),
-            2000,
+          dispatch(
+            loginRequest({
+              email: formikProps.values[EMAIL],
+              password: formikProps.values[PASSWORD],
+            }),
           )
         }}
         // rightIcon={{ family: 'octicon', name: 'globe' }}

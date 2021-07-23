@@ -47,8 +47,20 @@ export const authReducer: Reducer<State> = (state = initialState, action) => {
       return {
         appToken: action.payload.appToken,
         user: action.payload.user,
-        isLoggingIn: true,
+        isLoggingIn: false,
         error: undefined,
+      }
+    }
+    case 'LOGIN_FAILURE': {
+      console.log(action.error)
+      return {
+        appToken: undefined,
+        user: undefined,
+        isLoggingIn: false,
+        error: {
+          name: action.error.name,
+          message: action.error.message,
+        },
       }
     }
 
