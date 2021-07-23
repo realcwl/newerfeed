@@ -15,7 +15,7 @@ import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
 import { Spacer } from './Spacer'
 
-export interface GitHubLoginButtonProps
+export interface LoginButtonProps
   extends Omit<ButtonProps, 'children' | 'colors' | 'onPress' | 'textStyle'> {
   horizontal?: boolean
   leftIcon?: IconProp
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export function GitHubLoginButton(props: GitHubLoginButtonProps) {
+export function LoginButton(props: LoginButtonProps) {
   const {
     leftIcon,
     rightIcon,

@@ -5,7 +5,7 @@ const s = (state: RootState) => state.auth || EMPTY_OBJ
 
 export const authErrorSelector = (state: RootState) => s(state).error
 
-export const isLoggingInSelector = (state: RootState) => true
+export const isLoggingInSelector = (state: RootState) => s(state).isLoggingIn
 
 export const isLoggedSelector = (state: RootState) => true
 

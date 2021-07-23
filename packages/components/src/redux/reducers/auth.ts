@@ -21,10 +21,9 @@ export interface State {
   // be prompted with this error message to guide sign-in.
   error: AuthError | undefined
 
-  // Indicate whether user is logged in.
-  // If user is not logged in, shows the user sign-in page.
-  // Otherwise shows the user the actual App.
-  isLoggedIn: boolean
+  // Indicate whether user is logging in. If the user is logged in, this will be
+  // indicated by the non-empty user field.
+  isLoggingIn: boolean
 
   // Stored user's personal data.
   user: User | undefined
@@ -33,17 +32,22 @@ export interface State {
 const initialState: State = {
   appToken: undefined,
   error: undefined,
-  isLoggedIn: false,
+  isLoggingIn: false,
   user: undefined,
 }
 
 export const authReducer: Reducer<State> = (state = initialState, action) => {
   switch (action.type) {
+    case 'LOGIN_REQUEST': {
+      return immer(state, (draft) => {
+        draft.isLoggingIn = true
+      })
+    }
     case 'LOGIN_SUCCESS': {
       return {
         appToken: action.payload.appToken,
         user: action.payload.user,
-        isLoggedIn: true,
+        isLoggingIn: true,
         error: undefined,
       }
     }

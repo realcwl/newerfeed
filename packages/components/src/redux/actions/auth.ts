@@ -2,8 +2,8 @@ import { User } from '@devhub/core'
 import { createAction, createErrorAction } from '../helpers'
 import { AuthError, State as AuthState } from '../reducers/auth'
 
-export function loginRequest(payload: { appToken: string }) {
-  return createAction('LOGIN_REQUEST', payload)
+export function loginRequest() {
+  return createAction('LOGIN_REQUEST')
 }
 
 export function loginSuccess(payload: {
