@@ -33,6 +33,7 @@ function* onLoginRequest(
     Password: action.payload.password,
   })
 
+  // Wrap the callback in a promise to use Redux Saga.
   const authPromise = new Promise((resolve, reject) => {
     user.authenticateUser(authDetails, {
       onSuccess: (data) => {
@@ -45,8 +46,6 @@ function* onLoginRequest(
 
   try {
     const { data } = yield authPromise
-
-    console.log(data)
 
     yield put(
       actions.loginSuccess({

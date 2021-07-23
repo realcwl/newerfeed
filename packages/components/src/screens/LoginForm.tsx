@@ -59,7 +59,13 @@ export const LoginForm = React.memo(() => {
     initialValues: formInitialValues,
     validationSchema: Yup.object(formValidationSchema),
     onSubmit(formValues, formikActions) {
-      console.log(formValues)
+      // Indicate that we're logining in.
+      dispatch(
+        loginRequest({
+          email: formValues[EMAIL],
+          password: formValues[PASSWORD],
+        }),
+      )
     },
     validateOnChange: true,
     validate(values) {
@@ -166,13 +172,7 @@ export const LoginForm = React.memo(() => {
         disabled={!canSubmit() || isLoggingIn}
         loading={isLoggingIn}
         onPress={() => {
-          // Indicate that we're login.
-          dispatch(
-            loginRequest({
-              email: formikProps.values[EMAIL],
-              password: formikProps.values[PASSWORD],
-            }),
-          )
+          formikProps.submitForm()
         }}
         // rightIcon={{ family: 'octicon', name: 'globe' }}
         style={styles.button}
