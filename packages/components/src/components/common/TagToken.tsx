@@ -1,3 +1,4 @@
+import { ThemeColors } from '@devhub/core'
 import React from 'react'
 import { View } from 'react-native'
 
@@ -21,6 +22,14 @@ export type TagTokenProps = {
   strikethrough?: boolean
   tooltip?: ButtonProps['tooltip']
   transparent?: boolean
+  colors?: {
+    backgroundThemeColor?: keyof ThemeColors
+    foregroundThemeColor?: keyof ThemeColors
+    backgroundHoverThemeColor?: keyof ThemeColors | undefined
+    foregroundHoverThemeColor?: keyof ThemeColors
+  }
+  disabled?: boolean
+  disableDelete?: boolean
 } & (
   | {
       icon?: undefined
@@ -41,28 +50,25 @@ export const TagToken = React.memo((props: TagTokenProps) => {
     removeTooltip = 'Remove',
     size = smallTextSize + 4 * scaleFactor + contentPadding + 2,
     strikethrough,
+    colors,
     tooltip,
+    disabled,
     transparent,
+    disableDelete,
   } = props
 
   const iconOrLabelStyle: ThemedTextProps['style'] = {
     marginTop: (icon ? 2 : -1) * scaleFactor,
     lineHeight: smallTextSize + (5 + (icon ? 4 : 0)) * scaleFactor,
     fontSize: smallTextSize + (icon ? 4 : 0) * scaleFactor,
-    fontWeight: '300',
+    fontWeight: '600',
     textAlign: 'center',
     textDecorationLine: strikethrough && !icon ? 'line-through' : 'none',
   }
 
   return (
     <Button
-      colors={
-        icon && strikethrough
-          ? { backgroundThemeColor: 'backgroundColorTintedRed' }
-          : transparent
-          ? { backgroundThemeColor: 'transparent' }
-          : undefined
-      }
+      colors={colors}
       contentContainerStyle={
         icon
           ? sharedStyles.paddingHorizontalNone
@@ -73,6 +79,7 @@ export const TagToken = React.memo((props: TagTokenProps) => {
       tooltip={tooltip}
       type="neutral"
       withBorder
+      disabled={disabled ? true : false}
     >
       <View style={sharedStyles.horizontalAndVerticallyAligned}>
         <Spacer width={contentPadding / 2} />
@@ -84,7 +91,10 @@ export const TagToken = React.memo((props: TagTokenProps) => {
             style={iconOrLabelStyle}
           />
         ) : (
-          <ThemedText color="foregroundColor" style={iconOrLabelStyle}>
+          <ThemedText
+            color={colors && colors.foregroundThemeColor}
+            style={iconOrLabelStyle}
+          >
             {label}
           </ThemedText>
         )}
@@ -97,8 +107,8 @@ export const TagToken = React.memo((props: TagTokenProps) => {
               colors={{
                 backgroundThemeColor: 'transparent',
                 foregroundThemeColor: 'foregroundColor',
-                backgroundHoverThemeColor: 'backgroundColor',
-                foregroundHoverThemeColor: 'foregroundColor',
+                backgroundHoverThemeColor: 'red',
+                foregroundHoverThemeColor: 'gray',
               }}
               hitSlop={{
                 top: contentPadding,
@@ -119,9 +129,9 @@ export const TagToken = React.memo((props: TagTokenProps) => {
               tooltip={removeTooltip}
               type="custom"
             >
-              {({ foregroundThemeColor }) => (
+              {() => (
                 <ThemedIcon
-                  color={foregroundThemeColor}
+                  color={colors && colors.foregroundThemeColor}
                   family="octicon"
                   name="x"
                   size={smallTextSize - 3 * scaleFactor}

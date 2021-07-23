@@ -7,8 +7,10 @@ import * as actions from '../actions'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
 
-function* onAddColumn() {
-  const columnId = 'FAKE_COLUMN_ID'
+function* onAddColumn(
+  action: ExtractActionFromActionCreator<typeof actions.addColumn>,
+) {
+  const columnId = action.payload.id
 
   if (AppState.currentState === 'active')
     yield* call(InteractionManager.runAfterInteractions)
@@ -75,7 +77,7 @@ function* onClearColumnOrColumns(
 
 export function* columnsSagas() {
   yield* all([
-    yield* takeEvery('ADD_COLUMN_AND_SUBSCRIPTIONS', onAddColumn),
+    yield* takeEvery('ADD_COLUMN', onAddColumn),
     yield* takeEvery('MOVE_COLUMN', onMoveColumn),
     yield* takeEvery('DELETE_COLUMN', onDeleteColumn),
     yield* takeLatest(
