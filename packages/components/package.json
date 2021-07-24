@@ -18,6 +18,7 @@
         "@octokit/rest": "16.43.1",
         "@react-spring/core": "9.0.0-rc.3",
         "@react-spring/native": "9.0.0-rc.3",
+        "amazon-cognito-identity-js": "^5.0.6",
         "axios": "0.19.0",
         "fbemitter": "2.1.1",
         "flatted": "2.0.1",
