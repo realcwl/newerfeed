@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, StyleSheet } from 'react-native-web'
+import { View, StyleSheet } from 'react-native'
 import { sharedStyles } from '../../../styles/shared'
 import { guid, NewsFeedDataExpressionWrapper, ThemeColors } from '@devhub/core'
 import { contentPadding, scaleFactor } from '../../../styles/variables'
