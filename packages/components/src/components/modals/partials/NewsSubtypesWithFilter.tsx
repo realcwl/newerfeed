@@ -1,6 +1,6 @@
 import { NewsFeedColumnSource, ThemeColors } from '@devhub/core'
 import React, { useState } from 'react'
-import { View } from 'react-native-web'
+import { View } from 'react-native'
 import { useReduxState } from '../../../hooks/use-redux-state'
 import { contentPadding } from '../../../styles/variables'
 import { columnHeaderItemContentSize } from '../../columns/ColumnHeader'
