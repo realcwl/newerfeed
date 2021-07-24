@@ -1,7 +1,7 @@
 import { NewsFeedDataExpressionWrapper, guid } from '@devhub/core'
 import { useFormik } from 'formik'
 import React, { Children, useState } from 'react'
-import { View } from 'react-native-web'
+import { View } from 'react-native'
 import { sharedStyles } from '../../../styles/shared'
 import { contentPadding, scaleFactor } from '../../../styles/variables'
 import { columnHeaderItemContentSize } from '../../columns/ColumnHeader'

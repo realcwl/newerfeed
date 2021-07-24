@@ -51,14 +51,12 @@ const styles = StyleSheet.create({
   },
 
   smallAvatarContainer: {
-    position: 'relative',
     // width: avatarSize,
     height: smallAvatarSize,
-    paddingRight: '10px',
+    paddingRight: 10 * scaleFactor,
   },
 
   avatarContainer: {
-    position: 'relative',
     width: sizes.avatarContainerWidth,
     height: sizes.avatarContainerHeight,
   },
