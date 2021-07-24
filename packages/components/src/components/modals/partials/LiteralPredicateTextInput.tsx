@@ -25,7 +25,7 @@ export const LiteralPredicateTextInput = React.memo(
         if (!formValues['text']) {
           // If we empty this text input, this should be considered as a
           // deletion and we should remove this node.
-          if (onDelete) onDelete()
+          if (onDelete) onDe lete()
         } else {
           // Otherwise we're setting it to a new value. We reuse the same id.
           const newWrapperPayload: NewsFeedDataExpressionWrapper = {
