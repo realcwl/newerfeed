@@ -246,7 +246,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   // const dispatch = useDispatch()
 
-  const [textShown, setTextShown] = useState(false)
+  const [textShown, setTextShown] = useState(true)
   const toggleShowMoreText = () => {
     setTextShown(!textShown)
   }
@@ -379,27 +379,34 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               <ThemedText
                 color="foregroundColorMuted65"
                 numberOfLines={textShown ? undefined : NUM_OF_LINES}
-                // BONINGTODO: figure out why onTextLayout not called
-                onTextLayout={(e) => {
-                  console.log('textLayout', e)
-                }}
+                // BONINGTODO: figure out why onTextLayout not called to avoid blinking
+                // onTextLayout={(e) => {
+                //   console.log('textLayout', e)
+                // }}
                 onLayout={(e) => {
-                  console.log('layout', e)
+                  if (e.nativeEvent.layout.height > 17 * NUM_OF_LINES) {
+                    if (!hasMore) {
+                      setTextShown(false)
+                    }
+                    setHasMore(true)
+                  } else {
+                    setHasMore(hasMore ?? false)
+                  }
                 }}
               >
                 {text}
               </ThemedText>
             </View>
             {/* {MoreInfo('aaabbbcccddd:', 1)} */}
-            {/* {hasMore && ( */}
-            <ThemedText
-              color="primaryBackgroundColor"
-              onPress={toggleShowMoreText}
-              style={[styles.text, sharedStyles.flex]}
-            >
-              {textShown ? 'show less' : 'show more'}
-            </ThemedText>
-            {/* )} */}
+            {hasMore && (
+              <ThemedText
+                color="primaryBackgroundColor"
+                onPress={toggleShowMoreText}
+                style={[styles.text, sharedStyles.flex]}
+              >
+                {textShown ? 'show less' : 'show more'}
+              </ThemedText>
+            )}
           </View>
         </View>
 
