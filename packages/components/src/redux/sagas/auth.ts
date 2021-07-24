@@ -23,18 +23,6 @@ function* onRehydrate() {
 function* onLoginRequest(
   action: ExtractActionFromActionCreator<typeof actions.loginRequest>,
 ) {
-  yield put(
-    actions.loginSuccess({
-      appToken: 'data.accessToken.jwtToken',
-      user: {
-        id: 'data.accessToken.payload.sub',
-        name: 'DUMMY_USER_NAME',
-        avatarUrl:
-          'https://gravatar.com/avatar/80139cbc27fcec1066bc45100d992c79?s=400&d=robohash&r=x',
-      },
-    }),
-  )
-
   const user = new CognitoUser({
     Username: action.payload.email,
     Pool: userPool,
