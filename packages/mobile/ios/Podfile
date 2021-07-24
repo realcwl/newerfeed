@@ -12,7 +12,8 @@ target 'devhub' do
 
   # Fix macOS Catalyst Support
   def catalyst_unsupported_pods
-      ['FlipperKit', 'Firebase', 'RNFBAnalytics', 'RNFBApp']
+      ['FlipperKit', 'Firebase', 'RNFBAnalytics', 'RNFBApp', 'RNAWSCognito']
+
   end
 
   def catalyst_supported_pods
