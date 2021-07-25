@@ -408,6 +408,10 @@ PODS:
     - React-cxxreact (= 0.64.2)
     - React-jsi (= 0.64.2)
     - React-perflogger (= 0.64.2)
+  - RNAWSCognito (5.0.6):
+    - React-Core
+  - RNCAsyncStorage (1.15.5):
+    - React-Core
   - RNFBAnalytics (10.1.1):
     - Firebase/Analytics (~> 7.1.0)
     - React-Core
@@ -484,6 +488,8 @@ DEPENDENCIES:
   - React-RCTVibration (from `../../../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../../../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
+  - RNAWSCognito (from `../../../node_modules/amazon-cognito-identity-js`)
+  - "RNCAsyncStorage (from `../../../node_modules/@react-native-async-storage/async-storage`)"
   - "RNFBAnalytics (from `../../../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../../../node_modules/@react-native-firebase/app`)"
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
@@ -587,6 +593,10 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../../../node_modules/react-native/ReactCommon"
+  RNAWSCognito:
+    :path: "../../../node_modules/amazon-cognito-identity-js"
+  RNCAsyncStorage:
+    :path: "../../../node_modules/@react-native-async-storage/async-storage"
   RNFBAnalytics:
     :path: "../../../node_modules/@react-native-firebase/analytics"
   RNFBApp:
@@ -661,6 +671,8 @@ SPEC CHECKSUMS:
   React-RCTVibration: 24600e3b1aaa77126989bc58b6747509a1ba14f3
   React-runtimeexecutor: a9904c6d0218fb9f8b19d6dd88607225927668f9
   ReactCommon: 149906e01aa51142707a10665185db879898e966
+  RNAWSCognito: e2c01d53b4e6b83e1db587f06d34fead6fed4949
+  RNCAsyncStorage: 56a3355a10b5d660c48c6e37325ac85ebfd09885
   RNFBAnalytics: da48ff33f20c26ee63745271ae9c0fb252422e66
   RNFBApp: 2b4e07dfca4cf780b9e2d61bcc21e34d890cd654
   RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
@@ -671,6 +683,6 @@ SPEC CHECKSUMS:
   Yoga: 575c581c63e0d35c9a83f4b46d01d63abc1100ac
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: fac18bf3d1484b79a5a0479d5c758ed4324020f4
+PODFILE CHECKSUM: 01ab0a5b7a680ec45574cb38bbae1cca26ad082d
 
 COCOAPODS: 1.10.1

@@ -5,7 +5,6 @@ import { constants } from '@devhub/core'
 import logo from '@devhub/components/assets/logo_circle.png'
 
 import { FullHeightScrollView } from '../components/common/FullHeightScrollView'
-import { GitHubLoginButton } from '../components/common/GitHubLoginButton'
 import { Link } from '../components/common/Link'
 import { Screen } from '../components/common/Screen'
 import { Spacer } from '../components/common/Spacer'
@@ -20,7 +19,10 @@ import {
   scaleFactor,
 } from '../styles/variables'
 import { useDispatch } from 'react-redux'
-import { loginSuccess } from '../redux/actions'
+import { loginSuccess, loginRequest } from '../redux/actions'
+import { ThemedTextInput } from '../components/themed/ThemedTextInput'
+import _ from 'lodash'
+import LoginForm from './LoginForm'
 
 const SHOW_GITHUB_GRANULAR_OAUTH_LOGIN_BUTTON =
   constants.ENABLE_GITHUB_OAUTH_SUPPORT && !Platform.isMacOS
@@ -80,9 +82,29 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  invitation: {
+    fontSize: normalTextSize + 2 * scaleFactor,
+    fontWeight: 'bold',
+    lineHeight: normalTextSize + 4 * scaleFactor,
+    textAlign: 'center',
+  },
+
+  invitationLinkText: {
+    fontSize: normalTextSize + 2 * scaleFactor,
+    fontWeight: 'bold',
+    lineHeight: normalTextSize + 4 * scaleFactor,
+    textAlign: 'center',
+  },
+
   button: {
     alignSelf: 'stretch',
     marginTop: contentPadding / 2,
+  },
+
+  input: {
+    alignSelf: 'stretch',
+    marginTop: contentPadding / 2,
+    height: 45 * scaleFactor,
   },
 
   footerLink: {},
@@ -101,9 +123,6 @@ const styles = StyleSheet.create({
 
 export const LoginScreen = React.memo(() => {
   const dimensions = useDimensions('width')
-
-  const { isLoggingIn } = useLoginHelpers()
-  const dispatch = useDispatch()
 
   useEffect(() => {
     analytics.trackScreenView('LOGIN_SCREEN')
@@ -156,44 +175,19 @@ export const LoginScreen = React.memo(() => {
 
           <Spacer height={contentPadding * 2} />
 
-          {SHOW_GITHUB_GRANULAR_OAUTH_LOGIN_BUTTON &&
-            (() => {
-              const subtitle = hasMultipleLoginButtons
-                ? 'Granular permissions'
-                : undefined
+          <ThemedText color="foregroundColorMuted65" style={styles.invitation}>
+            {'Have invitation? '}
+            <ThemedText
+              onPress={() => console.log('sign up panel')}
+              color="orange"
+              style={styles.invitationLinkText}
+            >
+              Sign up
+            </ThemedText>
+          </ThemedText>
 
-              return (
-                <GitHubLoginButton
-                  analyticsLabel="github_login_public"
-                  disabled={isLoggingIn}
-                  loading={isLoggingIn}
-                  onPress={() => {
-                    dispatch(
-                      // TODO(chenweilunster): Change this login logic to actually call backend.
-                      loginSuccess({
-                        appToken: 'DUMMY_APP_TOKEN',
-                        user: {
-                          id: 'DUMMY_USER_ID',
-                          name: 'DUMMY_USER_NAME',
-                          avatarUrl:
-                            'https://gravatar.com/avatar/80139cbc27fcec1066bc45100d992c79?s=400&d=robohash&r=x',
-                        },
-                      }),
-                    )
-                  }}
-                  // rightIcon={{ family: 'octicon', name: 'globe' }}
-                  style={styles.button}
-                  subtitle={subtitle}
-                  textProps={{
-                    style: {
-                      textAlign:
-                        hasMultipleLoginButtons || subtitle ? 'left' : 'center',
-                    },
-                  }}
-                  title="Sign in"
-                />
-              )
-            })()}
+          <Spacer height={contentPadding} />
+          <LoginForm />
         </View>
 
         <Spacer height={contentPadding} />

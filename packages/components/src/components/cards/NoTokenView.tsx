@@ -41,7 +41,7 @@ export const NoTokenView = React.memo((props: NoTokenViewProps) => {
       clearOAuthQueryParams()
       if (!appToken) throw new Error('No app token')
 
-      loginRequest({ appToken })
+      loginRequest({ email: '', password: '' })
       setIsExecutingOAuth(false)
     } catch (error) {
       const description = 'OAuth execution failed'

@@ -1,6 +1,8 @@
 import React, { useContext } from 'react'
 
 import _ from 'lodash'
+import { useReduxState } from '../../hooks/use-redux-state'
+import * as selectors from '../../redux/selectors'
 
 export interface LoginHelpersProviderProps {
   children?: React.ReactNode
@@ -18,7 +20,7 @@ LoginHelpersContext.displayName = 'LoginHelpersContext'
 
 export function LoginHelpersProvider(props: LoginHelpersProviderProps) {
   const value = {
-    isLoggingIn: false,
+    isLoggingIn: useReduxState(selectors.isLoggingInSelector),
   }
 
   return (
