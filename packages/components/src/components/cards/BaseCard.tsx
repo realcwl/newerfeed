@@ -1,5 +1,12 @@
 import React, { Fragment, useCallback, useState } from 'react'
-import { PixelRatio, ScrollView, StyleSheet, View, Text } from 'react-native'
+import {
+  PixelRatio,
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  Linking,
+} from 'react-native'
 import { useDispatch } from 'react-redux'
 
 import { getDateSmallText, getFullDateText, Theme } from '@devhub/core'
@@ -29,6 +36,7 @@ import {
   CardItemSeparator,
   cardItemSeparatorSize,
 } from './partials/CardItemSeparator'
+import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
 
 const GestureHandlerTouchableOpacity = Platform.select({
   android: () => require('react-native-gesture-handler').TouchableOpacity,
@@ -37,31 +45,6 @@ const GestureHandlerTouchableOpacity = Platform.select({
 })()
 
 const NUM_OF_LINES = 2
-
-const MoreInfo = (text: string, linesToTruncate: number) => {
-  const [clippedText, setClippedText] = React.useState('')
-  return (
-    <Text
-      numberOfLines={linesToTruncate}
-      ellipsizeMode={'tail'}
-      onTextLayout={(event) => {
-        //get all lines
-        const { lines } = event.nativeEvent
-        //get lines after it truncate
-        const text = lines
-          .splice(0, linesToTruncate)
-          .map((line) => line.text)
-          .join('')
-        //substring with some random digit, this might need more work here based on the font size
-        //
-        console.log(event)
-        setClippedText(text.substr(0, text.length - 9))
-      }}
-    >
-      {text}
-    </Text>
-  )
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -249,6 +232,41 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     setTextShown(!textShown)
   }
 
+  const createLinkForText = (text: string) => {
+    let prev = 0
+    let match: RegExpExecArray | null = null
+    // let res = <Text>
+    const res: any[] = []
+    while ((match = REGEX_IS_URL.exec(text ?? 'no content')) !== null) {
+      console.log('i am here', match)
+      const link = text.slice(match.index, match.index + match[0].length)
+      res.push(
+        <ThemedText color="foregroundColorMuted65">
+          {text.slice(prev, match.index)}
+        </ThemedText>,
+      )
+      res.push(
+        <ThemedText
+          color="red"
+          // assume most website will redirect http to https
+          onPress={() =>
+            Linking.openURL(link.startsWith('http') ? link : `http://${link}`)
+          }
+        >
+          {link}
+        </ThemedText>,
+      )
+      prev = match.index + match[0].length
+    }
+    res.push(
+      <ThemedText color="foregroundColorMuted65">
+        {text.slice(prev)}
+      </ThemedText>,
+    )
+    console.log(res, prev, text.slice(prev))
+    return res
+  }
+
   const [hasMore, setHasMore] = useState(false)
   const checkHasMore = useCallback(
     ({
@@ -392,7 +410,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   }
                 }}
               >
-                {text}
+                {createLinkForText(text ?? 'no content')}
               </ThemedText>
             </View>
             {/* {MoreInfo('aaabbbcccddd:', 1)} */}
