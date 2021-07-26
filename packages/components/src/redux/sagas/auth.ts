@@ -40,7 +40,7 @@ function* onLoginRequest(
         resolve({ data })
       },
       onFailure: (err) => reject(err),
-      newPasswordRequired: (data) => console.log(data),
+      newPasswordRequired: (err) => reject(err),
     })
   })
 
