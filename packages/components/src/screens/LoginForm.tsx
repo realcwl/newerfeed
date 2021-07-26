@@ -10,6 +10,8 @@ import { loginRequest, loginSuccess } from '../redux/actions'
 import { contentPadding, scaleFactor } from '../styles/variables'
 import * as Yup from 'yup'
 import { ThemedText } from '../components/themed/ThemedText'
+import * as selectors from '../redux/selectors'
+import { useReduxState } from '../hooks/use-redux-state'
 
 const EMAIL = 'email'
 const PASSWORD = 'password'
@@ -38,6 +40,7 @@ const styles = StyleSheet.create({
 export const LoginForm = React.memo(() => {
   const { isLoggingIn } = useLoginHelpers()
   const dispatch = useDispatch()
+  const authError = useReduxState(selectors.authErrorSelector)
 
   const formInitialValues: Record<string, string> = {
     email: '',
@@ -183,6 +186,10 @@ export const LoginForm = React.memo(() => {
           },
         }}
       />
+
+      <ThemedText style={styles.error} color={'red'}>
+        {authError?.message}
+      </ThemedText>
     </>
   )
 })

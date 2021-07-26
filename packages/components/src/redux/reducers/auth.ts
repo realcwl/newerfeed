@@ -39,9 +39,12 @@ const initialState: State = {
 export const authReducer: Reducer<State> = (state = initialState, action) => {
   switch (action.type) {
     case 'LOGIN_REQUEST': {
-      return immer(state, (draft) => {
-        draft.isLoggingIn = true
-      })
+      return {
+        appToken: undefined,
+        user: undefined,
+        isLoggingIn: true,
+        error: undefined,
+      }
     }
     case 'LOGIN_SUCCESS': {
       return {
