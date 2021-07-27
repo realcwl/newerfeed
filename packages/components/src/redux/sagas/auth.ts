@@ -7,6 +7,7 @@ import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
 import { AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js'
 import userPool from '../../libs/auth/userPool'
+import { createAction } from '../helpers'
 
 function* init() {
   yield take('LOGIN_SUCCESS')
@@ -59,7 +60,29 @@ function* onLoginRequest(
       }),
     )
   } catch (error) {
-    yield put(actions.loginFailure(error))
+    yield put(actions.authFailure(error))
+  }
+}
+
+function* onSignUpRequest(
+  action: ExtractActionFromActionCreator<typeof actions.signUpRequest>,
+) {
+  const { email, password } = action.payload
+  const authPromise = new Promise((resolve, reject) => {
+    userPool.signUp(email, password, [], [], (err, data) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve({ data })
+      }
+    })
+  })
+
+  try {
+    const { data } = yield authPromise
+    yield put(actions.signUpSuccess())
+  } catch (error) {
+    yield put(actions.authFailure(error))
   }
 }
 
@@ -67,8 +90,8 @@ function* onLoginSuccess(
   _action: ExtractActionFromActionCreator<typeof actions.loginSuccess>,
 ) {}
 
-function* onLoginFailure(
-  action: ExtractActionFromActionCreator<typeof actions.loginFailure>,
+function* onAuthFailure(
+  action: ExtractActionFromActionCreator<typeof actions.authFailure>,
 ) {}
 
 function onLogout() {
@@ -80,7 +103,8 @@ export function* authSagas() {
     yield* fork(init),
     yield* takeLatest(REHYDRATE, onRehydrate),
     yield* takeLatest('LOGIN_REQUEST', onLoginRequest),
-    yield* takeLatest('LOGIN_FAILURE', onLoginFailure),
+    yield* takeLatest('SIGN_UP_REQUEST', onSignUpRequest),
+    yield* takeLatest('AUTH_FAILURE', onAuthFailure),
     yield* takeLatest('LOGIN_SUCCESS', onLoginSuccess),
     yield* takeLatest('LOGOUT', onLogout),
   ])

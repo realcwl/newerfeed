@@ -1,34 +1,38 @@
-import { FormikErrors, useFormik } from 'formik'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { LoginButton } from '../components/common/LoginButton'
 import { Spacer } from '../components/common/Spacer'
-import { useLoginHelpers } from '../components/context/LoginHelpersContext'
-import { clearAuthError, loginRequest } from '../redux/actions'
-import { contentPadding } from '../styles/variables'
-import * as Yup from 'yup'
 import { ThemedText } from '../components/themed/ThemedText'
-import * as selectors from '../redux/selectors'
 import { useReduxState } from '../hooks/use-redux-state'
 import { loginStyles } from '../styles/loginStyles'
+import { contentPadding } from '../styles/variables'
+import * as selectors from '../redux/selectors'
+import * as Yup from 'yup'
+import { FormikErrors, useFormik } from 'formik'
+import { clearAuthError, signUpRequest } from '../redux/actions'
 import SingleTextInputWithErrorMsg from '../components/auth/TextInputWithErrorMessage'
+import { LoginButton } from '../components/common/LoginButton'
+import { useLoginHelpers } from '../components/context/LoginHelpersContext'
 
 const EMAIL = 'email'
 const PASSWORD = 'password'
-const ALL_FIELDS = [EMAIL, PASSWORD]
+const CONFIRMATION = 'confirmation'
+const ALL_FIELDS = [EMAIL, PASSWORD, CONFIRMATION]
 
-export interface LoginFormProps {
+export interface SignupFormProps {
   onPress: () => void
 }
 
-export const LoginForm = React.memo((props: LoginFormProps) => {
+export const SignupForm = React.memo((props: SignupFormProps) => {
   const { isLoggingIn } = useLoginHelpers()
+
   const dispatch = useDispatch()
   const authError = useReduxState(selectors.authErrorSelector)
+  const signUpSuccessMsg = useReduxState(selectors.signUpSuccessMsgSelector)
 
   const formInitialValues: Record<string, string> = {
     email: '',
     password: '',
+    confirmation: '',
   }
 
   const formValidationSchema: Record<string, any> = {
@@ -40,6 +44,10 @@ export const LoginForm = React.memo((props: LoginFormProps) => {
         /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,~<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/,
         'Must contain uppercase, number and special character',
       ),
+    confirmation: Yup.string().oneOf(
+      [Yup.ref('password'), null],
+      'Passwords must match',
+    ),
   }
 
   const formikProps = useFormik({
@@ -48,7 +56,7 @@ export const LoginForm = React.memo((props: LoginFormProps) => {
     onSubmit(formValues, formikActions) {
       // Indicate that we're logining in.
       dispatch(
-        loginRequest({
+        signUpRequest({
           email: formValues[EMAIL],
           password: formValues[PASSWORD],
         }),
@@ -84,7 +92,7 @@ export const LoginForm = React.memo((props: LoginFormProps) => {
   return (
     <>
       <ThemedText color="foregroundColorMuted65" style={loginStyles.invitation}>
-        {'Have invitation? '}
+        {'Already have account? '}
         <ThemedText
           onPress={() => {
             dispatch(clearAuthError())
@@ -93,7 +101,7 @@ export const LoginForm = React.memo((props: LoginFormProps) => {
           color="orange"
           style={loginStyles.invitationLinkText}
         >
-          Sign up
+          Log in
         </ThemedText>
       </ThemedText>
 
@@ -116,23 +124,41 @@ export const LoginForm = React.memo((props: LoginFormProps) => {
         secureTextEntry={true}
       />
 
-      <Spacer height={contentPadding * 2} />
+      <Spacer height={contentPadding} />
 
-      <LoginButton
-        analyticsLabel="newsfeed"
-        disabled={!canSubmit() || isLoggingIn}
-        loading={isLoggingIn}
-        onPress={() => {
-          formikProps.submitForm()
-        }}
-        style={loginStyles.button}
-        title="Sign in"
-        textProps={{
-          style: {
-            textAlign: 'center',
-          },
-        }}
+      <SingleTextInputWithErrorMsg
+        formikProps={formikProps}
+        field={CONFIRMATION}
+        placeholder={'Confirm password'}
+        textInputKey={'sign-in-password-input-box'}
+        secureTextEntry={true}
       />
+
+      {signUpSuccessMsg ? (
+        <ThemedText style={loginStyles.error} color={'green'}>
+          {signUpSuccessMsg}
+        </ThemedText>
+      ) : (
+        <>
+          <Spacer height={contentPadding * 2} />
+          <LoginButton
+            analyticsLabel="newsfeed"
+            disabled={!canSubmit() || isLoggingIn}
+            loading={isLoggingIn}
+            onPress={() => {
+              dispatch(clearAuthError())
+              formikProps.submitForm()
+            }}
+            style={loginStyles.button}
+            title="Sign up"
+            textProps={{
+              style: {
+                textAlign: 'center',
+              },
+            }}
+          />
+        </>
+      )}
 
       <ThemedText style={loginStyles.error} color={'red'}>
         {authError?.message}
@@ -141,4 +167,4 @@ export const LoginForm = React.memo((props: LoginFormProps) => {
   )
 })
 
-export default LoginForm
+export default SignupForm
