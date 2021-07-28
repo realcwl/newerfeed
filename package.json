@@ -28,6 +28,7 @@
         "dev:mobile": "yarn workspace @devhub/mobile compile && concurrently --kill-others \"yarn workspace @devhub/mobile compile -w\" \"yarn workspace @devhub/mobile start\"",
         "dev:web": "yarn workspace @devhub/web compile && concurrently --kill-others \"yarn workspace @devhub/web compile -w\" \"yarn workspace @devhub/web start\"",
         "build:web": "yarn workspace @devhub/web compile && concurrently --kill-others \"yarn workspace @devhub/web compile\"",
+        "build:mobile": "yarn workspace @devhub/mobile compile && concurrently --kill-others \"yarn workspace @devhub/mobile compile\"",
         "format": "yarn workspaces run format",
         "lint": "yarn workspaces run lint",
         "patch-package": "patch-package",
