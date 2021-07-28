@@ -29,3 +29,5 @@ jobs:
       - run: |
           cd packages/mobile/ios
           pod install
+          cd ..
+          yarn ios
