@@ -17,6 +17,9 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Yarn Install
+        uses: CultureHQ/actions-yarn@master
+      - run: yarn
       - name: setup-cocoapods
         uses: maxim-lobanov/setup-cocoapods@v1
         with:
