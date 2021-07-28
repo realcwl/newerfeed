@@ -69,8 +69,7 @@ export const authReducer: Reducer<State> = (state = initialState, action) => {
         error: undefined,
         isLoggingIn: false,
         signUpSuccessMsg:
-          'Signed up successfully, please check your email for a confirmation \
-          link (check your Spam if not found in Inbox)',
+          'Signed up successfully, please check your email for a confirmation link (check your Spam if not found in Inbox)',
       }
     }
     case 'AUTH_FAILURE': {
