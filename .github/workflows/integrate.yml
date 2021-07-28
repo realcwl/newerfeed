@@ -28,11 +28,11 @@ jobs:
           podfile-path: packages/mobile/ios/Podfile.lock
 
       - name: Pod install Dependencies
-      - run: |
+        run: |
           cd packages/mobile/ios
           pod install
 
       - name: Run IOS. OPEN WITH CARE!! This might freeze your browzer
-      - run: |
+        run: |
           cd ..
           yarn ios
