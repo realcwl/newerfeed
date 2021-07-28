@@ -34,5 +34,5 @@ jobs:
 
       - name: Run IOS. OPEN WITH CARE!! This might freeze your browzer
         run: |
-          cd ..
+          cd packages/mobile
           yarn ios
