@@ -17,7 +17,10 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ty0x2333/cocoapods-action@master
+      - name: setup-cocoapods
+        uses: maxim-lobanov/setup-cocoapods@v1
+        with:
+          podfile-path: packages/mobile/ios/Podfile.lock
       - run: |
           cd packages/mobile/ios
           pod install
