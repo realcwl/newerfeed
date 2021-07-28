@@ -33,5 +33,6 @@ jobs:
           pod install
 
       - name: Run IOS. OPEN WITH CARE!! This might freeze your browzer
+      - run: |
           cd ..
           yarn ios
