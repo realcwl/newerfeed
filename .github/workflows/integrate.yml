@@ -17,7 +17,6 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: borales/actions-yarn@v2.3.0
       - uses: ty0x2333/cocoapods-action@master
       - name: Set XCode Version
         run: sudo xcode-select -s /Applications/Xcode_11.app
