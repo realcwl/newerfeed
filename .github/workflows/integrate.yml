@@ -17,14 +17,15 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/upload-artifact@v2
-        with:
-          name: node_modules
-          path: node_modules
+      - uses: c-hive/gha-yarn-cache@v2
+      - name: Install Yarn Dependencies
+        run: yarn
+
       - name: setup-cocoapods
         uses: maxim-lobanov/setup-cocoapods@v1
         with:
           podfile-path: packages/mobile/ios/Podfile.lock
+
       - run: |
           cd packages/mobile/ios
           pod install
