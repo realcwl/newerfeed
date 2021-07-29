@@ -2,8 +2,16 @@ import { User } from '@devhub/core'
 import { createAction, createErrorAction } from '../helpers'
 import { AuthError, State as AuthState } from '../reducers/auth'
 
+export function clearAuthError() {
+  return createAction('CLEAR_AUTH_ERROR')
+}
+
 export function loginRequest(payload: { email: string; password: string }) {
   return createAction('LOGIN_REQUEST', payload)
+}
+
+export function signUpRequest(payload: { email: string; password: string }) {
+  return createAction('SIGN_UP_REQUEST', payload)
 }
 
 export function loginSuccess(payload: {
@@ -13,8 +21,12 @@ export function loginSuccess(payload: {
   return createAction('LOGIN_SUCCESS', payload)
 }
 
-export function loginFailure<E extends AuthError>(error: E) {
-  return createErrorAction('LOGIN_FAILURE', error)
+export function signUpSuccess() {
+  return createAction('SIGN_UP_SUCCESS')
+}
+
+export function authFailure<E extends AuthError>(error: E) {
+  return createErrorAction('AUTH_FAILURE', error)
 }
 
 export function logout() {

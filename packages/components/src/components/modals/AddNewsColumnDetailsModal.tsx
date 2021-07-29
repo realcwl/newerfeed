@@ -1,9 +1,4 @@
-import {
-  ColumnCreation,
-  guid,
-  NewsFeedColumnSource,
-  NewsFeedDataExpressionWrapper,
-} from '@devhub/core'
+import { ColumnCreation, guid, NewsFeedColumnSource } from '@devhub/core'
 import { useFormik } from 'formik'
 import _ from 'lodash'
 import React, { Fragment, useEffect, useRef, useState } from 'react'
