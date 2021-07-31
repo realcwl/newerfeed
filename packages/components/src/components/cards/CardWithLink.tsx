@@ -55,7 +55,7 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
       cardProps: _cardProps,
       CardComponent: (
         <BaseCard
-          key={`${type}-base-card-`}
+          key={`${type}-base-card-${nodeIdOrId}`}
           {..._cardProps}
           // appViewMode={appViewMode}
           columnId={columnId}
