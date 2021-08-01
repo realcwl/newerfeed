@@ -35,28 +35,6 @@ ThemedText.displayName = 'ThemedText'
 
 export type ThemedText = Text
 
-export interface ThemedCollapsableText extends ThemedTextProps {
-  truncatedText: string
-  text: string
-}
-
-export const CollapsableThemedText = ({
-  truncatedText,
-  text,
-  ...otherProps
-}: ThemedCollapsableText) => {
-  const [more, setMore] = React.useState(false)
-
-  return (
-    <View>
-      <Text>{!more ? `${truncatedText}...` : text}</Text>
-      <ThemedText {...otherProps} onPress={() => setMore(!more)}>
-        {more ? 'show less' : 'show more'}
-      </ThemedText>
-    </View>
-  )
-}
-
 function getStyle(
   theme: Theme,
   {

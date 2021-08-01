@@ -264,9 +264,14 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         layout: { height },
       },
     }) => {
-      height > 18 * NUM_OF_LINES ? setHasMore(true) : setHasMore(false)
+      if (height > 19 * NUM_OF_LINES) {
+        if (!hasMore) {
+          setTextShown(false)
+        }
+        setHasMore(true)
+      }
     },
-    [],
+    [height, hasMore, textShown],
   )
 
   return (
@@ -384,18 +389,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               <ThemedText
                 color="foregroundColorMuted65"
                 numberOfLines={textShown ? undefined : NUM_OF_LINES}
-                // BONINGTODO: figure out why onTextLayout not called to avoid blinking
-                // onTextLayout={(e) => {
-                //   console.log('textLayout', e)
-                // }}
-                onLayout={(e) => {
-                  if (e.nativeEvent.layout.height > 19 * NUM_OF_LINES) {
-                    if (!hasMore) {
-                      setTextShown(false)
-                    }
-                    setHasMore(true)
-                  }
-                }}
+                onLayout={checkHasMore}
               >
                 {parseTextWithLinks(text ?? 'no content')}
               </ThemedText>
