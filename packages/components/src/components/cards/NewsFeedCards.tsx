@@ -89,6 +89,17 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
     NonNullable<OneListProps<DataItemT>['renderItem']>
   >(
     ({ item: nodeIdOrId, index }) => {
+      if (swipeable) {
+        return (
+          <View style={{ flex: 1 }}>
+            <SwipeableCard
+              type="COLUMN_TYPE_NEWS_FEED"
+              columnId={columnId}
+              nodeIdOrId={nodeIdOrId}
+            />
+          </View>
+        )
+      }
       return (
         <ErrorBoundary>
           <View style={{ flex: 1 }}>

@@ -37,7 +37,6 @@ import {
   cardItemSeparatorSize,
 } from './partials/CardItemSeparator'
 import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
-import { runSaga } from 'redux-saga'
 
 const GestureHandlerTouchableOpacity = Platform.select({
   android: () => require('react-native-gesture-handler').TouchableOpacity,
@@ -220,23 +219,14 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
 
-  // const backgroundThemeColor = (theme: Theme) =>
-  //   getCardBackgroundThemeColor({
-  //     isDark: theme.isDark,
-  //     isMuted,
-  //   })
-
-  // const dispatch = useDispatch()
-
   const [textShown, setTextShown] = useState(true)
   const toggleShowMoreText = () => {
     setTextShown(!textShown)
   }
 
-  const createLinkForText = (text: string) => {
+  const parseTextWithLinks = (text: string) => {
     let prev = 0
     let match: RegExpExecArray | null = null
-    // let res = <Text>
     const res: any[] = []
     while ((match = REGEX_IS_URL.exec(text ?? 'no content')) !== null) {
       const link = text.slice(match.index, match.index + match[0].length)
@@ -404,15 +394,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                       setTextShown(false)
                     }
                     setHasMore(true)
-                  } else {
-                    setHasMore(hasMore ?? false)
                   }
                 }}
               >
-                {createLinkForText(text ?? 'no content')}
+                {parseTextWithLinks(text ?? 'no content')}
               </ThemedText>
             </View>
-            {/* {MoreInfo('aaabbbcccddd:', 1)} */}
             {hasMore && (
               <View style={sharedStyles.horizontalAndVerticallyAligned}>
                 <ThemedText

@@ -171,8 +171,6 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
       data-card-link
       enableBackgroundHover={false}
       enableForegroundHover={false}
-      // href={cardProps.link}
-      // onPress={onPress}
       openOnNewTab
       style={sharedStyles.relative}
       onFocus={() => {

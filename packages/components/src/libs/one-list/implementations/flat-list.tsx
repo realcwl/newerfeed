@@ -129,19 +129,6 @@ export const OneList = React.memo(
       return (_, index) => itemLayouts[index]
     }, [data, getItemSize, itemSeparator && itemSeparator.size])
 
-    /*
-    const getItemLayout = useCallback<
-      NonNullable<FlatListProps<any>['getItemLayout']>
-    >(
-      (d, index) => ({
-        index,
-        length: (d && d[index] && getItemSize(d[index], index)) || 0,
-        offset: index * estimatedItemSize,
-      }),
-      [estimatedItemSize, getItemSize],
-    )
-    */
-
     const keyExtractor: FlatListProps<any>['keyExtractor'] = getItemKey
 
     const onViewableItemsChanged = useMemo<
@@ -232,68 +219,9 @@ export const OneList = React.memo(
                       />
                     )
                   }}
-                  // alwaysBounceHorizontal={false}
-                  // alwaysBounceVertical={false}
-                  // contentContainerStyle={contentContainerStyle}
                   data={data}
-                  // data-paging-enabled-fix={pagingEnabled}
-                  // disableVirtualization={disableVirtualization}
-                  // extraData={forceRerenderOnRefChange}
-                  // getItemLayout={getItemLayout}
                   horizontal={horizontal}
-                  // renderScrollComponent={renderScrollComponent}
-                  // initialNumToRender={
-                  //   1 +
-                  //   Math.ceil(
-                  //     horizontal
-                  //       ? (width || Dimensions.get('window').width) /
-                  //           estimatedItemSize
-                  //       : (height || Dimensions.get('window').height) /
-                  //           estimatedItemSize,
-                  //   )
-                  // }
-                  // keyExtractor={keyExtractor}
-                  // maxToRenderPerBatch={
-                  //   1 +
-                  //   Math.ceil(
-                  //     horizontal
-                  //       ? (width || Dimensions.get('window').width) /
-                  //           estimatedItemSize
-                  //       : (height || Dimensions.get('window').height) /
-                  //           estimatedItemSize,
-                  //   )
-                  // }
-                  // onScrollToIndexFailed={onScrollToIndexFailed}
-                  // onViewableItemsChanged={onViewableItemsChanged}
-                  // pagingEnabled={pagingEnabled}
-                  // refreshControl={refreshControl}
-                  // removeClippedSubviews={!disableVirtualization}
                   renderItem={renderItem}
-                  // scrollEventThrottle={10}
-                  // snapToAlignment={snapToAlignment}
-                  // style={[
-                  //   listStyle,
-                  //   {
-                  //     width: horizontal && width ? width : '100%',
-                  //     height: !horizontal && height ? height : '100%',
-                  //   },
-                  // ]}
-                  // updateCellsBatchingPeriod={50}
-                  // viewabilityConfig={viewabilityConfig}
-                  // windowSize={
-                  //   1 +
-                  //   (estimatedItemSize > 0 && overscanCount > 0
-                  //     ? Math.ceil(
-                  //         overscanCount /
-                  //           (horizontal
-                  //             ? (width || Dimensions.get('window').width) /
-                  //               estimatedItemSize
-                  //             : (height || Dimensions.get('window').height) /
-                  //               estimatedItemSize),
-                  //       )
-                  //     : 1)
-                  // }
-                  // {...restProps}
                 />
               )}
             </AutoSizer>
