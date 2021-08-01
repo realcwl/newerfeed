@@ -221,125 +221,79 @@ export const OneList = React.memo(
             >
               {({ width, height }) => (
                 <FlatList
-                  ref={flatListRef}
-                  key="flatlist"
-                  ListFooterComponent={
-                    footer && footer.size > 0 && !footer.sticky
-                      ? footer.Component
-                      : undefined
-                  }
-                  ListHeaderComponent={
-                    header && header.size > 0 && !header.sticky
-                      ? header.Component
-                      : undefined
-                  }
-                  ItemSeparatorComponent={
-                    itemSeparator &&
-                    itemSeparator.size &&
-                    itemSeparator.Component
-                      ? ({ leadingItem }) => {
-                          const leadingIndex = leadingItem
-                            ? data.findIndex((item) => item === leadingItem)
-                            : -1
-                          const trailingIndex =
-                            leadingIndex >= 0 &&
-                            leadingIndex + 1 < data.length - 1
-                              ? leadingIndex + 1
-                              : -1
-
-                          return (
-                            <>
-                              {!!(
-                                itemSeparator &&
-                                itemSeparator.size &&
-                                itemSeparator.Component
-                              ) && (
-                                <itemSeparator.Component
-                                  leading={
-                                    leadingIndex >= 0
-                                      ? {
-                                          index: leadingIndex,
-                                          item: data[leadingIndex],
-                                        }
-                                      : undefined
-                                  }
-                                  trailing={
-                                    trailingIndex >= 0
-                                      ? {
-                                          index: trailingIndex,
-                                          item: data[trailingIndex],
-                                        }
-                                      : undefined
-                                  }
-                                />
-                              )}
-                            </>
-                          )
-                        }
-                      : undefined
-                  }
-                  alwaysBounceHorizontal={false}
-                  alwaysBounceVertical={false}
-                  contentContainerStyle={contentContainerStyle}
+                  ItemSeparatorComponent={({ leadingItem }) => {
+                    return (
+                      <View
+                        style={{
+                          height: 1,
+                          width: '100%',
+                          backgroundColor: '#000',
+                        }}
+                      />
+                    )
+                  }}
+                  // alwaysBounceHorizontal={false}
+                  // alwaysBounceVertical={false}
+                  // contentContainerStyle={contentContainerStyle}
                   data={data}
-                  data-paging-enabled-fix={pagingEnabled}
-                  disableVirtualization={disableVirtualization}
-                  extraData={forceRerenderOnRefChange}
-                  getItemLayout={getItemLayout}
+                  // data-paging-enabled-fix={pagingEnabled}
+                  // disableVirtualization={disableVirtualization}
+                  // extraData={forceRerenderOnRefChange}
+                  // getItemLayout={getItemLayout}
                   horizontal={horizontal}
-                  renderScrollComponent={renderScrollComponent}
-                  initialNumToRender={
-                    1 +
-                    Math.ceil(
-                      horizontal
-                        ? (width || Dimensions.get('window').width) /
-                            estimatedItemSize
-                        : (height || Dimensions.get('window').height) /
-                            estimatedItemSize,
-                    )
-                  }
-                  keyExtractor={keyExtractor}
-                  maxToRenderPerBatch={
-                    1 +
-                    Math.ceil(
-                      horizontal
-                        ? (width || Dimensions.get('window').width) /
-                            estimatedItemSize
-                        : (height || Dimensions.get('window').height) /
-                            estimatedItemSize,
-                    )
-                  }
-                  onScrollToIndexFailed={onScrollToIndexFailed}
-                  onViewableItemsChanged={onViewableItemsChanged}
-                  pagingEnabled={pagingEnabled}
-                  refreshControl={refreshControl}
-                  removeClippedSubviews={!disableVirtualization}
+                  // renderScrollComponent={renderScrollComponent}
+                  // initialNumToRender={
+                  //   1 +
+                  //   Math.ceil(
+                  //     horizontal
+                  //       ? (width || Dimensions.get('window').width) /
+                  //           estimatedItemSize
+                  //       : (height || Dimensions.get('window').height) /
+                  //           estimatedItemSize,
+                  //   )
+                  // }
+                  // keyExtractor={keyExtractor}
+                  // maxToRenderPerBatch={
+                  //   1 +
+                  //   Math.ceil(
+                  //     horizontal
+                  //       ? (width || Dimensions.get('window').width) /
+                  //           estimatedItemSize
+                  //       : (height || Dimensions.get('window').height) /
+                  //           estimatedItemSize,
+                  //   )
+                  // }
+                  // onScrollToIndexFailed={onScrollToIndexFailed}
+                  // onViewableItemsChanged={onViewableItemsChanged}
+                  // pagingEnabled={pagingEnabled}
+                  // refreshControl={refreshControl}
+                  // removeClippedSubviews={!disableVirtualization}
                   renderItem={renderItem}
-                  scrollEventThrottle={10}
-                  snapToAlignment={snapToAlignment}
-                  style={[
-                    listStyle,
-                    {
-                      width: horizontal && width ? width : '100%',
-                      height: !horizontal && height ? height : '100%',
-                    },
-                  ]}
-                  updateCellsBatchingPeriod={50}
-                  viewabilityConfig={viewabilityConfig}
-                  windowSize={
-                    1 +
-                    (estimatedItemSize > 0 && overscanCount > 0
-                      ? Math.ceil(
-                          overscanCount /
-                            (horizontal
-                              ? (width || Dimensions.get('window').width) /
-                                estimatedItemSize
-                              : (height || Dimensions.get('window').height) /
-                                estimatedItemSize),
-                        )
-                      : 1)
-                  }
-                  {...restProps}
+                  // scrollEventThrottle={10}
+                  // snapToAlignment={snapToAlignment}
+                  // style={[
+                  //   listStyle,
+                  //   {
+                  //     width: horizontal && width ? width : '100%',
+                  //     height: !horizontal && height ? height : '100%',
+                  //   },
+                  // ]}
+                  // updateCellsBatchingPeriod={50}
+                  // viewabilityConfig={viewabilityConfig}
+                  // windowSize={
+                  //   1 +
+                  //   (estimatedItemSize > 0 && overscanCount > 0
+                  //     ? Math.ceil(
+                  //         overscanCount /
+                  //           (horizontal
+                  //             ? (width || Dimensions.get('window').width) /
+                  //               estimatedItemSize
+                  //             : (height || Dimensions.get('window').height) /
+                  //               estimatedItemSize),
+                  //       )
+                  //     : 1)
+                  // }
+                  // {...restProps}
                 />
               )}
             </AutoSizer>

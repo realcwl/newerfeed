@@ -37,6 +37,7 @@ import {
   cardItemSeparatorSize,
 } from './partials/CardItemSeparator'
 import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
+import { runSaga } from 'redux-saga'
 
 const GestureHandlerTouchableOpacity = Platform.select({
   android: () => require('react-native-gesture-handler').TouchableOpacity,
@@ -238,16 +239,16 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     // let res = <Text>
     const res: any[] = []
     while ((match = REGEX_IS_URL.exec(text ?? 'no content')) !== null) {
-      console.log('i am here', match)
       const link = text.slice(match.index, match.index + match[0].length)
       res.push(
-        <ThemedText color="foregroundColorMuted65">
+        <ThemedText color="foregroundColorMuted65" key={res.length}>
           {text.slice(prev, match.index)}
         </ThemedText>,
       )
       res.push(
         <ThemedText
           color="red"
+          key={res.length}
           // assume most website will redirect http to https
           onPress={() =>
             Linking.openURL(link.startsWith('http') ? link : `http://${link}`)
@@ -259,11 +260,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       prev = match.index + match[0].length
     }
     res.push(
-      <ThemedText color="foregroundColorMuted65">
+      <ThemedText color="foregroundColorMuted65" key={res.length}>
         {text.slice(prev)}
       </ThemedText>,
     )
-    console.log(res, prev, text.slice(prev))
     return res
   }
 
@@ -274,8 +274,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         layout: { height },
       },
     }) => {
-      console.log('what', height, textShown)
-      height > 17 * NUM_OF_LINES ? setHasMore(true) : setHasMore(false)
+      height > 18 * NUM_OF_LINES ? setHasMore(true) : setHasMore(false)
     },
     [],
   )
@@ -400,7 +399,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 //   console.log('textLayout', e)
                 // }}
                 onLayout={(e) => {
-                  if (e.nativeEvent.layout.height > 17 * NUM_OF_LINES) {
+                  if (e.nativeEvent.layout.height > 19 * NUM_OF_LINES) {
                     if (!hasMore) {
                       setTextShown(false)
                     }
@@ -415,13 +414,15 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             </View>
             {/* {MoreInfo('aaabbbcccddd:', 1)} */}
             {hasMore && (
-              <ThemedText
-                color="primaryBackgroundColor"
-                onPress={toggleShowMoreText}
-                style={[styles.text, sharedStyles.flex]}
-              >
-                {textShown ? 'show less' : 'show more'}
-              </ThemedText>
+              <View style={sharedStyles.horizontalAndVerticallyAligned}>
+                <ThemedText
+                  color="primaryBackgroundColor"
+                  onPress={toggleShowMoreText}
+                  style={[styles.text, sharedStyles.flex]}
+                >
+                  {textShown ? 'show less' : 'show more'}
+                </ThemedText>
+              </View>
             )}
           </View>
         </View>

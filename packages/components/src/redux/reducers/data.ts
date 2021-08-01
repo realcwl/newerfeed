@@ -36,7 +36,7 @@ const initialState: State = {
     dummyCard2: {
       id: 'dummyCard2',
       title: `I am dummyCard2's dummy title with more than one line as well`,
-      text: `first card with some real real real long descriptions www.google.com and real long text and see if it works shorturl.at/ijksA !`,
+      text: `www.facebook.com second card with some descriptions!`,
       author: {
         avatar: {
           imageURL:
@@ -50,7 +50,8 @@ const initialState: State = {
     dummyCard3: {
       id: 'dummyCard3',
       title: `I am dummyCard3's dummy title with more than one line as well`,
-      text: `first card with some real real real long descriptions www.google.com and real long text and see if it works shorturl.at/ijksA !`,
+      text: `third card with some longest descriptions \nwww.google.com and real long text \n
+      and see if it works shorturl.at/ijksA again\n let's see!`,
       author: {
         avatar: {
           imageURL:
