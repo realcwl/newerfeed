@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleProp, TextProps, TextStyle } from 'react-native'
+import { StyleProp, TextProps, TextStyle, View } from 'react-native'
 
 import { Theme, ThemeColors, ThemeTransformer } from '@devhub/core'
 import { Text } from '../common/Text'

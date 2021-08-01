@@ -89,11 +89,20 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
     NonNullable<OneListProps<DataItemT>['renderItem']>
   >(
     ({ item: nodeIdOrId, index }) => {
-      const height = getItemSize(nodeIdOrId, index)
-
+      if (swipeable) {
+        return (
+          <View style={{ flex: 1 }}>
+            <SwipeableCard
+              type="COLUMN_TYPE_NEWS_FEED"
+              columnId={columnId}
+              nodeIdOrId={nodeIdOrId}
+            />
+          </View>
+        )
+      }
       return (
         <ErrorBoundary>
-          <View style={{ height }}>
+          <View style={{ flex: 1 }}>
             <NewsFeedCard nodeIdOrId={nodeIdOrId} columnId={columnId} />
           </View>
         </ErrorBoundary>

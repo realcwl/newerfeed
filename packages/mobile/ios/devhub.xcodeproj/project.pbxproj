@@ -310,6 +310,7 @@
 				CURRENT_PROJECT_VERSION = 2709;
 				DEVELOPMENT_TEAM = JNXGJS86YQ;
 				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = devhub/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -341,6 +342,7 @@
 				CODE_SIGN_ENTITLEMENTS = devhub/DevHub.entitlements;
 				CURRENT_PROJECT_VERSION = 2709;
 				DEVELOPMENT_TEAM = JNXGJS86YQ;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = devhub/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -1,5 +1,12 @@
-import React, { Fragment } from 'react'
-import { PixelRatio, ScrollView, StyleSheet, View } from 'react-native'
+import React, { Fragment, useCallback, useState } from 'react'
+import {
+  PixelRatio,
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  Linking,
+} from 'react-native'
 import { useDispatch } from 'react-redux'
 
 import { getDateSmallText, getFullDateText, Theme } from '@devhub/core'
@@ -21,7 +28,6 @@ import { Avatar } from '../common/Avatar'
 import { IntervalRefresh } from '../common/IntervalRefresh'
 import { smallLabelHeight } from '../common/Label'
 import { Spacer } from '../common/Spacer'
-import { Text } from '../common/Text'
 import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
 import { BaseCardProps, renderCardActions, sizes } from './BaseCard.shared'
@@ -30,12 +36,15 @@ import {
   CardItemSeparator,
   cardItemSeparatorSize,
 } from './partials/CardItemSeparator'
+import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
 
 const GestureHandlerTouchableOpacity = Platform.select({
   android: () => require('react-native-gesture-handler').TouchableOpacity,
   ios: () => require('react-native-gesture-handler').TouchableOpacity,
   default: () => require('../common/TouchableOpacity').TouchableOpacity,
 })()
+
+const NUM_OF_LINES = 2
 
 const styles = StyleSheet.create({
   container: {
@@ -210,13 +219,60 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
 
-  const backgroundThemeColor = (theme: Theme) =>
-    getCardBackgroundThemeColor({
-      isDark: theme.isDark,
-      isMuted,
-    })
+  const [textShown, setTextShown] = useState(true)
+  const toggleShowMoreText = () => {
+    setTextShown(!textShown)
+  }
 
-  const dispatch = useDispatch()
+  const parseTextWithLinks = (text: string) => {
+    let prev = 0
+    let match: RegExpExecArray | null = null
+    const res: any[] = []
+    while ((match = REGEX_IS_URL.exec(text ?? 'no content')) !== null) {
+      const link = text.slice(match.index, match.index + match[0].length)
+      res.push(
+        <ThemedText color="foregroundColorMuted65" key={res.length}>
+          {text.slice(prev, match.index)}
+        </ThemedText>,
+      )
+      res.push(
+        <ThemedText
+          color="red"
+          key={res.length}
+          // assume most website will redirect http to https
+          onPress={() =>
+            Linking.openURL(link.startsWith('http') ? link : `http://${link}`)
+          }
+        >
+          {link}
+        </ThemedText>,
+      )
+      prev = match.index + match[0].length
+    }
+    res.push(
+      <ThemedText color="foregroundColorMuted65" key={res.length}>
+        {text.slice(prev)}
+      </ThemedText>,
+    )
+    return res
+  }
+
+  const [hasMore, setHasMore] = useState(false)
+  const checkHasMore = useCallback(
+    ({
+      nativeEvent: {
+        layout: { height },
+      },
+    }) => {
+      if (height > 19 * NUM_OF_LINES) {
+        if (!hasMore) {
+          setTextShown(false)
+        }
+        setHasMore(true)
+      }
+    },
+    [height, hasMore, textShown],
+  )
 
   return (
     <View
@@ -315,7 +371,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             <View style={sharedStyles.horizontalAndVerticallyAligned}>
               <ThemedText
                 color="foregroundColor"
-                style={[styles.title, sharedStyles.flex]}
+                style={[
+                  styles.title,
+                  sharedStyles.flex,
+                  sharedStyles.marginVerticalQuarter,
+                ]}
               >
                 {title}
               </ThemedText>
@@ -328,11 +388,23 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             <View style={sharedStyles.horizontalAndVerticallyAligned}>
               <ThemedText
                 color="foregroundColorMuted65"
-                style={[styles.text, sharedStyles.flex]}
+                numberOfLines={textShown ? undefined : NUM_OF_LINES}
+                onLayout={checkHasMore}
               >
-                {text}
+                {parseTextWithLinks(text ?? 'no content')}
               </ThemedText>
             </View>
+            {hasMore && (
+              <View style={sharedStyles.horizontalAndVerticallyAligned}>
+                <ThemedText
+                  color="primaryBackgroundColor"
+                  onPress={toggleShowMoreText}
+                  style={[styles.text, sharedStyles.flex]}
+                >
+                  {textShown ? 'show less' : 'show more'}
+                </ThemedText>
+              </View>
+            )}
           </View>
         </View>
 

@@ -55,7 +55,7 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
       cardProps: _cardProps,
       CardComponent: (
         <BaseCard
-          key={`${type}-base-card-`}
+          key={`${type}-base-card-${nodeIdOrId}`}
           {..._cardProps}
           // appViewMode={appViewMode}
           columnId={columnId}
@@ -171,8 +171,6 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
       data-card-link
       enableBackgroundHover={false}
       enableForegroundHover={false}
-      href={cardProps.link}
-      onPress={onPress}
       openOnNewTab
       style={sharedStyles.relative}
       onFocus={() => {
