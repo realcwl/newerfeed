@@ -19,7 +19,7 @@ export interface CardActionsProps {
   commentsLink: string | (() => void) | undefined
   isRead: boolean
   isSaved: boolean
-  itemNodeIdOrIds: string[]
+  itemNodeId: string
   leftSpacing?: number
   // muted?: boolean
   rightSpacing?: number
@@ -34,7 +34,7 @@ export function CardActions(props: CardActionsProps) {
     commentsLink,
     isRead,
     isSaved,
-    itemNodeIdOrIds,
+    itemNodeId,
     leftSpacing = sizes.avatarContainerWidth + sizes.horizontalSpaceSize,
     rightSpacing = 0,
     type,
@@ -59,7 +59,12 @@ export function CardActions(props: CardActionsProps) {
           right: contentPadding / 4,
         }}
         onPress={() => {
-          console.log('UNIMPLEMENTED_PRESS')
+          dispatch(
+            actions.favoriteItem({
+              itemNodeId: itemNodeId,
+              save: !isSaved,
+            }),
+          )
         }}
         textProps={{
           color: muted ? 'foregroundColorMuted40' : 'foregroundColorMuted65',
@@ -85,7 +90,12 @@ export function CardActions(props: CardActionsProps) {
           right: contentPadding / 4,
         }}
         onPress={() => {
-          console.log('UNIMPLEMENTED_PRESS')
+          dispatch(
+            actions.markItemAsRead({
+              itemNodeId: itemNodeId,
+              read: !isRead,
+            }),
+          )
         }}
         textProps={{
           color: muted ? 'foregroundColorMuted40' : 'foregroundColorMuted65',

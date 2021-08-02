@@ -16,15 +16,29 @@ export function SwipeableCard(props: CardWithLinkProps) {
   const theme = useTheme()
   const dispatch = useDispatch()
   const item = useItem(nodeIdOrId)
-  const isRead = false
-  const isSaved = false
+  if (!item) return null
+
+  const isRead = item.isRead
+  const isFavorite = item.isFavorite
 
   function handleMarkAsReadOrUnread() {
-    console.log('handleMarkAsReadOrUnread')
+    if (!item) return null
+    dispatch(
+      actions.markItemAsRead({
+        itemNodeId: item.id,
+        read: !isRead,
+      }),
+    )
   }
 
   function handleSave() {
-    console.log('handleSave')
+    if (!item) return null
+    dispatch(
+      actions.favoriteItem({
+        itemNodeId: item.id,
+        save: !isFavorite,
+      }),
+    )
   }
 
   const Content = useMemo(
@@ -62,7 +76,7 @@ export function SwipeableCard(props: CardWithLinkProps) {
           onPress: handleSave,
           backgroundColor: theme.orange,
           foregroundColor: theme.primaryForegroundColor,
-          ...(isSaved
+          ...(isFavorite
             ? {
                 icon: { family: 'octicon', name: 'bookmark-slash-fill' },
                 type: 'FULL',

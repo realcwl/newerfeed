@@ -165,6 +165,10 @@ export interface NewsFeedData {
   parentId?: string
   // Put all deplicate children messages.
   duplicateIds?: string[]
+  // Indicate that whether this item is already favorited by user.
+  isFavorite: boolean
+  // Indicate whether this card has been read by the user.
+  isRead: boolean
 }
 
 export interface Attachment {
