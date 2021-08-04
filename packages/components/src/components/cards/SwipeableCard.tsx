@@ -19,7 +19,7 @@ export function SwipeableCard(props: CardWithLinkProps) {
   if (!item) return null
 
   const isRead = item.isRead
-  const isFavorite = item.isFavorite
+  const isSaved = item.isSaved
 
   function handleMarkAsReadOrUnread() {
     if (!item) return null
@@ -36,7 +36,7 @@ export function SwipeableCard(props: CardWithLinkProps) {
     dispatch(
       actions.favoriteItem({
         itemNodeId: item.id,
-        save: !isFavorite,
+        save: !isSaved,
       }),
     )
   }
@@ -76,7 +76,7 @@ export function SwipeableCard(props: CardWithLinkProps) {
           onPress: handleSave,
           backgroundColor: theme.orange,
           foregroundColor: theme.primaryForegroundColor,
-          ...(isFavorite
+          ...(isSaved
             ? {
                 icon: { family: 'octicon', name: 'bookmark-slash-fill' },
                 type: 'FULL',

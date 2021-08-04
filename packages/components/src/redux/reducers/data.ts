@@ -31,7 +31,7 @@ const initialState: State = {
         profileURL: '/',
       },
       crawledTimestamp: new Date(),
-      isFavorite: false,
+      isSaved: false,
       isRead: false,
     },
     dummyCard2: {
@@ -47,7 +47,7 @@ const initialState: State = {
         profileURL: '/',
       },
       crawledTimestamp: new Date(),
-      isFavorite: false,
+      isSaved: false,
       isRead: false,
     },
     dummyCard3: {
@@ -64,7 +64,7 @@ const initialState: State = {
         profileURL: '/',
       },
       crawledTimestamp: new Date(),
-      isFavorite: false,
+      isSaved: false,
       isRead: false,
     },
   },
@@ -88,7 +88,7 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
           return
         }
         const entry = draft.byId[itemNodeId]
-        entry.isFavorite = save
+        entry.isSaved = save
         draft.updatedAt = now
       })
     case 'MARK_ITEM_AS_READ':

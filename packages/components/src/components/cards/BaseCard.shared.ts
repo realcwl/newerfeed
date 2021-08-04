@@ -72,7 +72,7 @@ export interface BaseCardProps extends AdditionalCardProps {
   author?: Author
   timestamp: Date
   isRead: boolean
-  isFavorite: boolean
+  isSaved: boolean
   link: string
   nodeIdOrId: string
   text?: string
@@ -89,7 +89,7 @@ function _getCardPropsForItem(
     type: 'COLUMN_TYPE_NEWS_FEED',
     link: '',
     isRead: item.isRead,
-    isFavorite: item.isFavorite,
+    isSaved: item.isSaved,
     timestamp: item.postTimestamp ?? item.crawledTimestamp,
     text: item.text,
     author: item.author,

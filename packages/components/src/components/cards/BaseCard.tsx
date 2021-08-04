@@ -209,7 +209,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     author,
     timestamp,
     isRead,
-    isFavorite: isSaved,
+    isSaved: isSaved,
     link,
     nodeIdOrId,
     text,
