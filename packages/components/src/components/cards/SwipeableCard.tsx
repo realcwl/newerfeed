@@ -16,15 +16,29 @@ export function SwipeableCard(props: CardWithLinkProps) {
   const theme = useTheme()
   const dispatch = useDispatch()
   const item = useItem(nodeIdOrId)
-  const isRead = false
-  const isSaved = false
+  if (!item) return null
+
+  const isRead = item.isRead
+  const isSaved = item.isSaved
 
   function handleMarkAsReadOrUnread() {
-    console.log('handleMarkAsReadOrUnread')
+    if (!item) return null
+    dispatch(
+      actions.markItemAsRead({
+        itemNodeId: item.id,
+        read: !isRead,
+      }),
+    )
   }
 
   function handleSave() {
-    console.log('handleSave')
+    if (!item) return null
+    dispatch(
+      actions.markItemAsSaved({
+        itemNodeId: item.id,
+        save: !isSaved,
+      }),
+    )
   }
 
   const Content = useMemo(

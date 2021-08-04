@@ -88,12 +88,12 @@ function _getCardPropsForItem(
     title: item.title,
     type: 'COLUMN_TYPE_NEWS_FEED',
     link: '',
-    isRead: false,
-    isSaved: false,
+    isRead: item.isRead,
+    isSaved: item.isSaved,
     timestamp: item.postTimestamp ?? item.crawledTimestamp,
     text: item.text,
     author: item.author,
-    nodeIdOrId: 'node_id',
+    nodeIdOrId: item.id,
   }
 }
 

@@ -51,6 +51,7 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
 
     const _cardProps = getCardPropsForItem(type, columnId, item)
 
+    console.log(_cardProps)
     return {
       cardProps: _cardProps,
       CardComponent: (
