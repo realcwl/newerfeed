@@ -74,7 +74,7 @@ const initialState: State = {
 
 export const dataReducer: Reducer<State> = (state = initialState, action) => {
   switch (action.type) {
-    case 'FAVORITE_ITEM':
+    case 'MARK_ITEM_AS_SAVED':
       return immer(state, (draft) => {
         const { itemNodeId, save } = action.payload
         const now = new Date().toISOString()

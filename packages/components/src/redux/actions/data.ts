@@ -1,12 +1,12 @@
 import { createAction } from '../helpers'
 
-export function favoriteItem(payload: {
+export function markItemAsSaved(payload: {
   // Indicate the item under action.
   itemNodeId: string
-  // Indicate whether user favorites or unfavorites, true for favorite.
+  // Indicate whether user saves or unsaves, true for saves.
   save: boolean
 }) {
-  return createAction('FAVORITE_ITEM', payload)
+  return createAction('MARK_ITEM_AS_SAVED', payload)
 }
 
 export function markItemAsRead(payload: {

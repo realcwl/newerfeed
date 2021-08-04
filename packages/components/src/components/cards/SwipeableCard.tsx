@@ -34,7 +34,7 @@ export function SwipeableCard(props: CardWithLinkProps) {
   function handleSave() {
     if (!item) return null
     dispatch(
-      actions.favoriteItem({
+      actions.markItemAsSaved({
         itemNodeId: item.id,
         save: !isSaved,
       }),

@@ -60,7 +60,7 @@ export function CardActions(props: CardActionsProps) {
         }}
         onPress={() => {
           dispatch(
-            actions.favoriteItem({
+            actions.markItemAsSaved({
               itemNodeId: itemNodeId,
               save: !isSaved,
             }),
