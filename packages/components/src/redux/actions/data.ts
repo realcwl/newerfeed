@@ -1,5 +1,23 @@
 import { createAction } from '../helpers'
 
+export function fetchFeedsRequest(payload: {
+  feeds: {
+    id: string
+  }[]
+}) {
+  console.log('feedRequest', payload)
+  return createAction('FETCH_FEEDS_REQUEST', payload)
+}
+
+export function fetchFeedsSuccess(payload: {
+  feeds: {
+    id: string
+    posts: { id: string; title: string; content: string }[]
+  }[]
+}) {
+  return createAction('FETCH_FEEDS_SUCCESS', payload)
+}
+
 export function markItemAsSaved(payload: {
   // Indicate the item under action.
   itemNodeId: string

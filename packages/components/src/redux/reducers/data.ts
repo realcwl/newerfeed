@@ -1,5 +1,5 @@
 import { NewsFeedData } from '@devhub/core'
-import _ from 'lodash'
+import _, { defaultTo } from 'lodash'
 
 import { Reducer } from '../types'
 import immer from 'immer'
@@ -30,7 +30,19 @@ const initialState: State = {
         name: 'John Doe',
         profileURL: '/',
       },
-      crawledTimestamp: new Date(),
+      crawledTimestamp: new Date('2021-01-02'),
+      attachments: [
+        {
+          id: 'dummyImg',
+          dataType: 'img',
+          url: 'https://images.unsplash.com/photo-1544526226-d4568090ffb8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aGQlMjBpbWFnZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80',
+        },
+        {
+          id: 'dummyImg2',
+          dataType: 'img',
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/2560px-Image_created_with_a_mobile_phone.png',
+        },
+      ],
       isSaved: false,
       isRead: false,
     },
@@ -46,7 +58,19 @@ const initialState: State = {
         name: 'John Doe',
         profileURL: '/',
       },
-      crawledTimestamp: new Date(),
+      attachments: [
+        {
+          id: 'dummyData3',
+          dataType: 'img',
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/TEIDE.JPG/2880px-TEIDE.JPG',
+        },
+        {
+          id: 'dummyData4',
+          dataType: 'img',
+          url: 'https://hbimg.huabanimg.com/300251098bb1d62a1d89f40c2e8018bbb415414c912fc-5z5wMR_fw658',
+        },
+      ],
+      crawledTimestamp: new Date('2021-05-02'),
       isSaved: false,
       isRead: false,
     },
@@ -63,7 +87,7 @@ const initialState: State = {
         name: 'John Doe',
         profileURL: '/',
       },
-      crawledTimestamp: new Date(),
+      crawledTimestamp: new Date('2021-06-02'),
       isSaved: false,
       isRead: false,
     },
@@ -74,6 +98,30 @@ const initialState: State = {
 
 export const dataReducer: Reducer<State> = (state = initialState, action) => {
   switch (action.type) {
+    case 'FETCH_FEEDS_SUCCESS':
+      return immer(state, (draft) => {
+        console.log('here', action.payload.feeds)
+        if (!!action.payload?.feeds && action.payload.feeds.length > 0) {
+          for (const feed of action.payload.feeds) {
+            // Asuume all returned posts are in descending timestamp order
+            for (const post of feed.posts.slice().reverse()) {
+              if (post.id in draft.byId) {
+                continue
+              }
+              draft.allIds.unshift(post.id)
+              draft.byId[post.id] = {
+                id: post.id,
+                title: post.title,
+                text: 'whatever',
+                crawledTimestamp: new Date(),
+                isSaved: false,
+                isRead: false,
+              }
+            }
+          }
+        }
+        console.log('draft', draft.allIds)
+      })
     case 'MARK_ITEM_AS_SAVED':
       return immer(state, (draft) => {
         const { itemNodeId, save } = action.payload

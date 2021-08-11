@@ -5,11 +5,19 @@ import {
   StyleSheet,
   View,
   Text,
+  Image,
   Linking,
+  Modal,
 } from 'react-native'
 import { useDispatch } from 'react-redux'
 
-import { getDateSmallText, getFullDateText, Theme } from '@devhub/core'
+import ImageViewer from '../../libs/image-viewer'
+import {
+  Attachment,
+  getDateSmallText,
+  getFullDateText,
+  Theme,
+} from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
 import { Separator } from '../common/Separator'
@@ -37,6 +45,13 @@ import {
   cardItemSeparatorSize,
 } from './partials/CardItemSeparator'
 import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
+import { TouchableHighlight } from '../common/TouchableHighlight'
+import { Button } from '../common/Button'
+import {
+  Pressable,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from 'react-native-web'
 
 const GestureHandlerTouchableOpacity = Platform.select({
   android: () => require('react-native-gesture-handler').TouchableOpacity,
@@ -204,6 +219,7 @@ const styles = StyleSheet.create({
 export const BaseCard = React.memo((props: BaseCardProps) => {
   const {
     action,
+    attachments,
     height,
 
     author,
@@ -220,6 +236,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
 
   const [textShown, setTextShown] = useState(true)
+  const [imageToView, setImageToView] = useState<Attachment | null>(null)
+
   const toggleShowMoreText = () => {
     setTextShown(!textShown)
   }
@@ -279,6 +297,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       key={`base-card-container-${type}-${nodeIdOrId}-inner`}
       style={[styles.container]}
     >
+      <ImageViewer image={imageToView} setImage={setImageToView} />
       <View
         style={[
           styles.innerContainer,
@@ -314,7 +333,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               sharedStyles.marginVerticalQuarter,
             ]}
           >
-            <IntervalRefresh interval={5000} date={timestamp}>
+            <IntervalRefresh interval={60000} date={timestamp}>
               {() => {
                 const dateText = getDateSmallText(timestamp)
                 if (!dateText) return null
@@ -407,6 +426,37 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             )}
           </View>
         </View>
+
+        {!!attachments && (
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              marginTop: 10,
+              justifyContent: 'flex-start',
+            }}
+          >
+            {attachments.map((attachment) => {
+              if (attachment.dataType === 'img') {
+                return (
+                  <TouchableHighlight
+                    onPress={() => {
+                      setImageToView(attachment)
+                    }}
+                  >
+                    <Image
+                      source={{
+                        uri: attachment.url,
+                      }}
+                      style={{ width: 100, height: 100 }}
+                      resizeMode="cover"
+                    />
+                  </TouchableHighlight>
+                )
+              }
+            })}
+          </View>
+        )}
 
         {!!renderCardActions && (
           <>
