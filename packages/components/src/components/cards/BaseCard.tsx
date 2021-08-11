@@ -5,11 +5,18 @@ import {
   StyleSheet,
   View,
   Text,
+  Image,
   Linking,
+  Modal,
 } from 'react-native'
 import { useDispatch } from 'react-redux'
 
-import { getDateSmallText, getFullDateText, Theme } from '@devhub/core'
+import {
+  Attachment,
+  getDateSmallText,
+  getFullDateText,
+  Theme,
+} from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
 import { Separator } from '../common/Separator'
@@ -37,6 +44,13 @@ import {
   cardItemSeparatorSize,
 } from './partials/CardItemSeparator'
 import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
+import { TouchableHighlight } from '../common/TouchableHighlight'
+import { Button } from '../common/Button'
+import {
+  Pressable,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from 'react-native-web'
 
 const GestureHandlerTouchableOpacity = Platform.select({
   android: () => require('react-native-gesture-handler').TouchableOpacity,
@@ -204,6 +218,7 @@ const styles = StyleSheet.create({
 export const BaseCard = React.memo((props: BaseCardProps) => {
   const {
     action,
+    attachments,
     height,
 
     author,
@@ -257,6 +272,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     return res
   }
 
+  const [modalImage, setModalImage] = useState<Attachment | null>(null)
+
   const [hasMore, setHasMore] = useState(false)
   const checkHasMore = useCallback(
     ({
@@ -279,6 +296,46 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       key={`base-card-container-${type}-${nodeIdOrId}-inner`}
       style={[styles.container]}
     >
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: 22,
+          position: 'absolute',
+        }}
+      >
+        <Modal
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setModalImage(null)}
+          visible={!!modalImage}
+        >
+          <TouchableWithoutFeedback
+            style={styles.container}
+            onPressOut={() => {
+              setModalImage(null)
+            }}
+          >
+            <View
+              style={{
+                marginTop: 200,
+                width: '100%',
+                height: '100%',
+                alignItems: 'center',
+              }}
+              onTouchEnd={() => setModalImage(null)}
+            >
+              <Image
+                source={{
+                  uri: modalImage?.url,
+                }}
+                key={modalImage?.id}
+                style={{ height: 500, width: 500, resizeMode: 'contain' }}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      </View>
       <View
         style={[
           styles.innerContainer,
@@ -407,6 +464,36 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             )}
           </View>
         </View>
+
+        {!!attachments && (
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              marginTop: 10,
+              justifyContent: 'flex-start',
+            }}
+          >
+            {attachments.map((attachment) => {
+              if (attachment.dataType === 'img') {
+                return (
+                  <TouchableHighlight
+                    onPress={() => {
+                      setModalImage(attachment)
+                    }}
+                  >
+                    <Image
+                      source={{
+                        uri: attachment.url,
+                      }}
+                      style={{ width: 100, height: 100 }}
+                    />
+                  </TouchableHighlight>
+                )
+              }
+            })}
+          </View>
+        )}
 
         {!!renderCardActions && (
           <>

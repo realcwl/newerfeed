@@ -1,5 +1,11 @@
 import { createAction } from '../helpers'
 
+export function updateFeeds(payload: {
+  feeds: { id: string; posts: { id: string; title: string }[] }[]
+}) {
+  return createAction('UPDATE_FEEDS', payload)
+}
+
 export function markItemAsSaved(payload: {
   // Indicate the item under action.
   itemNodeId: string

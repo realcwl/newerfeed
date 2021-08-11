@@ -1,11 +1,12 @@
 import { NewsFeedData } from '@devhub/core'
-import _ from 'lodash'
+import _, { defaultTo } from 'lodash'
 
 import { Reducer } from '../types'
 import immer from 'immer'
 
 export interface State {
   // Contains all data IDs, that can be referenced by multiple columns.
+  // TODISCUSS: change it to Set<string>
   allIds: string[]
   // Contains data id to actual data mapping.
   byId: Record<string, NewsFeedData>
@@ -31,6 +32,18 @@ const initialState: State = {
         profileURL: '/',
       },
       crawledTimestamp: new Date(),
+      attachments: [
+        {
+          id: 'dummyImg',
+          dataType: 'img',
+          url: 'https://images.unsplash.com/photo-1544526226-d4568090ffb8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aGQlMjBpbWFnZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80',
+        },
+        {
+          id: 'dummyImg2',
+          dataType: 'img',
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/2560px-Image_created_with_a_mobile_phone.png',
+        },
+      ],
       isSaved: false,
       isRead: false,
     },
@@ -46,6 +59,13 @@ const initialState: State = {
         name: 'John Doe',
         profileURL: '/',
       },
+      attachments: [
+        {
+          id: 'dummyData3',
+          dataType: 'img',
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/TEIDE.JPG/2880px-TEIDE.JPG',
+        },
+      ],
       crawledTimestamp: new Date(),
       isSaved: false,
       isRead: false,
@@ -74,6 +94,24 @@ const initialState: State = {
 
 export const dataReducer: Reducer<State> = (state = initialState, action) => {
   switch (action.type) {
+    case 'UPDATE_FEEDS':
+      return immer(state, (draft) => {
+        if (!!action.payload?.feeds && action.payload.feeds.length > 0) {
+          for (const feed of action.payload.feeds) {
+            for (const post of feed.posts) {
+              draft.allIds.push(post.id)
+              draft.byId[post.id] = {
+                id: post.id,
+                title: post.title,
+                text: 'whatever',
+                crawledTimestamp: new Date(),
+                isSaved: false,
+                isRead: false,
+              }
+            }
+          }
+        }
+      })
     case 'MARK_ITEM_AS_SAVED':
       return immer(state, (draft) => {
         const { itemNodeId, save } = action.payload
