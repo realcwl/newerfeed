@@ -7,7 +7,7 @@ import { bugsnag } from '../../bugsnag'
 import { Platform } from '../../platform'
 import { OneListInstance, OneListProps } from '../index.shared'
 
-export { OneListProps }
+export type { OneListProps }
 
 const renderScrollComponent = Platform.select<
   () => FlatListProps<any>['renderScrollComponent']

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { Image, ScrollView, StyleSheet, View } from 'react-native'
 
 import { constants } from '@devhub/core'
-import logo from '@devhub/components/assets/logo_circle.png'
 
 import { FullHeightScrollView } from '../components/common/FullHeightScrollView'
 import { Link } from '../components/common/Link'
@@ -133,7 +132,7 @@ export const LoginScreen = React.memo(() => {
               style: styles.footerLinkText,
             }}
           >
-            <Image resizeMode="contain" source={logo} style={styles.logo} />
+            {/* this way of using logo fails "npx tsc -b" <Image resizeMode="contain" source={logo} style={styles.logo} /> */}
           </Link>
 
           <Spacer height={contentPadding} />

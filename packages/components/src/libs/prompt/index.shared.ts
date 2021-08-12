@@ -1,4 +1,4 @@
-export { PromptOptions } from 'react-native-prompt-android'
+export type { PromptOptions } from 'react-native-prompt-android'
 
 export interface PromptButton {
   text?: string
