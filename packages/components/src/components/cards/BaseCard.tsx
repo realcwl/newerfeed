@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import { useDispatch } from 'react-redux'
 
+import ImageViewer from 'react-native-image-zoom-viewer'
 import {
   Attachment,
   getDateSmallText,
@@ -310,7 +311,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           onRequestClose={() => setModalImage(null)}
           visible={!!modalImage}
         >
-          <TouchableWithoutFeedback
+          {/* <TouchableWithoutFeedback
             style={styles.container}
             onPressOut={() => {
               setModalImage(null)
@@ -333,7 +334,17 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 style={{ height: 500, width: 500, resizeMode: 'contain' }}
               />
             </View>
-          </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback> */}
+          <ImageViewer
+            imageUrls={[
+              {
+                url: 'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
+              },
+              {
+                url: 'https://images.unsplash.com/photo-1544526226-d4568090ffb8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aGQlMjBpbWFnZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80',
+              },
+            ]}
+          />
         </Modal>
       </View>
       <View
