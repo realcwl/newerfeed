@@ -13,5 +13,4 @@ RUN yarn build:web
 
 EXPOSE 5000
 
-RUN cd packages/web
-CMD ["yarn", "serve"]
+CMD ["yarn", "serve:web"]
