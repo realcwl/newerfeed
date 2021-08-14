@@ -54,7 +54,9 @@ export const APP_BASE_URL = 'https://app.devhubapp.com'
 export const DEVHUB_BETA_URL = 'https://beta.devhubapp.com'
 export const API_BASE_URL = 'https://api.devhubapp.com'
 export const GRAPHQL_ENDPOINT = `${API_BASE_URL}/graphql`
-
+export const DEV_GRAPHQL_ENDPOINT = 'http://localhost:8080'
+export const DEV_GRAPHQL_SUBSCRIPTION_ENDPOINT =
+  'ws://localhost:8080/subscription'
 const LANDING_BASE_URL = 'https://devhubapp.com'
 export const DEVHUB_LINKS = {
   LANDING_PAGE_HOME: LANDING_BASE_URL,

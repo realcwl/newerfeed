@@ -91,6 +91,18 @@ export const authReducer: Reducer<State> = (state = initialState, action) => {
         draft.signUpSuccessMsg = ''
       })
     }
+    case 'UPDATE_SEED_STATE': {
+      return immer(state, (draft) => {
+        const userSeedState = action.payload.userSeedState
+
+        // field "id" should only be changed at the login time, from undefined
+        // to the actual user id.
+        const user: User = {
+          ...userSeedState,
+        }
+        draft.user = user
+      })
+    }
 
     default:
       return state

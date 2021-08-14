@@ -297,3 +297,22 @@ export type NewsFeedColumnCreation = GenericColumnCreation<NewsFeedColumn>
 // Identifies a Column Creation, in the future there can be multiple Column
 // creation types.
 export type ColumnCreation = NewsFeedColumnCreation
+
+// SeedState is defined in https://concise-worm-036.notion.site/Sync-Up-Down-fdde83e019b540a1ba1b6af8125b7814
+// Where it represents the core data structure of the App. This should match
+// the definition on the server side.
+export interface SeedState {
+  userSeedState: UserSeedState
+  feedSeedState: FeedSeedState[]
+}
+
+export interface UserSeedState {
+  id: string
+  name: string
+  avatarUrl: string
+}
+
+export interface FeedSeedState {
+  id: string
+  name: string
+}

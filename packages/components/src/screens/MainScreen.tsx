@@ -19,7 +19,10 @@ import { analytics } from '../libs/analytics'
 import { Linking } from '../libs/linking'
 import * as actions from '../redux/actions'
 import * as selectors from '../redux/selectors'
+import { SubscriptionClient } from 'subscriptions-transport-ws'
+import { constants, SeedState } from '@devhub/core'
 import { clearQueryStringFromURL } from '../utils/helpers/auth'
+import { updateSeedState } from '../redux/actions'
 
 const styles = StyleSheet.create({
   container: {
@@ -38,22 +41,43 @@ export const MainScreen = React.memo(() => {
   const currentOpenedModal = useReduxState(selectors.currentOpenedModal)
   const FAB = useFAB()
 
-  const debounceSyncDown = useMemo(() => {
-    return _.debounce(
-      () => {
-        dispatch(actions.syncDown())
-      },
-      5000,
+  useEffect(() => {
+    const client = new SubscriptionClient(
+      constants.DEV_GRAPHQL_SUBSCRIPTION_ENDPOINT,
       {
-        leading: true,
-        maxWait: 30000,
-        trailing: false,
+        reconnect: true,
       },
     )
-  }, [])
 
-  const isVisible = useAppVisibility()
-  const wasVisible = useRef(isVisible)
+    client
+      .request({
+        query: `
+          subscription {
+            syncDown(userId: "user_id_1") {
+              userSeedState {
+                id
+                name
+                avatarUrl
+              }
+              feedSeedState {
+                id
+                name
+              }
+            }
+          }
+        `,
+      })
+      .subscribe({
+        next: (v) => {
+          const seedState: SeedState = v.data?.syncDown
+          dispatch(updateSeedState(seedState))
+        },
+        error: (v) => {
+          // TODO(chenweilunster): Display using error banner
+          console.log(v.message)
+        },
+      })
+  }, [])
 
   return (
     <>

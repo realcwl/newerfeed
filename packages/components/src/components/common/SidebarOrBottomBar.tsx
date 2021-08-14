@@ -160,6 +160,7 @@ export const SidebarOrBottomBar = React.memo(
     const columnIds = useReduxState(selectors.columnIdsSelector)
     const currentOpenedModal = useReduxState(selectors.currentOpenedModal)
     const modalStack = useReduxState(selectors.modalStack)
+    const user = useReduxState(selectors.currentUserSelector)
 
     const small = sizename <= '2-medium'
 
@@ -393,7 +394,7 @@ export const SidebarOrBottomBar = React.memo(
                     >
                       <Avatar
                         avatarUrl={
-                          'https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light'
+                          user?.avatarUrl ? user?.avatarUrl : undefined
                         }
                         disableLink
                         shape="circle"
