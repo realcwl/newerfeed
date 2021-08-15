@@ -25,28 +25,6 @@ async function syncUp(state: RootState) {
   const seedState = selectSeedStateFromRootState(state)
   if (!seedState) return
 
-  console.log(
-    jsonToGraphQLQuery(
-      {
-        mutation: {
-          syncUp: {
-            __args: {
-              input: {
-                userSeedState: seedState.userSeedState,
-                feedSeedState: seedState.feedSeedState,
-              },
-            },
-            userSeedState: {
-              name: true,
-              avatarUrl: true,
-            },
-          },
-        },
-      },
-      { pretty: true },
-    ),
-  )
-
   try {
     const response = await axios.post(constants.DEV_GRAPHQL_ENDPOINT, {
       query: jsonToGraphQLQuery({
