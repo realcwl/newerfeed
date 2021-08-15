@@ -20,6 +20,7 @@
     ],
     "nohoist": []
   },
+  
   "scripts": {
     "clean": "yarn workspaces run clean",
     "dev": "yarn workspace @devhub/desktop compile && concurrently --kill-others \"yarn workspace @devhub/desktop compile -w\" \"yarn workspace @devhub/web start\" \"yarn workspace @devhub/mobile start\" \"wait-on http://localhost:3000 && yarn workspace @devhub/desktop start\"",
