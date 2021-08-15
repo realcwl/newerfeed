@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import { useDispatch } from 'react-redux'
 
-import ImageViewer from 'react-native-image-zoom-viewer'
+import ImageViewer from '../../libs/image-viewer'
 import {
   Attachment,
   getDateSmallText,
@@ -236,6 +236,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
 
   const [textShown, setTextShown] = useState(true)
+  const [imageToView, setImageToView] = useState<Attachment | null>(null)
+
   const toggleShowMoreText = () => {
     setTextShown(!textShown)
   }
@@ -273,8 +275,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     return res
   }
 
-  const [modalImage, setModalImage] = useState<Attachment | null>(null)
-
   const [hasMore, setHasMore] = useState(false)
   const checkHasMore = useCallback(
     ({
@@ -297,56 +297,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       key={`base-card-container-${type}-${nodeIdOrId}-inner`}
       style={[styles.container]}
     >
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: 22,
-          position: 'absolute',
-        }}
-      >
-        <Modal
-          animationType="fade"
-          transparent={true}
-          onRequestClose={() => setModalImage(null)}
-          visible={!!modalImage}
-        >
-          {/* <TouchableWithoutFeedback
-            style={styles.container}
-            onPressOut={() => {
-              setModalImage(null)
-            }}
-          >
-            <View
-              style={{
-                marginTop: 200,
-                width: '100%',
-                height: '100%',
-                alignItems: 'center',
-              }}
-              onTouchEnd={() => setModalImage(null)}
-            >
-              <Image
-                source={{
-                  uri: modalImage?.url,
-                }}
-                key={modalImage?.id}
-                style={{ height: 500, width: 500, resizeMode: 'contain' }}
-              />
-            </View>
-          </TouchableWithoutFeedback> */}
-          <ImageViewer
-            imageUrls={[
-              {
-                url: 'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-              },
-              {
-                url: 'https://images.unsplash.com/photo-1544526226-d4568090ffb8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aGQlMjBpbWFnZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80',
-              },
-            ]}
-          />
-        </Modal>
-      </View>
+      <ImageViewer image={imageToView} setImage={setImageToView} />
       <View
         style={[
           styles.innerContainer,
@@ -490,7 +441,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 return (
                   <TouchableHighlight
                     onPress={() => {
-                      setModalImage(attachment)
+                      setImageToView(attachment)
                     }}
                   >
                     <Image

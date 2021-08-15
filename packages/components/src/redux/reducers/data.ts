@@ -65,6 +65,11 @@ const initialState: State = {
           dataType: 'img',
           url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/TEIDE.JPG/2880px-TEIDE.JPG',
         },
+        {
+          id: 'dummyData4',
+          dataType: 'img',
+          url: 'http://sunchateau.com/twb/t/16034258311095.png',
+        },
       ],
       crawledTimestamp: new Date(),
       isSaved: false,
