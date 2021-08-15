@@ -6,6 +6,7 @@ import { emitter } from '../../libs/emitter'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
+import { take } from 'lodash'
 
 function* onAddColumn(
   action: ExtractActionFromActionCreator<typeof actions.addColumn>,
@@ -45,6 +46,9 @@ function* onMoveColumn(
     columnId,
     focusOnVisibleItem: true,
   })
+
+  // Column ordering is seedState, sync up
+  yield* put(actions.syncUp())
 }
 
 function* onDeleteColumn(

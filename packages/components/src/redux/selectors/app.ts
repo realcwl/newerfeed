@@ -1,3 +1,4 @@
+import { SeedState } from '@devhub/core'
 import { getAppLayout } from '../../components/context/LayoutContext'
 import { EMPTY_ARRAY } from '../../utils/constants'
 import { RootState } from '../types'
@@ -27,4 +28,24 @@ export const bannerMessageSelector = (state: RootState) => {
   )
 
   return filteredBanners[0]
+}
+
+// Extract SeedState from Redux store.
+export const selectSeedStateFromRootState = (state: RootState) => {
+  if (!state.auth.user) return undefined
+  const seedState: SeedState = {
+    userSeedState: {
+      id: state.auth.user.id,
+      avatarUrl: state.auth.user.avatarUrl || '',
+      name: state.auth.user.name,
+    },
+    feedSeedState: state.columns.allIds.map((v) => {
+      return {
+        id: v,
+        name: state.columns.byId[v].title,
+      }
+    }),
+  }
+
+  return seedState
 }

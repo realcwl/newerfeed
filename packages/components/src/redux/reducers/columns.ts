@@ -1,11 +1,6 @@
 import _ from 'lodash'
 
-import {
-  Column,
-  ColumnCreation,
-  FeedSeedState,
-  normalizeColumns,
-} from '@devhub/core'
+import { Column, ColumnCreation, normalizeColumns } from '@devhub/core'
 import { Reducer } from '../types'
 import immer from 'immer'
 
