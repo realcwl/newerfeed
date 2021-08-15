@@ -17,7 +17,6 @@ function* fetchAllFeeds() {
     const response: AxiosResponse = yield axios.post(
       constants.GRAPHQL_ENDPOINT,
       {
-        // TODISCUSS: we should return all posts, not per feed
         query: `query AllFeeds {
           allFeeds {
             id

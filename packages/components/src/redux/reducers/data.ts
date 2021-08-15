@@ -6,7 +6,6 @@ import immer from 'immer'
 
 export interface State {
   // Contains all data IDs, that can be referenced by multiple columns.
-  // TODISCUSS: change it to Set<string>
   allIds: string[]
   // Contains data id to actual data mapping.
   byId: Record<string, NewsFeedData>
