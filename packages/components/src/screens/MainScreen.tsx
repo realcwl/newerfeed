@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { useDispatch } from 'react-redux'
 
@@ -12,16 +12,11 @@ import { Separator } from '../components/common/Separator'
 import { SidebarOrBottomBar } from '../components/common/SidebarOrBottomBar'
 import { useAppLayout } from '../components/context/LayoutContext'
 import { ModalRenderer } from '../components/modals/ModalRenderer'
-import { useAppVisibility } from '../hooks/use-app-visibility'
 import { useFAB } from '../hooks/use-fab'
 import { useReduxState } from '../hooks/use-redux-state'
-import { analytics } from '../libs/analytics'
-import { Linking } from '../libs/linking'
-import * as actions from '../redux/actions'
 import * as selectors from '../redux/selectors'
 import { SubscriptionClient } from 'subscriptions-transport-ws'
 import { constants, SeedState } from '@devhub/core'
-import { clearQueryStringFromURL } from '../utils/helpers/auth'
 import { updateSeedState } from '../redux/actions'
 
 const styles = StyleSheet.create({

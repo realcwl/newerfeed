@@ -1,12 +1,10 @@
 import { AppState, InteractionManager } from 'react-native'
 import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
 
-import { guid, itemPassesFilterRecord } from '@devhub/core'
 import { emitter } from '../../libs/emitter'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
-import { take } from 'lodash'
 
 function* onAddColumn(
   action: ExtractActionFromActionCreator<typeof actions.addColumn>,

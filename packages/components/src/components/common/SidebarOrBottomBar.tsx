@@ -393,9 +393,7 @@ export const SidebarOrBottomBar = React.memo(
                       ]}
                     >
                       <Avatar
-                        avatarUrl={
-                          user?.avatarUrl ? user?.avatarUrl : undefined
-                        }
+                        avatarUrl={user?.avatarUrl ?? undefined}
                         disableLink
                         shape="circle"
                         size={sidebarWidth * (3 / 5)}
