@@ -21,9 +21,7 @@ function* onSyncUp() {
 }
 
 // Note: Lodash debounce was not working as expected with generators
-// remove async now to make lint pass
-function syncUp(state: RootState) {
-  
+async function syncUp(state: RootState) {
   const seedState = selectSeedStateFromRootState(state)
   if (!seedState) return
 

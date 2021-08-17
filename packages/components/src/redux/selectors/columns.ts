@@ -24,9 +24,7 @@ export const columnsArrSelector = createShallowEqualSelector(
   (state: RootState) => columnIdsSelector(state),
   (byId, columnIds) => {
     if (!(byId && columnIds)) return EMPTY_ARRAY
-    return columnIds
-      .map((columnId) => byId[columnId])
-      .filter(Boolean) as Column[]
+    return columnIds.map((columnId) => byId[columnId]).filter(Boolean)
   },
 )
 

@@ -32,7 +32,7 @@ export const ColumnContainer = React.memo((props: ColumnContainerProps) => {
     }
 
     default: {
-      const message = `Invalid Column type: ${column && (column as any).type}`
+      const message = `Invalid Column type: ${column && column.type}`
       console.error(message, { column })
       bugsnag.notify(new Error(message))
       return null
