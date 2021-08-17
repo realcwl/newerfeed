@@ -51,7 +51,6 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
 
     const _cardProps = getCardPropsForItem(type, columnId, item)
 
-    console.log(_cardProps)
     return {
       cardProps: _cardProps,
       CardComponent: (
@@ -72,8 +71,6 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
       isHoveredRef.current = false
 
       if (e && e.isDefaultPrevented()) return
-
-      console.log('CardWithLink on press')
     },
     [type, columnId],
   )

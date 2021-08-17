@@ -426,7 +426,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
-              marginTop: 10,
+              marginTop: 10 * scaleFactor,
               justifyContent: 'flex-start',
             }}
           >
@@ -442,7 +442,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                       source={{
                         uri: attachment.url,
                       }}
-                      style={{ width: 100, height: 100 }}
+                      style={{
+                        width: 100 * scaleFactor,
+                        height: 100 * scaleFactor,
+                      }}
                       resizeMode="cover"
                     />
                   </TouchableHighlight>
