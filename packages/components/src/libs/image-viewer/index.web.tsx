@@ -4,7 +4,7 @@ import { Prop } from './index'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
 
-export default ({ image, setImage }: Prop) => {
+const ImageViewerWeb = ({ image, setImage }: Prop) => {
   return (
     <View>
       {!!image && (
@@ -16,3 +16,5 @@ export default ({ image, setImage }: Prop) => {
     </View>
   )
 }
+
+export default ImageViewerWeb

@@ -12,12 +12,7 @@ import {
 import { useDispatch } from 'react-redux'
 
 import ImageViewer from '../../libs/image-viewer'
-import {
-  Attachment,
-  getDateSmallText,
-  getFullDateText,
-  Theme,
-} from '@devhub/core'
+import { Attachment, getDateSmallText, getFullDateText } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
 import { Separator } from '../common/Separator'
