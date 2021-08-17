@@ -30,7 +30,7 @@ const initialState: State = {
         name: 'John Doe',
         profileURL: '/',
       },
-      crawledTimestamp: new Date(),
+      crawledTimestamp: new Date('2021-01-02'),
       attachments: [
         {
           id: 'dummyImg',
@@ -67,10 +67,10 @@ const initialState: State = {
         {
           id: 'dummyData4',
           dataType: 'img',
-          url: 'http://sunchateau.com/twb/t/16034258311095.png',
+          url: 'https://hbimg.huabanimg.com/300251098bb1d62a1d89f40c2e8018bbb415414c912fc-5z5wMR_fw658',
         },
       ],
-      crawledTimestamp: new Date(),
+      crawledTimestamp: new Date('2021-05-02'),
       isSaved: false,
       isRead: false,
     },
@@ -87,7 +87,7 @@ const initialState: State = {
         name: 'John Doe',
         profileURL: '/',
       },
-      crawledTimestamp: new Date(),
+      crawledTimestamp: new Date('2021-06-02'),
       isSaved: false,
       isRead: false,
     },
@@ -98,12 +98,17 @@ const initialState: State = {
 
 export const dataReducer: Reducer<State> = (state = initialState, action) => {
   switch (action.type) {
-    case 'UPDATE_FEEDS':
+    case 'FETCH_FEEDS_SUCCESS':
       return immer(state, (draft) => {
+        console.log('here', action.payload.feeds)
         if (!!action.payload?.feeds && action.payload.feeds.length > 0) {
           for (const feed of action.payload.feeds) {
-            for (const post of feed.posts) {
-              draft.allIds.push(post.id)
+            // Asuume all returned posts are in descending timestamp order
+            for (const post of feed.posts.slice().reverse()) {
+              if (post.id in draft.byId) {
+                continue
+              }
+              draft.allIds.unshift(post.id)
               draft.byId[post.id] = {
                 id: post.id,
                 title: post.title,
@@ -115,6 +120,7 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
             }
           }
         }
+        console.log('draft', draft.allIds)
       })
     case 'MARK_ITEM_AS_SAVED':
       return immer(state, (draft) => {

@@ -7,17 +7,21 @@ import { bugsnag } from '../../libs/bugsnag'
 import { put } from 'redux-saga/effects'
 import * as actions from '../actions'
 
-function* init() {
-  const initialAction = yield* take(['REFRESH_COLUMNS'])
-}
-
-function* fetchAllFeeds() {
+function* fetchAllFeedsPosts() {
   const state: RootState = yield* select()
   try {
-    const response: AxiosResponse = yield axios.post(
-      constants.GRAPHQL_ENDPOINT,
-      {
-        query: `query AllFeeds {
+    const response: AxiosResponse<{
+      data: {
+        allFeeds: {
+          id: string
+          name: string
+          creator: { id: string; name: string }
+          posts: { id: string; title: string; content: string }[]
+        }[]
+      }
+      errors: any[]
+    }> = yield axios.post(constants.GRAPHQL_ENDPOINT, {
+      query: `query AllFeeds {
           allFeeds {
             id
             name
@@ -25,25 +29,21 @@ function* fetchAllFeeds() {
               id
               name
             }
-            posts{
+            posts {
               id
               title
-              comment
-              feeds{
-                id
-              }
+              content
             }
           }
         }
       `,
-      },
-    )
+    })
 
     const { data, errors } = response.data
     if (errors && errors.length) {
       throw Object.assign(new Error('GraphQL Error'), { response })
     }
-    yield put(actions.updateFeeds(response.data.allFeeds))
+    yield put(actions.fetchFeedsSuccess({ feeds: data.allFeeds }))
   } catch (error) {
     const description = 'fetch feeds failed'
     console.error(description, error)
@@ -52,6 +52,5 @@ function* fetchAllFeeds() {
 }
 
 export function* dataSagas() {
-  yield* all([yield* takeLatest(['SET_THEME'], fetchAllFeeds)])
-  // yield* all([yield* fork(init)])
+  yield* all([yield* takeLatest('FETCH_FEEDS_REQUEST', fetchAllFeedsPosts)])
 }

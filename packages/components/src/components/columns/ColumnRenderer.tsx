@@ -165,17 +165,17 @@ export const ColumnRenderer = React.memo((props: ColumnRendererProps) => {
               family="octicon"
               name="check"
               onPress={() => {
+                // BONINGTODO: change this button icon to refresh or add a different icon for it
                 dispatch(
-                  actions.setColumnClearedAtFilter({
-                    columnId,
-                    clearedAt: hasItemsToMarkAsDone
-                      ? new Date().toISOString()
-                      : null,
+                  actions.fetchFeedsRequest({
+                    feeds: [
+                      {
+                        id: columnId,
+                      },
+                    ],
                   }),
                 )
-
                 focusColumn()
-
                 if (!hasItemsToMarkAsDone) refresh()
               }}
               tooltip="Done"

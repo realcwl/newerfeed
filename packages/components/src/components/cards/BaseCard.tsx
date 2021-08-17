@@ -333,7 +333,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               sharedStyles.marginVerticalQuarter,
             ]}
           >
-            <IntervalRefresh interval={5000} date={timestamp}>
+            <IntervalRefresh interval={60000} date={timestamp}>
               {() => {
                 const dateText = getDateSmallText(timestamp)
                 if (!dateText) return null
@@ -449,6 +449,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                         uri: attachment.url,
                       }}
                       style={{ width: 100, height: 100 }}
+                      resizeMode="cover"
                     />
                   </TouchableHighlight>
                 )

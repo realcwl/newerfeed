@@ -36,6 +36,10 @@ export const hasCreatedColumnSelector = (state: RootState) =>
 // TODO(chenweilunster): Implement this function.
 export const createColumnDataSelector = () => {
   return (state: RootState, columnId: string) => {
-    return []
+    // DUMMY logic to return all data for a column
+    const allIds = state.data.allIds
+    const datas = Object.entries(state.data.byId).map(([id, data]) => data)
+    return allIds.map((id) => datas.find((data) => data.id === id))
+    // return []
   }
 }
