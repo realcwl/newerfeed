@@ -219,6 +219,7 @@ export const OneList = React.memo(
                       />
                     )
                   }}
+                  keyExtractor={keyExtractor}
                   data={data}
                   horizontal={horizontal}
                   renderItem={renderItem}

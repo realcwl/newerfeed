@@ -1,7 +1,6 @@
 import { AppState, InteractionManager } from 'react-native'
 import { all, call, put, select, takeEvery, takeLatest } from 'typed-redux-saga'
 
-import { guid, itemPassesFilterRecord } from '@devhub/core'
 import { emitter } from '../../libs/emitter'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
@@ -45,6 +44,9 @@ function* onMoveColumn(
     columnId,
     focusOnVisibleItem: true,
   })
+
+  // Column ordering is seedState, sync up
+  yield* put(actions.syncUp())
 }
 
 function* onDeleteColumn(

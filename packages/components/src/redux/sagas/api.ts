@@ -1,12 +1,15 @@
+import { constants, SeedState } from '@devhub/core'
 import _ from 'lodash'
 import { all, fork, select, take, takeLatest } from 'typed-redux-saga'
-
+import axios from 'axios'
+import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as actions from '../actions'
-import * as selectors from '../selectors'
+import { selectSeedStateFromRootState } from '../selectors'
 import { RootState } from '../types'
 import { ExtractActionFromActionCreator } from '../types/base'
 
 function* init() {
+  // Do not monitoring before login success happen
   yield take('LOGIN_SUCCESS')
 }
 
@@ -17,18 +20,44 @@ function* onSyncUp() {
   void debounceSyncUp(state)
 }
 
-function* onSyncDown() {
-  const state: RootState = yield* select()
-
-  const appToken = selectors.appTokenSelector(state)
-  if (!appToken) return
-}
-
 // Note: Lodash debounce was not working as expected with generators
 // remove async now to make lint pass
 function syncUp(state: RootState) {
-  const appToken = selectors.appTokenSelector(state)
-  if (!appToken) return
+  
+  const seedState = selectSeedStateFromRootState(state)
+  if (!seedState) return
+
+  try {
+    const response = await axios.post(constants.DEV_GRAPHQL_ENDPOINT, {
+      query: jsonToGraphQLQuery({
+        mutation: {
+          syncUp: {
+            __args: {
+              input: {
+                userSeedState: seedState.userSeedState,
+                feedSeedState: seedState.feedSeedState,
+              },
+            },
+            userSeedState: {
+              name: true,
+              avatarUrl: true,
+            },
+            feedSeedState: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      }),
+    })
+    const { errors } = response.data
+
+    if (errors && errors.length) {
+      throw Object.assign(new Error('GraphQL Error'), { response })
+    }
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 const debounceSyncUp = _.debounce(syncUp, 5000, {
@@ -47,7 +76,6 @@ export function* apiSagas() {
   yield* all([
     yield* fork(init),
     yield* takeLatest('LOGIN_SUCCESS', onLoginSuccess),
-    yield* takeLatest('SYNC_DOWN', onSyncDown),
     yield* takeLatest('SYNC_UP', onSyncUp),
   ])
 }

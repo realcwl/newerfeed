@@ -7,7 +7,6 @@ import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
 import { AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js'
 import userPool from '../../libs/auth/userPool'
-import { createAction } from '../helpers'
 
 function* init() {
   yield take('LOGIN_SUCCESS')
