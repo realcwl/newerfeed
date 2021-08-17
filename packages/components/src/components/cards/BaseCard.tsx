@@ -7,7 +7,6 @@ import {
   Text,
   Image,
   Linking,
-  Modal,
 } from 'react-native'
 import { useDispatch } from 'react-redux'
 

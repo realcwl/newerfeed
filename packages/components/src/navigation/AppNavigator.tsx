@@ -10,11 +10,11 @@ export const AppNavigator = React.memo(() => {
 
   return (
     <>
-      {/* {user ? ( */}
-      <MainScreen key="app-main-screen" />
-      {/* ) : (
+      {user ? (
+        <MainScreen key="app-main-screen" />
+      ) : (
         <LoginScreen key="app-login-screen" />
-      )} */}
+      )}
     </>
   )
 })

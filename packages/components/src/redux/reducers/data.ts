@@ -1,5 +1,5 @@
 import { NewsFeedData } from '@devhub/core'
-import _, { defaultTo } from 'lodash'
+import _ from 'lodash'
 
 import { Reducer } from '../types'
 import immer from 'immer'
@@ -100,7 +100,6 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
   switch (action.type) {
     case 'FETCH_FEEDS_SUCCESS':
       return immer(state, (draft) => {
-        console.log('here', action.payload.feeds)
         if (!!action.payload?.feeds && action.payload.feeds.length > 0) {
           for (const feed of action.payload.feeds) {
             // Asuume all returned posts are in descending timestamp order

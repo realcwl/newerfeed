@@ -5,7 +5,6 @@ export function fetchFeedsRequest(payload: {
     id: string
   }[]
 }) {
-  console.log('feedRequest', payload)
   return createAction('FETCH_FEEDS_REQUEST', payload)
 }
 
