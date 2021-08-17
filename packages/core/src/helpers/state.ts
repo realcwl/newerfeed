@@ -8,7 +8,7 @@ export function normalizeColumns(
   updatedAt?: string,
 ) {
   const items = columns || []
-  const byId: Record<string, Column | undefined> = {}
+  const byId: Record<string, Column> = {}
 
   const allIds = items.map((column: ColumnCreation) => {
     const id = column.id || guid()

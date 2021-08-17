@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { useDispatch } from 'react-redux'
 
@@ -12,14 +12,12 @@ import { Separator } from '../components/common/Separator'
 import { SidebarOrBottomBar } from '../components/common/SidebarOrBottomBar'
 import { useAppLayout } from '../components/context/LayoutContext'
 import { ModalRenderer } from '../components/modals/ModalRenderer'
-import { useAppVisibility } from '../hooks/use-app-visibility'
 import { useFAB } from '../hooks/use-fab'
 import { useReduxState } from '../hooks/use-redux-state'
-import { analytics } from '../libs/analytics'
-import { Linking } from '../libs/linking'
-import * as actions from '../redux/actions'
 import * as selectors from '../redux/selectors'
-import { clearQueryStringFromURL } from '../utils/helpers/auth'
+import { SubscriptionClient } from 'subscriptions-transport-ws'
+import { constants, SeedState } from '@devhub/core'
+import { updateSeedState } from '../redux/actions'
 
 const styles = StyleSheet.create({
   container: {
@@ -38,22 +36,43 @@ export const MainScreen = React.memo(() => {
   const currentOpenedModal = useReduxState(selectors.currentOpenedModal)
   const FAB = useFAB()
 
-  const debounceSyncDown = useMemo(() => {
-    return _.debounce(
-      () => {
-        dispatch(actions.syncDown())
-      },
-      5000,
+  useEffect(() => {
+    const client = new SubscriptionClient(
+      constants.DEV_GRAPHQL_SUBSCRIPTION_ENDPOINT,
       {
-        leading: true,
-        maxWait: 30000,
-        trailing: false,
+        reconnect: true,
       },
     )
-  }, [])
 
-  const isVisible = useAppVisibility()
-  const wasVisible = useRef(isVisible)
+    client
+      .request({
+        query: `
+          subscription {
+            syncDown(userId: "user_id_1") {
+              userSeedState {
+                id
+                name
+                avatarUrl
+              }
+              feedSeedState {
+                id
+                name
+              }
+            }
+          }
+        `,
+      })
+      .subscribe({
+        next: (v) => {
+          const seedState: SeedState = v.data?.syncDown
+          dispatch(updateSeedState(seedState))
+        },
+        error: (v) => {
+          // TODO(chenweilunster): Display using error banner
+          console.log(v.message)
+        },
+      })
+  }, [])
 
   return (
     <>

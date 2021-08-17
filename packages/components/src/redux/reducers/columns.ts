@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import { Column, normalizeColumns } from '@devhub/core'
+import { Column, ColumnCreation, normalizeColumns } from '@devhub/core'
 import { Reducer } from '../types'
 import immer from 'immer'
 
@@ -10,10 +10,10 @@ export interface State {
   allIds: string[]
 
   // byId maps the hex string column id to the Column type, where details of the
-  // Column such as column header, type, are defined. Note that this is onlt a
-  // definition of the column, the actual mapping between column->data are
-  // defined in Subscription reducer.
-  byId: Record<string, Column | undefined> | null
+  // Column such as column header, type, are defined. Note that this is only a
+  // definition of the column, the mapping between column->data are defined in
+  // each Column, and actual data is stored in data reducer.
+  byId: Record<string, Column>
 
   // The last time this column is updated.
   updatedAt: string | null
@@ -21,7 +21,7 @@ export interface State {
 
 const initialState: State = {
   allIds: [],
-  byId: null,
+  byId: {},
   updatedAt: null,
 }
 
@@ -86,6 +86,61 @@ export const columnsReducer: Reducer<State> = (
         draft.allIds.splice(newIndex, 0, columnId)
 
         draft.updatedAt = new Date().toISOString()
+      })
+    case 'UPDATE_SEED_STATE':
+      return immer(state, (draft) => {
+        const feedSeedStates = action.payload.feedSeedState
+        const newAllIds = feedSeedStates.map((v) => v.id)
+
+        // Get all added feeds as objects
+        const addFeeds = feedSeedStates.filter(
+          (v) => !draft.allIds.includes(v.id),
+        )
+
+        // All existing feeds that might require update on feed seed state
+        const updateFeeds = feedSeedStates.filter(
+          (v) => draft.allIds.includes(v.id) && newAllIds.includes(v.id),
+        )
+
+        // Get all deleted feeds as ids
+        const delIds = draft.allIds.filter((v) => !newAllIds.includes(v))
+
+        // Only update when the ids in feed change. It should:
+        // 1. substitude the ids
+        // 2. remove deleted ones
+        // 3. update common feeds
+        // 4. add new ids
+        if (!_.isEqual(newAllIds, draft.allIds)) {
+          draft.allIds = newAllIds
+        }
+
+        delIds.forEach((v) => {
+          if (draft.byId) delete draft.byId[v]
+        })
+
+        updateFeeds.forEach((v) => {
+          draft.byId[v.id].title = v.name
+        })
+
+        addFeeds.forEach((v) => {
+          const columnCreation: ColumnCreation = {
+            title: v.name,
+            type: 'COLUMN_TYPE_NEWS_FEED',
+            id: v.id,
+            itemListIds: [],
+            firstItemId: '',
+            lastItemId: '',
+            sources: [],
+            dataExpression: undefined,
+          }
+          const normalized = normalizeColumns([{ ...columnCreation }])
+
+          if (!(normalized.allIds.length === 1)) return
+
+          draft.byId[normalized.allIds[0]] =
+            normalized.byId[normalized.allIds[0]]
+          draft.updatedAt = normalized.updatedAt
+        })
       })
     default:
       return state
