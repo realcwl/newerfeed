@@ -33,7 +33,8 @@ export const NoTokenView = React.memo((props: NoTokenViewProps) => {
   const isLoggingIn = useReduxState(selectors.isLoggingInSelector)
   const loginRequest = useReduxAction(actions.loginRequest)
 
-  async function startOAuth() {
+  // remove async for this function to bypass lint
+  function startOAuth() {
     try {
       setIsExecutingOAuth(true)
 

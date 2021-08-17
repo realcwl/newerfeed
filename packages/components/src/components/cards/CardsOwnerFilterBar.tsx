@@ -24,7 +24,7 @@ export const CardsOwnerFilterBar = React.memo(
       <GenericOwnerFilterBar
         columnType={'COLUMN_TYPE_NEWS_FEED'}
         data={[]}
-        onItemPress={() => {}}
+        onItemPress={() => undefined}
       />
     )
   },

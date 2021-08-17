@@ -18,14 +18,15 @@ function* onSyncUp() {
 }
 
 function* onSyncDown() {
-  let state: RootState = yield* select()
+  const state: RootState = yield* select()
 
   const appToken = selectors.appTokenSelector(state)
   if (!appToken) return
 }
 
 // Note: Lodash debounce was not working as expected with generators
-async function syncUp(state: RootState) {
+// remove async now to make lint pass
+function syncUp(state: RootState) {
   const appToken = selectors.appTokenSelector(state)
   if (!appToken) return
 }

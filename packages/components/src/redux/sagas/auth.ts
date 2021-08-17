@@ -86,6 +86,8 @@ function* onSignUpRequest(
   }
 }
 
+// TODO: remove following eslint comments when we have implement login and auth function
+/* eslint-disable */
 function* onLoginSuccess(
   _action: ExtractActionFromActionCreator<typeof actions.loginSuccess>,
 ) {}
@@ -93,6 +95,7 @@ function* onLoginSuccess(
 function* onAuthFailure(
   action: ExtractActionFromActionCreator<typeof actions.authFailure>,
 ) {}
+/* eslint-enable */
 
 function onLogout() {
   clearOAuthQueryParams()
