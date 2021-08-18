@@ -1,0 +1,17 @@
+name: Newsfeed Countinuos Integration for Web
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_pull_request_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2.3.0
+        with:
+          node-version: '16'
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint
+      - run: yarn build:mobile
