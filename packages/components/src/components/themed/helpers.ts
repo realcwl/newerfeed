@@ -11,6 +11,7 @@ export function getThemeColorOrItself(
     | null,
   { enableCSSVariable = false } = {},
 ) {
+  // eslint-disable-next-line
   const _color = typeof color === 'function' ? color(theme as any) : color
 
   if (_color && typeof _color === 'string' && _color in theme)
