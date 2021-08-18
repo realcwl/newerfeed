@@ -271,6 +271,7 @@ export function ModalRenderer(props: ModalRendererProps) {
                       top: 0,
                       bottom: 0,
                       ...modalAnimatedStyle,
+                      // eslint-disable-next-line
                       zIndex: 900 + modalItem.index,
                     },
                   ]}
