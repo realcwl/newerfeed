@@ -245,13 +245,40 @@ export type EnhancementCache = Map<
 
 export type AppViewMode = 'single-column' | 'multi-column'
 
+export type BannerType = 'BANNER_TYPE_ERROR' | 'BANNER_TYPE_PROMO'
+export type BannerId = 'fail_initial_connection'
+
 export interface BannerMessage {
-  id: string
+  // Uniquely identifies a banner
+  id: BannerId
+
+  // banner type, which determines the banner style. E.g. Error type will have
+  // red background, while promo banner will have normal background.
+  type: BannerType
+
+  // What to show in the banner
   message: string
+
+  // If provided, the banner is clickable
   href?: string
+
+  // If provided, banners with the same signature will be collapsed and show
+  // only one. Otherwise default signature will be used: "${id}#${type}"
+  signature?: string
+
+  // if set to true, banner will be automatically closed after 3 seconds. Most
+  // error banner should set this to true, while promo banner we want user to
+  // explicitly close it.
+  autoClose: boolean
+
   openOnNewTab?: boolean
   disableOnSmallScreens?: boolean
   minLoginCount?: number
+
+  // TODO(chenweilunster): The original devhub uses this field to perform "soft"
+  // deletion and log it for analysis, we should reconsider whether this field
+  // is neccessary or not since closure in the new implementation is simply
+  // a removal from the banner array.
   closedAt?: string | undefined
   createdAt?: string
 }

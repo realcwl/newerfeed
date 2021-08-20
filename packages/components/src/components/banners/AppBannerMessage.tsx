@@ -31,6 +31,7 @@ export function AppBannerMessage() {
           paddingLeft: safeAreaInsets.left,
           paddingRight: safeAreaInsets.right,
         },
+        { backgroundColor: '#EF7C8E' },
       ]}
     >
       <View
@@ -61,8 +62,16 @@ export function AppBannerMessage() {
             openOnNewTab={bannerMessage.openOnNewTab}
             tooltip={undefined}
           >
-            <ThemedText color="foregroundColor" style={sharedStyles.textCenter}>
-              {'UNIMPLEMENTED_THEMED_TEXT'}
+            <ThemedText
+              color="foregroundColor"
+              style={[
+                sharedStyles.textCenter,
+                {
+                  fontWeight: 'bold',
+                },
+              ]}
+            >
+              {bannerMessage.message}
             </ThemedText>
           </Link>
         </View>
