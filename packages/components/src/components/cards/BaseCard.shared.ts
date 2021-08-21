@@ -1,4 +1,10 @@
-import { Author, Column, constants, NewsFeedData } from '@devhub/core'
+import {
+  Attachment,
+  Author,
+  Column,
+  constants,
+  NewsFeedData,
+} from '@devhub/core'
 import { PixelRatio } from 'react-native'
 
 import { Platform } from '../../libs/platform'
@@ -70,10 +76,11 @@ export interface BaseCardProps extends AdditionalCardProps {
     text: string
   }
   author?: Author
+  attachments?: Attachment[]
   timestamp: Date
   isRead: boolean
   isSaved: boolean
-  link: string
+  link?: string
   nodeIdOrId: string
   text?: string
   title?: string
@@ -87,7 +94,8 @@ function _getCardPropsForItem(
   return {
     title: item.title,
     type: 'COLUMN_TYPE_NEWS_FEED',
-    link: '',
+    link: item.url,
+    attachments: item.attachments,
     isRead: item.isRead,
     isSaved: item.isSaved,
     timestamp: item.postTimestamp ?? item.crawledTimestamp,
