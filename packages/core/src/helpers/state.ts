@@ -5,7 +5,7 @@ import immer from 'immer'
 // Convert a list of ColumnCreation into standarlize Column reducer state.
 export function normalizeColumns(
   columns: ColumnCreation[],
-  updatedAt?: string,
+  updatedAt?: number,
 ) {
   const items = columns || []
   const byId: Record<string, Column> = {}
@@ -15,15 +15,12 @@ export function normalizeColumns(
 
     byId[id] = immer(column, (draft) => {
       draft.id = id
-      draft.createdAt = column.createdAt || new Date().toISOString()
-      draft.updatedAt = column.updatedAt || new Date().toISOString()
-
-      // BONINGTODO: delete after card testing is done
-      draft.itemListIds = ['dummyCard']
+      draft.createdAt = column.createdAt || 0
+      draft.updatedAt = column.updatedAt || 0
     }) as Column
 
     return id
   })
 
-  return { allIds, byId, updatedAt: updatedAt || new Date().toISOString() }
+  return { allIds, byId, updatedAt: updatedAt || 0 }
 }

@@ -16,10 +16,10 @@ export interface State {
 }
 
 const initialState: State = {
-  allIds: ['dummyCard', 'dummyCard2', 'dummyCard3'],
+  allIds: ['dummyCard1', 'dummyCard2', 'dummyCard3'],
   byId: {
-    dummyCard: {
-      id: 'dummyCard',
+    dummyCard1: {
+      id: 'dummyCard1',
       title: `I am dummyCard's dummy title with more than one line as well`,
       text: `first card with some real real real long descriptions www.google.com and real long text and see if it works shorturl.at/ijksA !`,
       author: {
@@ -131,6 +131,16 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
         const entry = draft.byId[itemNodeId]
         entry.isRead = read
         draft.updatedAt = now
+      })
+    case 'FETCH_COLUMN_DATA_SUCCESS':
+      return immer(state, (draft) => {
+        const { data } = action.payload
+        for (const singleData of data) {
+          // insert into data reducer if not already exist.
+          if (singleData.id in draft.byId) continue
+          draft.byId[singleData.id] = singleData
+          draft.allIds.push(singleData.id)
+        }
       })
     default:
       return state

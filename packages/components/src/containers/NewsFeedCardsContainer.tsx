@@ -58,7 +58,7 @@ export const NewsFeedCardsContainer = React.memo(
         fetchNextPage={() => undefined}
         getItemByNodeIdOrId={getItemByNodeIdOrId}
         isShowingOnlyBookmarks={!!(column.filters && column.filters.saved)}
-        itemNodeIdOrIds={['dummyCard', 'dummyCard2', 'dummyCard3']}
+        itemNodeIdOrIds={column.itemListIds}
         lastFetchSuccessAt={''}
         refresh={() => undefined}
       />

@@ -61,11 +61,11 @@ export interface BaseColumn {
   // Title of the Column, user defined.
   title: string
 
-  // creation time as denoted in the frontend.
-  createdAt: string
+  // Last update time in timestamp of seconds.
+  updatedAt: number
 
-  // Last update time.
-  updatedAt: string
+  // the current state of the column.
+  state: LoadState
 }
 
 // Contains the actual news feed data expression.
@@ -287,8 +287,8 @@ export type GenericColumnCreation<ColumnType extends NewsFeedColumn> = Omit<
   ColumnType,
   'createdAt' | 'updatedAt'
 > & {
-  createdAt?: string
-  updatedAt?: string
+  createdAt?: number
+  updatedAt?: number
 }
 
 // Identifies a column creation activity for a news feed column.

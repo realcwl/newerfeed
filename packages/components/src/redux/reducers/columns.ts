@@ -14,15 +14,11 @@ export interface State {
   // definition of the column, the mapping between column->data are defined in
   // each Column, and actual data is stored in data reducer.
   byId: Record<string, Column>
-
-  // The last time this column is updated.
-  updatedAt: string | null
 }
 
 const initialState: State = {
   allIds: [],
   byId: {},
-  updatedAt: null,
 }
 
 export const columnsReducer: Reducer<State> = (
@@ -47,12 +43,10 @@ export const columnsReducer: Reducer<State> = (
         if (draft.allIds.includes(normalized.allIds[0])) {
           draft.byId[normalized.allIds[0]] =
             normalized.byId[normalized.allIds[0]]
-          draft.updatedAt = normalized.updatedAt
           return
         }
         draft.allIds.push(normalized.allIds[0])
         _.merge(draft.byId, normalized.byId)
-        draft.updatedAt = normalized.updatedAt
       })
     case 'DELETE_COLUMN':
       return immer(state, (draft) => {
@@ -62,8 +56,6 @@ export const columnsReducer: Reducer<State> = (
           )
 
         if (draft.byId) delete draft.byId[action.payload.columnId]
-
-        draft.updatedAt = new Date().toISOString()
       })
     case 'MOVE_COLUMN':
       return immer(state, (draft) => {
@@ -84,8 +76,6 @@ export const columnsReducer: Reducer<State> = (
         const columnId = draft.allIds[currentIndex]
         draft.allIds = draft.allIds.filter((id) => id !== columnId)
         draft.allIds.splice(newIndex, 0, columnId)
-
-        draft.updatedAt = new Date().toISOString()
       })
     case 'UPDATE_SEED_STATE':
       return immer(state, (draft) => {
@@ -131,6 +121,7 @@ export const columnsReducer: Reducer<State> = (
             firstItemId: '',
             lastItemId: '',
             sources: [],
+            state: 'loaded',
             dataExpression: undefined,
           }
           const normalized = normalizeColumns([{ ...columnCreation }])
@@ -139,8 +130,39 @@ export const columnsReducer: Reducer<State> = (
 
           draft.byId[normalized.allIds[0]] =
             normalized.byId[normalized.allIds[0]]
-          draft.updatedAt = normalized.updatedAt
         })
+      })
+    case 'FETCH_COLUMN_DATA_SUCCESS':
+      return immer(state, (draft) => {
+        const {
+          columnId,
+          updatedAt,
+          data,
+          direction,
+          dropExistingData,
+          dataExpression,
+        } = action.payload
+
+        const column = draft.byId[columnId]
+        if (!column) return
+
+        // if explicit drop is requested, we should clear all the data ids
+        column.itemListIds = dropExistingData ? [] : column.itemListIds
+
+        // append of insert front based on the direction.
+        data.forEach((d) => {
+          direction == 'NEW'
+            ? column.itemListIds.unshift(d.id)
+            : column.itemListIds.push(d.id)
+        })
+
+        // if data expression or filters is used, update them.
+        column.dataExpression = dataExpression
+          ? dataExpression
+          : column.dataExpression
+
+        // update the updatedAt timestamp.
+        column.updatedAt = updatedAt
       })
     default:
       return state
