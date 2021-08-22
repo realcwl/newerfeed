@@ -61,8 +61,11 @@ export interface BaseColumn {
   // Title of the Column, user defined.
   title: string
 
-  // Last update time in timestamp of seconds.
+  // Last update time in timestamp in micro seconds.
   updatedAt: number
+
+  // timestamp of the last refresh in micro seconds.
+  refreshedAt: number
 
   // the current state of the column.
   state: LoadState
@@ -285,7 +288,7 @@ export interface AddColumnDetailsPayload {
 // NewsFeedColumn but in the future there can be multiple column types.
 export type GenericColumnCreation<ColumnType extends NewsFeedColumn> = Omit<
   ColumnType,
-  'createdAt' | 'updatedAt'
+  'createdAt' | 'updatedAt' | 'refreshedAt'
 > & {
   createdAt?: number
   updatedAt?: number

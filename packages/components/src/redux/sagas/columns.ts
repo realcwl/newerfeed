@@ -5,6 +5,7 @@ import {
   put,
   delay,
   select,
+  fork,
   takeEvery,
   takeLatest,
 } from 'typed-redux-saga'
@@ -13,6 +14,39 @@ import { emitter } from '../../libs/emitter'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
+
+// columnRefresher is a saga that indefinetly refresh columns if it's outdated.
+function* columnRefresher() {
+  while (true) {
+    // Try refresh all columns every 10 seconds.
+    yield delay(10 * 1000)
+    console.log('try refreshing')
+
+    const allColumnsWithRefreshTime = yield* select(
+      selectors.columnsWithRefreshTimeSelector,
+    )
+    console.log(allColumnsWithRefreshTime)
+
+    yield* all(
+      allColumnsWithRefreshTime.map(function* (columnWithRefreshTime) {
+        if (!columnWithRefreshTime) return
+        const oneMinutes = 1000 * 60 * 1
+        const timeDiff = Date.now() - columnWithRefreshTime.refreshedAt
+
+        if (timeDiff < oneMinutes) {
+          return
+        }
+
+        return yield put(
+          actions.fetchColumnDataRequest({
+            columnId: columnWithRefreshTime.id,
+            direction: 'NEW',
+          }),
+        )
+      }),
+    )
+  }
+}
 
 function* onAddColumn(
   action: ExtractActionFromActionCreator<typeof actions.addColumn>,
@@ -35,7 +69,6 @@ function* onAddColumn(
       // Initial request for fetching data is always of direction "OLD", and
       // update timestamp as 0, so that it will receive new data.
       direction: 'OLD',
-      updatedAt: 0,
     }),
   )
 }
@@ -193,6 +226,7 @@ function* onFetchColumnDataRequest(
 
 export function* columnsSagas() {
   yield* all([
+    yield* fork(columnRefresher),
     yield* takeEvery('ADD_COLUMN', onAddColumn),
     yield* takeEvery('FETCH_COLUMN_DATA_REQUEST', onFetchColumnDataRequest),
     yield* takeEvery('MOVE_COLUMN', onMoveColumn),

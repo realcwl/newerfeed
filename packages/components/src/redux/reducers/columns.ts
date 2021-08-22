@@ -121,7 +121,7 @@ export const columnsReducer: Reducer<State> = (
             firstItemId: '',
             lastItemId: '',
             sources: [],
-            state: 'loaded',
+            state: 'not_loaded',
             dataExpression: undefined,
           }
           const normalized = normalizeColumns([{ ...columnCreation }])
@@ -131,6 +131,11 @@ export const columnsReducer: Reducer<State> = (
           draft.byId[normalized.allIds[0]] =
             normalized.byId[normalized.allIds[0]]
         })
+      })
+    case 'FETCH_COLUMN_DATA_REQUEST':
+      return immer(state, (draft) => {
+        const { columnId } = action.payload
+        draft.byId[columnId].state = 'loading'
       })
     case 'FETCH_COLUMN_DATA_SUCCESS':
       return immer(state, (draft) => {
@@ -163,6 +168,8 @@ export const columnsReducer: Reducer<State> = (
 
         // update the updatedAt timestamp.
         column.updatedAt = updatedAt
+        column.refreshedAt = Date.now()
+        column.state = 'loaded'
       })
     default:
       return state

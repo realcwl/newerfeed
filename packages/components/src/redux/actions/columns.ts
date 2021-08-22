@@ -142,10 +142,6 @@ export function fetchColumnDataRequest(payload: {
   // NEW stands for "refresh", OLD stands for "load more". The initial fetch or
   // the first fetch after column attribute change is denoted as OLD.
   direction: 'NEW' | 'OLD'
-  // each request should be attached with this updatedAt timestamp, so that
-  // the backend knows whether the request is out of sync. Timestamp is set at
-  // the backend, and passed back to frontend for update.
-  updatedAt: number
 }) {
   return createAction('FETCH_COLUMN_DATA_REQUEST', payload)
 }

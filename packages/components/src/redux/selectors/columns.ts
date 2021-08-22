@@ -13,6 +13,18 @@ export const columnSelector = (state: RootState, columnId: string) => {
   return (byId && byId[columnId]) || undefined
 }
 
+export const columnsWithRefreshTimeSelector = (state: RootState) => {
+  const result: { id: string; refreshedAt: number }[] = []
+  const byId: Record<string, Column> = s(state).byId
+  for (const columnId in byId) {
+    result.push({
+      id: columnId,
+      refreshedAt: byId[columnId].refreshedAt,
+    })
+  }
+  return result
+}
+
 export const columnIdsSelector = (state: RootState) =>
   s(state).allIds || EMPTY_ARRAY
 
@@ -24,18 +36,17 @@ export const columnsArrSelector = createShallowEqualSelector(
   (state: RootState) => columnIdsSelector(state),
   (byId, columnIds) => {
     if (!(byId && columnIds)) return EMPTY_ARRAY
-    return columnIds
-      .map((columnId) => byId[columnId])
-      .filter(Boolean) as Column[]
+    return columnIds.map((columnId) => byId[columnId]).filter(Boolean)
   },
 )
 
 export const hasCreatedColumnSelector = (state: RootState) =>
   s(state).byId !== null
 
-// TODO(chenweilunster): Implement this function.
 export const createColumnDataSelector = () => {
   return (state: RootState, columnId: string) => {
-    return []
+    const column = columnSelector(state, columnId)
+    if (!column) return []
+    return column.itemListIds
   }
 }
