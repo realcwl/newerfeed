@@ -1,16 +1,12 @@
 import { NewsFeedDataExpressionWrapper, guid } from '@devhub/core'
-import { useFormik } from 'formik'
-import React, { Children, useState } from 'react'
+import React from 'react'
 import { View } from 'react-native'
 import { sharedStyles } from '../../../styles/shared'
-import { contentPadding, scaleFactor } from '../../../styles/variables'
+import { contentPadding } from '../../../styles/variables'
 import { columnHeaderItemContentSize } from '../../columns/ColumnHeader'
 import { H3 } from '../../common/H3'
 import { Spacer } from '../../common/Spacer'
-import { StyleSheet } from 'react-native'
-import { ThemedIcon } from '../../themed/ThemedIcon'
 import { isAllOf, isAnyOf, isNotTrue } from '../../../utils/types'
-import { IconButton } from '../../common/IconButton'
 import {
   AddNewPredicateButton,
   LiteralPredicateButton,
@@ -175,7 +171,7 @@ export const DataExpressionEditor = React.memo(
       // Handling Predicate Type.
       return (
         <LiteralPredicateButton
-          text={dataExpressionWrapper.expr?.param || ''}
+          text={dataExpressionWrapper.expr?.pred.param?.text || ''}
           id={dataExpressionWrapper.id}
           disabled={false}
           color={'gray'}

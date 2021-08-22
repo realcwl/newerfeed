@@ -1,6 +1,6 @@
 import { NewsFeedDataExpressionWrapper } from '@devhub/core'
 import { useFormik } from 'formik'
-import React, { useState } from 'react'
+import React from 'react'
 import { scaleFactor } from '../../../styles/variables'
 import { ThemedTextInput } from '../../themed/ThemedTextInput'
 
@@ -31,8 +31,10 @@ export const LiteralPredicateTextInput = React.memo(
           const newWrapperPayload: NewsFeedDataExpressionWrapper = {
             id: id,
             expr: {
-              type: 'LITERAL',
-              param: formValues['text'],
+              pred: {
+                type: 'LITERAL',
+                param: { text: formValues['text'] },
+              },
             },
           }
           if (setExpressionWrapper) setExpressionWrapper(newWrapperPayload)
