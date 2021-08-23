@@ -19,3 +19,7 @@ export function getDefaultDevHubHeaders({
 
   return headers
 }
+
+export function WrapUrlWithToken(url: string, token: string | undefined) {
+  return `${url}?token=${token}`
+}

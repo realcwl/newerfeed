@@ -4,9 +4,11 @@ import { all, fork, select, take, takeLatest } from 'typed-redux-saga'
 import axios from 'axios'
 import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as actions from '../actions'
-import { selectSeedStateFromRootState } from '../selectors'
+import { appTokenSelector, selectSeedStateFromRootState } from '../selectors'
 import { RootState } from '../types'
 import { ExtractActionFromActionCreator } from '../types/base'
+import { useReduxState } from '../../hooks/use-redux-state'
+import { WrapUrlWithToken } from '../../utils/api'
 
 function* init() {
   // Do not monitoring before login success happen
@@ -26,28 +28,31 @@ async function syncUp(state: RootState) {
   if (!seedState) return
 
   try {
-    const response = await axios.post(constants.DEV_GRAPHQL_ENDPOINT, {
-      query: jsonToGraphQLQuery({
-        mutation: {
-          syncUp: {
-            __args: {
-              input: {
-                userSeedState: seedState.userSeedState,
-                feedSeedState: seedState.feedSeedState,
+    const response = await axios.post(
+      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appTokenSelector(state)),
+      {
+        query: jsonToGraphQLQuery({
+          mutation: {
+            syncUp: {
+              __args: {
+                input: {
+                  userSeedState: seedState.userSeedState,
+                  feedSeedState: seedState.feedSeedState,
+                },
+              },
+              userSeedState: {
+                name: true,
+                avatarUrl: true,
+              },
+              feedSeedState: {
+                id: true,
+                name: true,
               },
             },
-            userSeedState: {
-              name: true,
-              avatarUrl: true,
-            },
-            feedSeedState: {
-              id: true,
-              name: true,
-            },
           },
-        },
-      }),
-    })
+        }),
+      },
+    )
     const { errors } = response.data
 
     if (errors && errors.length) {

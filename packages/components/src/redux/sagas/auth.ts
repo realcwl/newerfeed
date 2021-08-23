@@ -6,7 +6,11 @@ import * as actions from '../actions'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
 import { AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js'
+import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import userPool from '../../libs/auth/userPool'
+import axios, { AxiosResponse } from 'axios'
+import { WrapUrlWithToken } from '../../utils/api'
+import { constants } from '@devhub/core'
 
 function* init() {
   yield take('LOGIN_SUCCESS')
@@ -46,6 +50,31 @@ function* onLoginRequest(
 
   try {
     const { data } = yield authPromise
+
+    // Create user if it's not already exist
+    const userResponse: AxiosResponse = yield axios.post(
+      WrapUrlWithToken(
+        constants.DEV_GRAPHQL_ENDPOINT,
+        data.accessToken.jwtToken,
+      ),
+      {
+        query: jsonToGraphQLQuery({
+          mutation: {
+            createUser: {
+              __args: {
+                input: {
+                  id: data.accessToken.payload.sub,
+                  // TODO(chenweilunster): Allow user to change name during sign
+                  // up stage.
+                  name: 'default',
+                },
+              },
+              id: true,
+            },
+          },
+        }),
+      },
+    )
 
     yield put(
       actions.loginSuccess({
@@ -91,7 +120,10 @@ function* onLoginSuccess(
 
 function* onAuthFailure(
   action: ExtractActionFromActionCreator<typeof actions.authFailure>,
-) {}
+) {
+  // TODO(chenweilunster): Auth failure should kick user out of the current
+  // session and force user to login again.
+}
 
 function onLogout() {
   clearOAuthQueryParams()
