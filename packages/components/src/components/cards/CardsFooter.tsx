@@ -64,12 +64,8 @@ export const CardsFooter = React.memo((props: CardsFooterProps) => {
         >
           <Button
             analyticsLabel={loadState === 'error' ? 'try_again' : 'load_more'}
-            disabled={
-              loadState === 'loading' ||
-              loadState === 'loading_first' ||
-              loadState === 'loading_more'
-            }
-            loading={loadState === 'loading_more'}
+            disabled={loadState === 'loading'}
+            loading={loadState === 'loading'}
             onPress={fetchNextPage}
             round={isEmpty}
           >
@@ -114,9 +110,7 @@ export const CardsFooter = React.memo((props: CardsFooterProps) => {
               >
                 <Button
                   analyticsLabel="refresh"
-                  disabled={
-                    loadState === 'loading' || loadState === 'loading_first'
-                  }
+                  disabled={loadState === 'loading'}
                   onPress={() => {
                     void refresh()
                   }}

@@ -33,7 +33,7 @@ export const NewsSubtypesWithFilter = React.memo(
 
     // Show error if all subtypes doesn't contain the specified text f
     function shouldShowError(source: NewsFeedColumnSource) {
-      for (var subtype of source.subtypes) {
+      for (const subtype of source.subtypes) {
         if (mapSourceIdToName(subtype, idToNameMap).includes(filter)) {
           return false
         }
@@ -101,7 +101,7 @@ export const NewsSubtypesWithFilter = React.memo(
               label={mapSourceIdToName(subtype, idToNameMap)}
               onChange={(checked) => {
                 if (selectedSubtype.includes(subtype)) {
-                  let newlySelectedSubtypes = selectedSubtype.filter(
+                  const newlySelectedSubtypes = selectedSubtype.filter(
                     (name: string) => name !== subtype,
                   )
                   // formik 2.1.1 is required here, otherwise setting this field

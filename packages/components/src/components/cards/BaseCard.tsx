@@ -437,6 +437,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                     onPress={() => {
                       setImageToView(attachment)
                     }}
+                    key={attachment.id}
                   >
                     <Image
                       source={{

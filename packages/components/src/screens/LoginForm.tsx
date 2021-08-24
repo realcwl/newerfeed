@@ -74,7 +74,7 @@ export const LoginForm = React.memo((props: LoginFormProps) => {
   })
 
   function canSubmit(): boolean {
-    for (var field of ALL_FIELDS) {
+    for (const field of ALL_FIELDS) {
       if (!formikProps.values[field]) return false
       if (!!formikProps.errors[field]) return false
     }

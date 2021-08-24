@@ -83,3 +83,7 @@ export const EMPTY_ARRAY = []
 
 // prettier-ignore
 export const EMPTY_OBJ = {}
+
+// banner related
+// delay for banner auto closure in ms.
+export const BANNER_AUTO_CLOSE_DURATION = 3000

@@ -16,8 +16,9 @@ import { useFAB } from '../hooks/use-fab'
 import { useReduxState } from '../hooks/use-redux-state'
 import * as selectors from '../redux/selectors'
 import { SubscriptionClient } from 'subscriptions-transport-ws'
+import { WrapUrlWithToken } from '../utils/api'
 import { constants, SeedState } from '@devhub/core'
-import { updateSeedState } from '../redux/actions'
+import { setBannerMessage, updateSeedState } from '../redux/actions'
 
 const styles = StyleSheet.create({
   container: {
@@ -34,21 +35,39 @@ export const MainScreen = React.memo(() => {
 
   const dispatch = useDispatch()
   const currentOpenedModal = useReduxState(selectors.currentOpenedModal)
+  const appToken = useReduxState(selectors.appTokenSelector)
+  const userId = useReduxState(selectors.userIdSelector)
   const FAB = useFAB()
 
   useEffect(() => {
     const client = new SubscriptionClient(
-      constants.DEV_GRAPHQL_SUBSCRIPTION_ENDPOINT,
+      WrapUrlWithToken(constants.DEV_GRAPHQL_SUBSCRIPTION_ENDPOINT, appToken),
       {
         reconnect: true,
+        connectionParams: {
+          headers: {
+            token: appToken,
+          },
+        },
       },
+    )
+
+    client.onError((e) =>
+      dispatch(
+        setBannerMessage({
+          id: 'fail_initial_connection',
+          type: 'BANNER_TYPE_ERROR',
+          autoClose: true,
+          message: 'Websocket fail to connect',
+        }),
+      ),
     )
 
     client
       .request({
         query: `
           subscription {
-            syncDown(userId: "user_id_1") {
+            syncDown(userId: "${userId}") {
               userSeedState {
                 id
                 name
@@ -63,13 +82,19 @@ export const MainScreen = React.memo(() => {
         `,
       })
       .subscribe({
-        next: (v) => {
+        next: (v: any) => {
           const seedState: SeedState = v.data?.syncDown
           dispatch(updateSeedState(seedState))
         },
         error: (v) => {
-          // TODO(chenweilunster): Display using error banner
-          console.log(v.message)
+          dispatch(
+            setBannerMessage({
+              id: 'fail_initial_connection',
+              type: 'BANNER_TYPE_ERROR',
+              autoClose: true,
+              message: 'Fail to subscribe to backend',
+            }),
+          )
         },
       })
   }, [])

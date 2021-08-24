@@ -5,22 +5,14 @@
     "jsx": "react-jsx",
     "noEmit": true,
     "outDir": "dist",
+    "noImplicitAny": false,
     "rootDir": "src",
-    "typeRoots": [
-      "../../@types",
-      "../../node_modules/@types"
-    ],
+    "typeRoots": ["../../@types", "../../node_modules/@types"],
     "module": "esnext",
     "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "src/*"
-  ],
-  "exclude": [
-    "src/setupProxy.js",
-    "node_modules",
-    "dist"
-  ],
+  "include": ["src/*"],
+  "exclude": ["src/setupProxy.js", "node_modules", "dist"],
   "references": [
     {
       "path": "../core"

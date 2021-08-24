@@ -6,7 +6,8 @@ import {
 
 import { Appearence, ColorSchemeName } from './index.shared'
 
-export { AppearanceProvider, ColorSchemeName }
+export { AppearanceProvider }
+export type { ColorSchemeName }
 
 export const Appearance: Appearence = {
   addChangeListener(listener) {

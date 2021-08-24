@@ -243,7 +243,7 @@ export const Link = React.forwardRef<Touchable, LinkProps>((props, ref) => {
     (typeof finalProps.children !== 'string' && enableTextWrapper === true)
   ) {
     finalProps.children = (
-      <ThemedText ref={textRef} {...textProps} color={color as any}>
+      <ThemedText ref={textRef} {...textProps} color={color}>
         {finalProps.children}
       </ThemedText>
     )

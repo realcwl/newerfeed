@@ -1,7 +1,6 @@
 import { User } from '@devhub/core'
 import immer from 'immer'
 import _ from 'lodash'
-import { REHYDRATE } from 'redux-persist'
 
 import { Reducer } from '../types'
 
@@ -17,6 +16,9 @@ export interface State {
   // in.
   appToken: string | undefined
 
+  // Used for token refresher
+  refreshToken: string | undefined
+
   // AuthError will go here, which is used during the sign in phase. User will
   // be prompted with this error message to guide sign-in.
   error: AuthError | undefined
@@ -29,6 +31,9 @@ export interface State {
   // indicated by the non-empty user field.
   isLoggingIn: boolean
 
+  // The last timestamp user is authenticated denoted in ms.
+  lastAuthTime: number
+
   // Stored user's personal data.
   user: User | undefined
 }
@@ -38,6 +43,8 @@ const initialState: State = {
   error: undefined,
   signUpSuccessMsg: '',
   isLoggingIn: false,
+  lastAuthTime: 0,
+  refreshToken: undefined,
   user: undefined,
 }
 
@@ -50,6 +57,8 @@ export const authReducer: Reducer<State> = (state = initialState, action) => {
         user: undefined,
         isLoggingIn: true,
         error: undefined,
+        lastAuthTime: 0,
+        refreshToken: undefined,
         signUpSuccessMsg: '',
       }
     }
@@ -59,15 +68,19 @@ export const authReducer: Reducer<State> = (state = initialState, action) => {
         user: action.payload.user,
         isLoggingIn: false,
         error: undefined,
+        refreshToken: action.payload.refreshToken,
+        lastAuthTime: Date.now(),
         signUpSuccessMsg: '',
       }
     }
     case 'SIGN_UP_SUCCESS': {
       return {
         appToken: undefined,
+        refreshToken: undefined,
         user: undefined,
         error: undefined,
         isLoggingIn: false,
+        lastAuthTime: 0,
         signUpSuccessMsg:
           'Signed up successfully, please check your email for a confirmation link (check your Spam if not found in Inbox)',
       }
@@ -75,12 +88,14 @@ export const authReducer: Reducer<State> = (state = initialState, action) => {
     case 'AUTH_FAILURE': {
       return {
         appToken: undefined,
+        refreshToken: undefined,
         user: undefined,
         isLoggingIn: false,
         error: {
           name: action.error.name,
           message: action.error.message,
         },
+        lastAuthTime: 0,
         signUpSuccessMsg: '',
       }
     }
@@ -96,6 +111,7 @@ export const authReducer: Reducer<State> = (state = initialState, action) => {
         const userSeedState = action.payload.userSeedState
 
         const user: User = {
+          email: draft.user?.email || '',
           ...userSeedState,
         }
         draft.user = user

@@ -1,3 +1,4 @@
 import { OneList, OneListProps } from './implementations/flat-list'
 
-export { OneList, OneListProps }
+export { OneList }
+export type { OneListProps }

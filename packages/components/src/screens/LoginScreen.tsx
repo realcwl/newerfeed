@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { Image, ScrollView, StyleSheet, View } from 'react-native'
 
 import { constants } from '@devhub/core'
-import logo from '@devhub/components/assets/logo_circle.png'
 
 import { FullHeightScrollView } from '../components/common/FullHeightScrollView'
 import { Link } from '../components/common/Link'
@@ -19,6 +18,7 @@ import {
 import _ from 'lodash'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
+import logo from '@devhub/components/assets/logo_circle.png'
 
 const styles = StyleSheet.create({
   container: {
