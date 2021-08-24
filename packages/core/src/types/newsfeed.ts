@@ -184,6 +184,9 @@ export interface User {
   // User name, created during the account creation process.
   name: string
 
+  // User's email address, used for login.
+  email: string
+
   // User's avartar. If not provided we'll use a random default icon.
   avatarUrl: string | null
 }

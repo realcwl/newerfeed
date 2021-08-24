@@ -16,6 +16,7 @@ export function signUpRequest(payload: { email: string; password: string }) {
 
 export function loginSuccess(payload: {
   appToken: string
+  refreshToken: string
   user: NonNullable<User>
 }) {
   return createAction('LOGIN_SUCCESS', payload)

@@ -15,6 +15,10 @@ export const isLoggedSelector = (state: RootState) => true
 export const appTokenSelector = (state: RootState) =>
   s(state).appToken || undefined
 
+export const refreshTokenSelector = (state: RootState) => s(state).refreshToken
+
+export const lastAuthTimeSelector = (state: RootState) => s(state).lastAuthTime
+
 export const userIdSelector = (state: RootState) => s(state).user?.id
 
 export const currentUserSelector = (state: RootState) => {
