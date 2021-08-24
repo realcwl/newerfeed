@@ -1,7 +1,6 @@
 import { User } from '@devhub/core'
 import immer from 'immer'
 import _ from 'lodash'
-import { REHYDRATE } from 'redux-persist'
 
 import { Reducer } from '../types'
 

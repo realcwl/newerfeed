@@ -1,4 +1,4 @@
-import { all, delay, fork, put, select, takeLatest } from 'typed-redux-saga'
+import { all, select, takeLatest } from 'typed-redux-saga'
 
 import { analytics } from '../../libs/analytics'
 import * as selectors from '../selectors'

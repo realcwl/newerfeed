@@ -1,64 +1,68 @@
 import { BannerMessage } from '@devhub/core'
 import immer from 'immer'
 import _ from 'lodash'
-import { REHYDRATE } from 'redux-persist'
+import { bannerMessageSelector } from '../selectors'
 
 import { Reducer } from '../types'
 
 export interface State {
+  // All banners to be rendered with top -> down order
   banners: BannerMessage[]
+
+  // all banner signatures in App
+  bannerSignatures: string[]
 }
 
 const initialState: State = {
-  banners: [].filter(Boolean) as State['banners'],
+  banners: [],
+  bannerSignatures: [],
+}
+
+// Use banner signature if provided, otherwise construct the default signature.
+// A default banner signature is of format:
+// "${id}#${type}"
+// Note that, if your banner message is dynamically constructed, or you just
+// don't know what the banner message will be (e.g. err from http response), you
+// should always provide the signature to avoid huge bump in error banners.
+function getBannerSignature(banner: BannerMessage) {
+  if (banner.signature) return banner.signature
+
+  const defaultSignature = `${banner.id}#${banner.type}`
+  return defaultSignature
 }
 
 export const appReducer: Reducer<State> = (state = initialState, action) => {
   switch (action.type) {
-    case REHYDRATE as any: {
-      const { err, payload } = action as any
-
-      const app: State = err ? state : payload && payload.app
-
-      return {
-        ...app,
-        banners: _.uniqBy(
-          ((app && app.banners) || [])
-            .concat(initialState.banners)
-            .map((banner) => {
-              if (!(banner && banner.id)) return banner
-              if (banner.id === 'join_our_slack') return
-              if (banner.id === 'new_layout_mode') return
-              if (banner.id === 'desktop_push_notifications') return
-
-              const updatedBanner = initialState.banners.find(
-                (b) => b.id === banner.id,
-              )
-              if (updatedBanner) {
-                return {
-                  ...banner,
-                  ..._.omit(updatedBanner, ['closedAt', 'createdAt']),
-                }
-              }
-
-              return banner
-            })
-            .filter(Boolean) as State['banners'],
-          'id',
-        ),
-      }
-    }
-
     case 'CLOSE_BANNER_MESSAGE':
       return immer(state, (draft) => {
         draft.banners = draft.banners || []
 
-        draft.banners.forEach((banner) => {
-          if (!(banner && banner.id === action.payload)) return
+        // Remove the banner from the banner array and remove signature
+        const bannerToDrop = draft.banners.find(
+          (banner) => banner.id == action.payload,
+        )
 
-          banner.closedAt = new Date().toISOString()
-        })
+        if (bannerToDrop) {
+          draft.banners = draft.banners.filter(
+            (banner) => banner.id != action.payload,
+          )
+          draft.bannerSignatures = draft.bannerSignatures.filter(
+            (sig) => sig != getBannerSignature(bannerToDrop),
+          )
+        }
       })
+
+    case 'SET_BANNER_MESSAGE': {
+      return immer(state, (draft) => {
+        const newBanner = action.payload
+        const signature = getBannerSignature(newBanner)
+        if (draft.bannerSignatures.includes(signature)) return
+
+        // Push to the end of banner array and set signature
+        draft.banners.push(newBanner)
+        draft.bannerSignatures.push(signature)
+      })
+    }
 
     default:
       return state

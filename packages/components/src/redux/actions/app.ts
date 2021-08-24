@@ -1,4 +1,4 @@
-import { SeedState } from '@devhub/core'
+import { BannerMessage, SeedState } from '@devhub/core'
 import { createAction } from '../helpers'
 
 export function closeBannerMessage(id: string) {
@@ -7,4 +7,8 @@ export function closeBannerMessage(id: string) {
 
 export function updateSeedState(seedState: SeedState) {
   return createAction('UPDATE_SEED_STATE', seedState)
+}
+
+export function setBannerMessage(banner: BannerMessage) {
+  return createAction('SET_BANNER_MESSAGE', banner)
 }

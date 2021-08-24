@@ -16,9 +16,9 @@ import { useFAB } from '../hooks/use-fab'
 import { useReduxState } from '../hooks/use-redux-state'
 import * as selectors from '../redux/selectors'
 import { SubscriptionClient } from 'subscriptions-transport-ws'
-import { constants, SeedState } from '@devhub/core'
-import { updateSeedState } from '../redux/actions'
 import { WrapUrlWithToken } from '../utils/api'
+import { constants, SeedState } from '@devhub/core'
+import { setBannerMessage, updateSeedState } from '../redux/actions'
 
 const styles = StyleSheet.create({
   container: {
@@ -52,6 +52,17 @@ export const MainScreen = React.memo(() => {
       },
     )
 
+    client.onError((e) =>
+      dispatch(
+        setBannerMessage({
+          id: 'fail_initial_connection',
+          type: 'BANNER_TYPE_ERROR',
+          autoClose: true,
+          message: 'Websocket fail to connect',
+        }),
+      ),
+    )
+
     client
       .request({
         query: `
@@ -75,9 +86,15 @@ export const MainScreen = React.memo(() => {
           const seedState: SeedState = v.data?.syncDown
           dispatch(updateSeedState(seedState))
         },
-        error: (v: any) => {
-          // TODO(chenweilunster): Display using error banner
-          console.log(v.message)
+        error: (v) => {
+          dispatch(
+            setBannerMessage({
+              id: 'fail_initial_connection',
+              type: 'BANNER_TYPE_ERROR',
+              autoClose: true,
+              message: 'Fail to subscribe to backend',
+            }),
+          )
         },
       })
   }, [])
