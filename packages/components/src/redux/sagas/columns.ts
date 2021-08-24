@@ -20,12 +20,10 @@ function* columnRefresher() {
   while (true) {
     // Try refresh all columns every 10 seconds.
     yield delay(10 * 1000)
-    console.log('try refreshing')
 
     const allColumnsWithRefreshTime = yield* select(
       selectors.columnsWithRefreshTimeSelector,
     )
-    console.log(allColumnsWithRefreshTime)
 
     yield* all(
       allColumnsWithRefreshTime.map(function* (columnWithRefreshTime) {
@@ -66,8 +64,7 @@ function* onAddColumn(
   yield* put(
     actions.fetchColumnDataRequest({
       columnId: columnId,
-      // Initial request for fetching data is always of direction "OLD", and
-      // update timestamp as 0, so that it will receive new data.
+      // Initial request for fetching data is always of direction "OLD"
       direction: 'OLD',
     }),
   )
