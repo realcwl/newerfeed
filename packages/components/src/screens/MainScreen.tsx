@@ -71,11 +71,11 @@ export const MainScreen = React.memo(() => {
         `,
       })
       .subscribe({
-        next: (v) => {
+        next: (v: any) => {
           const seedState: SeedState = v.data?.syncDown
           dispatch(updateSeedState(seedState))
         },
-        error: (v) => {
+        error: (v: any) => {
           // TODO(chenweilunster): Display using error banner
           console.log(v.message)
         },

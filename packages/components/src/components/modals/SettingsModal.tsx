@@ -64,7 +64,7 @@ export const SettingsModal = React.memo((props: SettingsModalProps) => {
 
             <Button
               analyticsLabel="rate_app"
-              onPress={() => {}}
+              onPress={() => undefined}
               size={32 * scaleFactor}
             >
               <ThemedIcon
@@ -81,7 +81,7 @@ export const SettingsModal = React.memo((props: SettingsModalProps) => {
 
             <Button
               analyticsLabel="download_native_app"
-              onPress={() => {}}
+              onPress={() => undefined}
               size={32 * scaleFactor}
             >
               <ThemedIcon

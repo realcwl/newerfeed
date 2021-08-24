@@ -179,12 +179,20 @@ function* onSignUpRequest(
   }
 }
 
+// TODO: remove following eslint comments when we have implement login and auth function
+/* eslint-disable */
+function* onLoginSuccess(
+  _action: ExtractActionFromActionCreator<typeof actions.loginSuccess>,
+) {}
+
 function* onAuthFailure(
   action: ExtractActionFromActionCreator<typeof actions.authFailure>,
 ) {
   // TODO(chenweilunster): Auth failure should kick user out of the current
   // session and force user to login again.
 }
+/* eslint-enable */
+
 
 function onLogout() {
   clearOAuthQueryParams()

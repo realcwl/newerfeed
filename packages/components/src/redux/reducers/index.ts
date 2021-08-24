@@ -39,5 +39,5 @@ export const rootReducer = (state: any, action: any) => {
 function cleanupArchivedItemsReducer(
   state: ExtractStateFromReducer<typeof _rootReducer>,
 ) {
-  return immer(state, (draft) => {})
+  return immer(state, (draft) => undefined)
 }

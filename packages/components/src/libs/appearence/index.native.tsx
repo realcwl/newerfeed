@@ -6,7 +6,7 @@ import {
 
 import { Appearence, ColorSchemeName } from './index.shared'
 
-export { ColorSchemeName }
+export type { ColorSchemeName }
 
 export const AppearanceProvider = Fragment
 
