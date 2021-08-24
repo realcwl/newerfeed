@@ -18,6 +18,7 @@ import {
 import _ from 'lodash'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
+import logo from '@devhub/components/assets/logo_circle.png'
 
 const styles = StyleSheet.create({
   container: {
@@ -132,7 +133,7 @@ export const LoginScreen = React.memo(() => {
               style: styles.footerLinkText,
             }}
           >
-            {/* this way of using logo fails "npx tsc -b" <Image resizeMode="contain" source={logo} style={styles.logo} /> */}
+            <Image resizeMode="contain" source={logo} style={styles.logo} />
           </Link>
 
           <Spacer height={contentPadding} />
