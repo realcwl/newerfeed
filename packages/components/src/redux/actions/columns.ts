@@ -1,4 +1,9 @@
-import { ColumnCreation } from '@devhub/core'
+import {
+  ColumnCreation,
+  ColumnFilter,
+  NewsFeedData,
+  NewsFeedDataExpressionWrapper,
+} from '@devhub/core'
 import { EmitterTypes } from '../../libs/emitter'
 import { createAction } from '../helpers'
 
@@ -129,4 +134,36 @@ export function changeIssueNumberFilter(payload: {
   removeOthers?: boolean
 }) {
   return createAction('CHANGE_ISSUE_NUMBER_FILTER', payload)
+}
+
+export function fetchColumnDataRequest(payload: {
+  // columnId is the subject column we're fetching data for
+  columnId: string
+  // NEW stands for "refresh", OLD stands for "load more". The initial fetch or
+  // the first fetch after column attribute change is denoted as OLD.
+  direction: 'NEW' | 'OLD'
+}) {
+  return createAction('FETCH_COLUMN_DATA_REQUEST', payload)
+}
+
+export function fetchColumnDataSuccess(payload: {
+  // columnId is the subject column we're fetching data for
+  columnId: string
+  // NEW stands for "refresh", OLD stands for "load more". The initial fetch or
+  // the first fetch after column attribute change is denoted as OLD.
+  direction: 'NEW' | 'OLD'
+  // a list of NewsFeedData that we fetched
+  data: NewsFeedData[]
+  // Timestamp in seconds. Backend should return updatedAt to make sure the
+  // frontend is always up to date with this timestamp.
+  updatedAt: number
+  // the caller should decide whether to drop existing data in this column.
+  // e.g. when the data fetched reached the limit, it's very likely that there's
+  // a "gap" between existing data and newly fetched data, and thus should drop
+  // the existing ones.
+  dropExistingData: boolean
+  // optionally, pass data expression to update the column attributes.
+  dataExpression?: NewsFeedDataExpressionWrapper
+}) {
+  return createAction('FETCH_COLUMN_DATA_SUCCESS', payload)
 }

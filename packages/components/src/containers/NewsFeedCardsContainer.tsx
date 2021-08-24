@@ -39,7 +39,7 @@ export const NewsFeedCardsContainer = React.memo(
   (props: NewsFeedCardsContainerProps) => {
     const { columnId, ...otherProps } = props
 
-    const { allItems, filteredItemsIds, getItemByNodeIdOrId } =
+    const { allItemsIds, filteredItemsIds, getItemByNodeIdOrId } =
       useColumnData<NewsFeedData>(columnId, { mergeSimilar: false })
 
     const { isLoggingIn } = useLoginHelpers()
@@ -58,7 +58,7 @@ export const NewsFeedCardsContainer = React.memo(
         fetchNextPage={() => undefined}
         getItemByNodeIdOrId={getItemByNodeIdOrId}
         isShowingOnlyBookmarks={!!(column.filters && column.filters.saved)}
-        itemNodeIdOrIds={['dummyCard', 'dummyCard2', 'dummyCard3']}
+        itemNodeIdOrIds={filteredItemsIds}
         lastFetchSuccessAt={''}
         refresh={() => undefined}
       />

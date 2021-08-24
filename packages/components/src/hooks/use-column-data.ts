@@ -26,36 +26,23 @@ export function useColumnData<ItemT extends NewsFeedData>(
 
   const dataByNodeIdOrId = useReduxState(selectors.dataByNodeIdOrId)
 
-  const allItems = useReduxState((state) => {
+  const _allItemsIds = useReduxState((state) => {
     if (!(column && column.id)) return EMPTY_ARRAY
     return columnDataSelector(state, column.id)
   })
 
-  const _allItemsIds = useMemo(
-    () => allItems.map(getItemNodeIdOrId).filter(Boolean) as string[],
-    [allItems],
-  )
   const allItemsIds = useMemo(() => _allItemsIds, [_allItemsIds.join(',')])
 
-  const filteredItems = useMemo(() => {
-    return allItems
+  const filteredItemsIds = useMemo(() => {
+    return allItemsIds
   }, [
-    allItems,
+    allItemsIds,
     column && column.filters,
     column && column.type,
     hasCrossedColumnsLimit,
     mergeSimilar,
     dashboardFromUsername,
-  ]) as ItemT[]
-
-  const _filteredItemsIds = useMemo(
-    () => filteredItems.map(getItemNodeIdOrId).filter(Boolean) as string[],
-    [filteredItems],
-  )
-  const filteredItemsIds = useMemo(
-    () => _filteredItemsIds,
-    [_filteredItemsIds.join(',')],
-  )
+  ])
 
   const previousDataByNodeIdOrIdRef = usePreviousRef(dataByNodeIdOrId)
   const getItemByNodeIdOrIdChangeCountRef = useRef(0)
@@ -81,17 +68,13 @@ export function useColumnData<ItemT extends NewsFeedData>(
 
   return useMemo(
     () => ({
-      allItems,
       allItemsIds,
-      filteredItems,
       filteredItemsIds,
       getItemByNodeIdOrId,
       hasCrossedColumnsLimit,
     }),
     [
-      allItems,
       allItemsIds,
-      filteredItems,
       filteredItemsIds,
       getItemByNodeIdOrId,
       hasCrossedColumnsLimit,

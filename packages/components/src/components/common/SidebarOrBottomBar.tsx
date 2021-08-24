@@ -500,10 +500,6 @@ export const SidebarOrBottomBarColumnItem = React.memo(
     const { column, columnIndex, hasCrossedColumnsLimit, headerDetails } =
       useColumn(columnId)
 
-    const { filteredItems } = useColumnData(columnId, {
-      mergeSimilar: false,
-    })
-
     const isColumnFocused = useIsColumnFocused(columnId)
 
     const avatarAndIconProps = useMemo(() => {

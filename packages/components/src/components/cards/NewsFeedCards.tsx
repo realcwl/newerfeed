@@ -92,20 +92,22 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
       if (swipeable) {
         return (
           <View style={{ flex: 1 }}>
-            <SwipeableCard
-              type="COLUMN_TYPE_NEWS_FEED"
-              columnId={columnId}
-              nodeIdOrId={nodeIdOrId}
-            />
+            <ErrorBoundary>
+              <SwipeableCard
+                type="COLUMN_TYPE_NEWS_FEED"
+                columnId={columnId}
+                nodeIdOrId={nodeIdOrId}
+              />
+            </ErrorBoundary>
           </View>
         )
       }
       return (
-        <ErrorBoundary>
-          <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
+          <ErrorBoundary>
             <NewsFeedCard nodeIdOrId={nodeIdOrId} columnId={columnId} />
-          </View>
-        </ErrorBoundary>
+          </ErrorBoundary>
+        </View>
       )
     },
     [swipeable],

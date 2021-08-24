@@ -102,7 +102,7 @@ export const ColumnRenderer = React.memo((props: ColumnRendererProps) => {
   const columnData = useColumnData(columnId, {
     mergeSimilar: false,
   })
-  const { hasCrossedColumnsLimit, filteredItems } = columnData
+  const { hasCrossedColumnsLimit, filteredItemsIds } = columnData
 
   const dispatch = useDispatch()
   const store = useStore()
@@ -186,7 +186,7 @@ export const ColumnRenderer = React.memo((props: ColumnRendererProps) => {
               analyticsLabel={
                 !hasOneUnreadItem ? 'mark_as_unread' : 'mark_as_read'
               }
-              disabled={hasCrossedColumnsLimit || !filteredItems.length}
+              disabled={hasCrossedColumnsLimit}
               family="octicon"
               name={!hasOneUnreadItem ? 'eye-closed' : 'eye'}
               onPress={() => {

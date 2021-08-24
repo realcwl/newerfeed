@@ -29,9 +29,6 @@ export const ColumnLoadingIndicator = React.memo(
     const isLoggingIn = useReduxState(selectors.isLoggingInSelector)
     const loadState = useColumnLoadingState(columnId || '')
 
-    // TODO(chenweilunster): For simplicity, we by default don't show loading
-    // status. But in the future we will show show loading state.
-    return null
     if (!(isLoggingIn || (loadState && loadState.includes('loading'))))
       return null
 

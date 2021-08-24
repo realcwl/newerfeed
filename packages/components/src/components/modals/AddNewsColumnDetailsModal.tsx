@@ -118,6 +118,7 @@ export const AddColumnDetailsModal = React.memo(
           lastItemId: '',
           sources: getColumnSourcesFromFormValues(formValues),
           dataExpression: formValues['dataExpression'],
+          state: 'not_loaded',
         }
         dispatch(actions.addColumn(columnCreation))
 

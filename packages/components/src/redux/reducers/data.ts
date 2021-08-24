@@ -16,82 +16,8 @@ export interface State {
 }
 
 const initialState: State = {
-  allIds: ['dummyCard', 'dummyCard2', 'dummyCard3'],
-  byId: {
-    dummyCard: {
-      id: 'dummyCard',
-      title: `I am dummyCard's dummy title with more than one line as well`,
-      text: `first card with some real real real long descriptions www.google.com and real long text and see if it works shorturl.at/ijksA !`,
-      author: {
-        avatar: {
-          imageURL:
-            'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-        },
-        name: 'John Doe',
-        profileURL: '/',
-      },
-      crawledTimestamp: new Date('2021-01-02'),
-      attachments: [
-        {
-          id: 'dummyImg',
-          dataType: 'img',
-          url: 'https://images.unsplash.com/photo-1544526226-d4568090ffb8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aGQlMjBpbWFnZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80',
-        },
-        {
-          id: 'dummyImg2',
-          dataType: 'img',
-          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/2560px-Image_created_with_a_mobile_phone.png',
-        },
-      ],
-      isSaved: false,
-      isRead: false,
-    },
-    dummyCard2: {
-      id: 'dummyCard2',
-      title: `I am dummyCard2's dummy title with more than one line as well`,
-      text: `www.facebook.com second card with some descriptions!`,
-      author: {
-        avatar: {
-          imageURL:
-            'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-        },
-        name: 'John Doe',
-        profileURL: '/',
-      },
-      attachments: [
-        {
-          id: 'dummyData3',
-          dataType: 'img',
-          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/TEIDE.JPG/2880px-TEIDE.JPG',
-        },
-        {
-          id: 'dummyData4',
-          dataType: 'img',
-          url: 'https://hbimg.huabanimg.com/300251098bb1d62a1d89f40c2e8018bbb415414c912fc-5z5wMR_fw658',
-        },
-      ],
-      crawledTimestamp: new Date('2021-05-02'),
-      isSaved: false,
-      isRead: false,
-    },
-    dummyCard3: {
-      id: 'dummyCard3',
-      title: `I am dummyCard3's dummy title with more than one line as well`,
-      text: `third card with some longest descriptions \nwww.google.com and real long text \n
-      and see if it works shorturl.at/ijksA again\n let's see!`,
-      author: {
-        avatar: {
-          imageURL:
-            'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-        },
-        name: 'John Doe',
-        profileURL: '/',
-      },
-      crawledTimestamp: new Date('2021-06-02'),
-      isSaved: false,
-      isRead: false,
-    },
-  },
+  allIds: [],
+  byId: {},
   savedIds: [],
   updatedAt: undefined,
 }
@@ -131,6 +57,16 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
         const entry = draft.byId[itemNodeId]
         entry.isRead = read
         draft.updatedAt = now
+      })
+    case 'FETCH_COLUMN_DATA_SUCCESS':
+      return immer(state, (draft) => {
+        const { data } = action.payload
+        for (const singleData of data) {
+          // insert into data reducer if not already exist.
+          if (singleData.id in draft.byId) continue
+          draft.byId[singleData.id] = singleData
+          draft.allIds.push(singleData.id)
+        }
       })
     default:
       return state
