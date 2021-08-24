@@ -18,6 +18,7 @@ import * as selectors from '../redux/selectors'
 import { SubscriptionClient } from 'subscriptions-transport-ws'
 import { constants, SeedState } from '@devhub/core'
 import { updateSeedState } from '../redux/actions'
+import { WrapUrlWithToken } from '../utils/api'
 
 const styles = StyleSheet.create({
   container: {
@@ -34,13 +35,20 @@ export const MainScreen = React.memo(() => {
 
   const dispatch = useDispatch()
   const currentOpenedModal = useReduxState(selectors.currentOpenedModal)
+  const appToken = useReduxState(selectors.appTokenSelector)
+  const userId = useReduxState(selectors.userIdSelector)
   const FAB = useFAB()
 
   useEffect(() => {
     const client = new SubscriptionClient(
-      constants.DEV_GRAPHQL_SUBSCRIPTION_ENDPOINT,
+      WrapUrlWithToken(constants.DEV_GRAPHQL_SUBSCRIPTION_ENDPOINT, appToken),
       {
         reconnect: true,
+        connectionParams: {
+          headers: {
+            token: appToken,
+          },
+        },
       },
     )
 
@@ -48,7 +56,7 @@ export const MainScreen = React.memo(() => {
       .request({
         query: `
           subscription {
-            syncDown(userId: "user_id_1") {
+            syncDown(userId: "${userId}") {
               userSeedState {
                 id
                 name
