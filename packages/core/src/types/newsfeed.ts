@@ -91,17 +91,21 @@ export interface NewsFeedDataExpressionWrapper {
   expr?: NewsFeedDataExpression
 }
 
-export type PredicateType = 'LITERAL'
+export interface LiteralPredicate {
+  // PredicateType is a predefined list of string.
+  type: 'LITERAL'
+  // A PredicateParam is a predefined list of params matching the predicate.
+  param?: { text: string }
+}
 
-export type LiteralPredicateParam = string
-
-export type PredicateParam = LiteralPredicateParam
+// All possible predicates should be added as OR here.
+// e.g. ... = LiteralPredicate | SourcePredicate
+// All predicate must have type and params.
+export type DataExpressionPredicate = LiteralPredicate
 
 export interface Predicate {
-  // PredicateType is a predefined list of string.
-  type: PredicateType
-  // A PredicateParam is a predefined list of params matching the predicate.
-  param?: PredicateParam
+  // The actual predicate that
+  pred: DataExpressionPredicate
 }
 
 export interface AllOf {
