@@ -97,7 +97,7 @@ export const MainScreen = React.memo(() => {
           )
         },
       })
-  }, [])
+  }, [appToken])
 
   return (
     <>
