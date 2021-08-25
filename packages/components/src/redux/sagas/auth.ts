@@ -185,14 +185,13 @@ function* onLoginSuccess(
   _action: ExtractActionFromActionCreator<typeof actions.loginSuccess>,
 ) {}
 
+/* eslint-enable */
 function* onAuthFailure(
   action: ExtractActionFromActionCreator<typeof actions.authFailure>,
 ) {
   // TODO(chenweilunster): Auth failure should kick user out of the current
   // session and force user to login again.
 }
-/* eslint-enable */
-
 
 function onLogout() {
   clearOAuthQueryParams()
