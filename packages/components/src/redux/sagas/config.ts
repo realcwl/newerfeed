@@ -1,7 +1,55 @@
-import { all, select, takeLatest } from 'typed-redux-saga'
-
+import { constants, NewsFeedColumnSource } from '@devhub/core'
+import { all, select, takeLatest, delay, put } from 'typed-redux-saga'
+import axios, { AxiosResponse } from 'axios'
 import { analytics } from '../../libs/analytics'
+import { WrapUrlWithToken } from '../../utils/api'
+import { setSourcesAndIdMap } from '../actions'
+import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as selectors from '../selectors'
+
+// Response returned from the backend for available sources.
+interface SourcesResponse {
+  data: {
+    sources: {
+      id: string
+      name: string
+      subsources: {
+        id: string
+        name: string
+      }[]
+    }[]
+  }
+}
+
+function GetAvailableSourcesFromSourcesResponse(
+  sourcesResponse: SourcesResponse,
+): NewsFeedColumnSource[] {
+  const res: NewsFeedColumnSource[] = []
+  for (const source of sourcesResponse.data.sources) {
+    const singleSource: NewsFeedColumnSource = {
+      source: source.id,
+      subSources: [],
+    }
+    for (const subSource of source.subsources) {
+      singleSource.subSources.push(subSource.id)
+    }
+    res.push(singleSource)
+  }
+  return res
+}
+
+function GetIdToNameMapFromSourcesResponse(
+  sourcesResponse: SourcesResponse,
+): Record<string, string> {
+  const res: Record<string, string> = {}
+  for (const source of sourcesResponse.data.sources) {
+    res[source.id] = source.name
+    for (const subSource of source.subsources) {
+      res[subSource.id] = subSource.name
+    }
+  }
+  return res
+}
 
 function* onThemeChange() {
   const state = yield* select()
@@ -13,6 +61,38 @@ function* onThemeChange() {
   })
 }
 
+// On each login success we fetch all login sources available.
+function* fetchAvailableSourcesAndIdMap() {
+  const appToken = yield* select(selectors.appTokenSelector)
+  const sourcesResponse: AxiosResponse<SourcesResponse> = yield axios.post(
+    WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+    {
+      query: jsonToGraphQLQuery({
+        query: {
+          sources: {
+            id: true,
+            name: true,
+            subsources: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      }),
+    },
+  )
+
+  yield put(
+    setSourcesAndIdMap({
+      sources: GetAvailableSourcesFromSourcesResponse(sourcesResponse.data),
+      idToNameMap: GetIdToNameMapFromSourcesResponse(sourcesResponse.data),
+    }),
+  )
+}
+
 export function* configSagas() {
-  yield* all([yield* takeLatest(['SET_THEME'], onThemeChange)])
+  yield* all([
+    yield* takeLatest(['SET_THEME'], onThemeChange),
+    yield* takeLatest(['LOGIN_SUCCESS'], fetchAvailableSourcesAndIdMap),
+  ])
 }

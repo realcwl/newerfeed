@@ -51,7 +51,7 @@ export interface NewsFeedColumnSource {
   source: string
 
   // Subtypes is a predefined list of subtypes of type string.
-  subtypes: string[]
+  subSources: string[]
 }
 
 // Base column datastructure.

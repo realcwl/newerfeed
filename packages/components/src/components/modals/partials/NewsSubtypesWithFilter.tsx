@@ -33,7 +33,7 @@ export const NewsSubtypesWithFilter = React.memo(
 
     // Show error if all subtypes doesn't contain the specified text f
     function shouldShowError(source: NewsFeedColumnSource) {
-      for (const subtype of source.subtypes) {
+      for (const subtype of source.subSources) {
         if (mapSourceIdToName(subtype, idToNameMap).includes(filter)) {
           return false
         }
@@ -87,7 +87,7 @@ export const NewsSubtypesWithFilter = React.memo(
       source: NewsFeedColumnSource,
       filter: string,
     ) {
-      return source.subtypes.map((subtype) => {
+      return source.subSources.map((subtype) => {
         const selectedSubtype = formikProps.values[source.source]
         // Filter by the actual name, instead of by id.
         return mapSourceIdToName(subtype, idToNameMap).includes(filter) ? (
@@ -131,7 +131,7 @@ export const NewsSubtypesWithFilter = React.memo(
 
     return (
       <View>
-        {source.subtypes.length > MAX_ITEM_WITHOUT_FILTER
+        {source.subSources.length > MAX_ITEM_WITHOUT_FILTER
           ? renderGenericFormTextInput(source, filter, setFilter)
           : null}
 

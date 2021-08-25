@@ -82,7 +82,7 @@ export const AddColumnDetailsModal = React.memo(
       }
 
       for (const columnSource of newsFeedColumnAttributes.sources) {
-        res[columnSource.source] = columnSource.subtypes
+        res[columnSource.source] = columnSource.subSources
       }
       return {
         ...res,
@@ -182,7 +182,7 @@ export const AddColumnDetailsModal = React.memo(
       if (selected.length === 0) {
         return ''
       }
-      return ` (${selected.length}/${source.subtypes.length})`
+      return ` (${selected.length}/${source.subSources.length})`
     }
 
     // When submitting the form, extract sources and subtypes from the
@@ -195,7 +195,7 @@ export const AddColumnDetailsModal = React.memo(
         if (formValues[key].length === 0) continue
         sources.push({
           source: key,
-          subtypes: formValues[key],
+          subSources: formValues[key],
         })
       }
       return sources
