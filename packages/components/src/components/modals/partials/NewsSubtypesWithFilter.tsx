@@ -33,7 +33,7 @@ export const NewsSubtypesWithFilter = React.memo(
 
     // Show error if all subtypes doesn't contain the specified text f
     function shouldShowError(source: NewsFeedColumnSource) {
-      for (const subtype of source.subtypes) {
+      for (const subtype of source.subSourceIds) {
         if (mapSourceIdToName(subtype, idToNameMap).includes(filter)) {
           return false
         }
@@ -63,7 +63,7 @@ export const NewsSubtypesWithFilter = React.memo(
       return (
         <>
           <ThemedTextInput
-            textInputKey={`add-column-details-text-input-${source.source}`}
+            textInputKey={`add-column-details-text-input-${source.sourceId}`}
             borderThemeColor={shouldShowError(source) ? errorColor : undefined}
             borderHoverThemeColor={
               shouldShowError(source) ? errorColor : undefined
@@ -87,8 +87,8 @@ export const NewsSubtypesWithFilter = React.memo(
       source: NewsFeedColumnSource,
       filter: string,
     ) {
-      return source.subtypes.map((subtype) => {
-        const selectedSubtype = formikProps.values[source.source]
+      return source.subSourceIds.map((subtype) => {
+        const selectedSubtype = formikProps.values[source.sourceId]
         // Filter by the actual name, instead of by id.
         return mapSourceIdToName(subtype, idToNameMap).includes(filter) ? (
           <View key={`add-news-column-details-source-subtype-${subtype}`}>
@@ -109,11 +109,11 @@ export const NewsSubtypesWithFilter = React.memo(
                   // See the below issue for more context:
                   // https://github.com/formium/formik/issues/2130
                   formikProps.setFieldValue(
-                    source.source,
+                    source.sourceId,
                     newlySelectedSubtypes,
                   )
                 } else {
-                  formikProps.setFieldValue(source.source, [
+                  formikProps.setFieldValue(source.sourceId, [
                     ...selectedSubtype,
                     subtype,
                   ])
@@ -131,7 +131,7 @@ export const NewsSubtypesWithFilter = React.memo(
 
     return (
       <View>
-        {source.subtypes.length > MAX_ITEM_WITHOUT_FILTER
+        {source.subSourceIds.length > MAX_ITEM_WITHOUT_FILTER
           ? renderGenericFormTextInput(source, filter, setFilter)
           : null}
 
