@@ -26,6 +26,7 @@ export interface NewsSubtypesWithFilterProps {
 export const NewsSubtypesWithFilter = React.memo(
   (props: NewsSubtypesWithFilterProps) => {
     const { source, formikProps } = props
+    console.log(source)
     const idToNameMap = useReduxState(selectors.idToNameMapSelector)
 
     // A string filter that will be changed by text input.

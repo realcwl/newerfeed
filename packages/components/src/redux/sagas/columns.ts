@@ -9,11 +9,34 @@ import {
   takeEvery,
   takeLatest,
 } from 'typed-redux-saga'
-
+import axios, { AxiosResponse } from 'axios'
 import { emitter } from '../../libs/emitter'
 import * as actions from '../actions'
+import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
+import { ColumnCreation, constants } from '@devhub/core'
+import { WrapUrlWithToken } from '../../utils/api'
+
+// Helper function to extract all subSources to create a column.
+function ExtractSubSourcesFromColumnCreation(
+  payload: ColumnCreation,
+): string[] {
+  const subSources: string[] = []
+  for (const source of payload.sources) {
+    for (const subSource of source.subtypes) {
+      subSources.push(subSource)
+    }
+  }
+  return subSources
+}
+
+function EncodeDataExpressionFromColumnCreation(
+  payload: ColumnCreation,
+): string {
+  if (!payload.dataExpression) return '{}'
+  return JSON.stringify(payload)
+}
 
 // columnRefresher is a saga that indefinetly refresh columns if it's outdated.
 function* columnRefresher() {
@@ -49,21 +72,56 @@ function* columnRefresher() {
 function* onAddColumn(
   action: ExtractActionFromActionCreator<typeof actions.addColumn>,
 ) {
-  const columnId = action.payload.id
+  const placeHolderColumnId = action.payload.id
 
   if (AppState.currentState === 'active')
     yield* call(InteractionManager.runAfterInteractions)
 
   emitter.emit('FOCUS_ON_COLUMN', {
     animated: true,
-    columnId,
+    columnId: placeHolderColumnId,
     highlight: true,
     scrollTo: true,
   })
 
+  // TODO(chenweilunster): Call CreateFeed API before actually fetching anything
+  // and also Subscribe to the Feed on response.
+  yield* put(actions.setColumnLoading({ columnId: placeHolderColumnId }))
+
+  const appToken = yield* select(selectors.appTokenSelector)
+  const userId = yield* select(selectors.userIdSelector)
+  const createFeedResponse: AxiosResponse = yield axios.post(
+    WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+    {
+      query: jsonToGraphQLQuery({
+        mutation: {
+          createFeed: {
+            __args: {
+              input: {
+                userId: userId,
+                name: action.payload.title,
+                filterDataExpression: EncodeDataExpressionFromColumnCreation(
+                  action.payload,
+                ),
+                subSourceIds: ExtractSubSourcesFromColumnCreation(
+                  action.payload,
+                ),
+              },
+            },
+            id: true,
+            updatedAt: true,
+          },
+        },
+      }),
+    },
+  )
+
+  console.log(createFeedResponse)
+
   yield* put(
     actions.fetchColumnDataRequest({
-      columnId: columnId,
+      // TODO: Use real id
+      columnId: placeHolderColumnId,
       // Initial request for fetching data is always of direction "OLD"
       direction: 'OLD',
     }),
