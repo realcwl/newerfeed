@@ -146,6 +146,7 @@ export const columnsReducer: Reducer<State> = (
           draft.allIds[idx] = updatedId
         }
         draft.byId[updatedId] = draft.byId[prevId]
+        draft.byId[updatedId].id = updatedId
         delete draft.byId[prevId]
       })
     }
