@@ -27,11 +27,11 @@ function GetAvailableSourcesFromSourcesResponse(
   const res: NewsFeedColumnSource[] = []
   for (const source of sourcesResponse.data.sources) {
     const singleSource: NewsFeedColumnSource = {
-      source: source.id,
-      subSources: [],
+      sourceId: source.id,
+      subSourceIds: [],
     }
     for (const subSource of source.subsources) {
-      singleSource.subSources.push(subSource.id)
+      singleSource.subSourceIds.push(subSource.id)
     }
     res.push(singleSource)
   }

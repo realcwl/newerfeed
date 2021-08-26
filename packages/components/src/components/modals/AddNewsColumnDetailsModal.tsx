@@ -47,7 +47,7 @@ export const AddColumnDetailsModal = React.memo(
       selectors.availableNewsFeedSourcesSelector,
     )
     // Get all main sources.
-    const allSources = availableNewsFeedSources.map((source) => source.source)
+    const allSources = availableNewsFeedSources.map((source) => source.sourceId)
 
     const newsFeedColumnAttributes = selectors.columnSelector(
       store.getState(),
@@ -82,7 +82,7 @@ export const AddColumnDetailsModal = React.memo(
       }
 
       for (const columnSource of newsFeedColumnAttributes.sources) {
-        res[columnSource.source] = columnSource.subSources
+        res[columnSource.sourceId] = columnSource.subSourceIds
       }
       return {
         ...res,
@@ -182,7 +182,7 @@ export const AddColumnDetailsModal = React.memo(
       if (selected.length === 0) {
         return ''
       }
-      return ` (${selected.length}/${source.subSources.length})`
+      return ` (${selected.length}/${source.subSourceIds.length})`
     }
 
     // When submitting the form, extract sources and subtypes from the
@@ -194,8 +194,8 @@ export const AddColumnDetailsModal = React.memo(
       for (const key of allSources) {
         if (formValues[key].length === 0) continue
         sources.push({
-          source: key,
-          subSources: formValues[key],
+          sourceId: key,
+          subSourceIds: formValues[key],
         })
       }
       return sources
@@ -204,26 +204,26 @@ export const AddColumnDetailsModal = React.memo(
     // Renders Source and Sub sources. For example this could be Weibo with a
     // list of users.
     function renderSingleSourceOptions(source: NewsFeedColumnSource) {
-      const isOptionsOpened = openedSource === source.source
+      const isOptionsOpened = openedSource === source.sourceId
 
       return (
-        <View key={`add-news-column-details-source-${source.source}`}>
+        <View key={`add-news-column-details-source-${source.sourceId}`}>
           <TouchableWithoutFeedback
             onPress={() => {
-              formikProps.setFieldTouched(source.source)
+              formikProps.setFieldTouched(source.sourceId)
 
               // If we're clicking the already opened source, reset the
               // openedSource state and collapse all options. Otherwise we
               // should replace the openedSource.
-              setOpenedSource(isOptionsOpened ? '' : source.source)
+              setOpenedSource(isOptionsOpened ? '' : source.sourceId)
             }}
           >
             <View>
               <View style={[sharedStyles.flex, sharedStyles.horizontal]}>
                 <H3>
-                  {mapSourceIdToName(source.source, idToNameMap) +
+                  {mapSourceIdToName(source.sourceId, idToNameMap) +
                     getNumberOfSelectionLabel(
-                      formikProps.values[source.source],
+                      formikProps.values[source.sourceId],
                       source,
                     )}
                 </H3>
