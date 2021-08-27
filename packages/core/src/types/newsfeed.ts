@@ -48,10 +48,10 @@ export interface NewsFeedColumn extends BaseColumn {
 export interface NewsFeedColumnSource {
   // Source is a predefined list of information sources, such as "weibo",
   // "twitter", "caixin".
-  source: string
+  sourceId: string
 
   // Subtypes is a predefined list of subtypes of type string.
-  subtypes: string[]
+  subSourceIds: string[]
 }
 
 // Base column datastructure.

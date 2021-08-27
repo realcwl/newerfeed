@@ -10,8 +10,11 @@ export function setTheme(payload: {
   return createAction('SET_THEME', payload)
 }
 
-export function setAvailableNewsFeedSources(payload: NewsFeedColumnSource[]) {
-  return createAction('SET_AVAILABLE_NEWS_FEED_SOURCES', payload)
+export function setSourcesAndIdMap(payload: {
+  sources: NewsFeedColumnSource[]
+  idToNameMap: Record<string, string>
+}) {
+  return createAction('SET_SOURCES_AND_ID_MAP', payload)
 }
 
 export function setPreferrableTheme(payload: {

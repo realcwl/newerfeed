@@ -182,6 +182,7 @@ function* onLoginSuccess(
   _action: ExtractActionFromActionCreator<typeof actions.loginSuccess>,
 ) {}
 
+
 function* onAuthFailure(
   action: ExtractActionFromActionCreator<typeof actions.authFailure>,
 ) {
