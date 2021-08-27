@@ -144,10 +144,10 @@ export const columnsReducer: Reducer<State> = (
         const idx = draft.allIds.indexOf(prevId)
         if (idx > -1) {
           draft.allIds[idx] = updatedId
+          draft.byId[updatedId] = draft.byId[prevId]
+          draft.byId[updatedId].id = updatedId
+          delete draft.byId[prevId]
         }
-        draft.byId[updatedId] = draft.byId[prevId]
-        draft.byId[updatedId].id = updatedId
-        delete draft.byId[prevId]
       })
     }
     case 'FETCH_COLUMN_DATA_SUCCESS':
