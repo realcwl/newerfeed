@@ -13,3 +13,4 @@ yarn-error.log
 .gitpod.yml
 .nowignore
 .nosync
+.env
