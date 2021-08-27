@@ -142,12 +142,14 @@ export const columnsReducer: Reducer<State> = (
       return immer(state, (draft) => {
         const { prevId, updatedId } = action.payload
         const idx = draft.allIds.indexOf(prevId)
-        if (idx > -1) {
-          draft.allIds[idx] = updatedId
-          draft.byId[updatedId] = draft.byId[prevId]
-          draft.byId[updatedId].id = updatedId
-          delete draft.byId[prevId]
+        if (idx === -1) {
+          console.error('cannot find the original id: ' + prevId)
+          return
         }
+        draft.allIds[idx] = updatedId
+        draft.byId[updatedId] = draft.byId[prevId]
+        draft.byId[updatedId].id = updatedId
+        delete draft.byId[prevId]
       })
     }
     case 'FETCH_COLUMN_DATA_SUCCESS':
