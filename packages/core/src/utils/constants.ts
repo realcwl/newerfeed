@@ -66,7 +66,7 @@ export const GOOGLEPLAY_ID = 'com.devhubapp'
 export const APP_BASE_URL = 'https://app.devhubapp.com'
 export const DEVHUB_BETA_URL = 'https://beta.devhubapp.com'
 export const GRAPHQL_ENDPOINT = `${ENV_API_BASE_URL}/graphql`
-export const GRAPHQL_SUBSCRIPTION_ENDPOINT = `wss://${ENV_API_BASE_URL}/subscription`
+export const GRAPHQL_SUBSCRIPTION_ENDPOINT = `ws://${ENV_API_BASE_URL}/subscription`
 
 const LANDING_BASE_URL = 'https://devhubapp.com'
 export const DEVHUB_LINKS = {
