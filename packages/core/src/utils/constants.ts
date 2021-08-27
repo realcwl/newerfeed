@@ -2,6 +2,14 @@ import { ThemeName, ThemePair } from '../types'
 
 const pkg = require('../../package.json') // eslint-disable-line
 
+export let ENV_API_BASE_URL = ''
+import { Platform } from 'react-native'
+if (Platform.OS === 'ios') {
+  ENV_API_BASE_URL = 'localhost:8080'
+} else {
+  ENV_API_BASE_URL = process.env.API_BASE_URL as string
+}
+
 export const APP_VERSION = `${pkg.version || ''}`.replace(/\-\d+$/g, '')
 
 const _window = typeof window !== 'undefined' ? window : undefined
@@ -39,6 +47,7 @@ export const FULL_ACCESS_GITHUB_OAUTH_SCOPES =
 
 // unfortunately github permissions are still not granular enough.
 // code permission is required to support some events, e.g. commits
+// TODO(boning): replace all constants with dotenv
 export const GITHUB_APP_HAS_CODE_ACCESS = true
 
 export const ENABLE_GITHUB_OAUTH_SUPPORT = true
@@ -52,11 +61,9 @@ export const GOOGLEPLAY_ID = 'com.devhubapp'
 
 export const APP_BASE_URL = 'https://app.devhubapp.com'
 export const DEVHUB_BETA_URL = 'https://beta.devhubapp.com'
-export const API_BASE_URL = 'https://api.devhubapp.com'
-export const GRAPHQL_ENDPOINT = `${API_BASE_URL}/graphql`
-export const DEV_GRAPHQL_ENDPOINT = 'http://localhost:8080/graphql'
-export const DEV_GRAPHQL_SUBSCRIPTION_ENDPOINT =
-  'ws://localhost:8080/subscription'
+export const GRAPHQL_ENDPOINT = `${ENV_API_BASE_URL}/graphql`
+export const GRAPHQL_SUBSCRIPTION_ENDPOINT = `${ENV_API_BASE_URL}/subscription`
+
 const LANDING_BASE_URL = 'https://devhubapp.com'
 export const DEVHUB_LINKS = {
   LANDING_PAGE_HOME: LANDING_BASE_URL,

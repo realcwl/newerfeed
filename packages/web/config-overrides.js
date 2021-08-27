@@ -1,11 +1,12 @@
 const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
-  .BundleAnalyzerPlugin
+const BundleAnalyzerPlugin =
+  require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 const appDirectory = fs.realpathSync(process.cwd())
 const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath)
+const dotenv = require('dotenv')
 
 const appIncludes = [
   resolveApp('src'),
@@ -30,7 +31,16 @@ module.exports = function override(config, env) {
     require.resolve('babel-plugin-react-native-web'),
   )
 
-  config.plugins.push(new webpack.DefinePlugin({ __DEV__ }))
+  const envs = dotenv.config({ path: '../../.env' }).parsed
+  let formatted = {}
+  for (const [key, value] of Object.entries(envs)) {
+    formatted[key] = JSON.stringify(value)
+  }
+
+  // use webpack to public dotenv variables to frontend
+  config.plugins.push(
+    new webpack.DefinePlugin({ __DEV__, 'process.env': formatted }),
+  )
 
   config.plugins.push(
     new BundleAnalyzerPlugin({

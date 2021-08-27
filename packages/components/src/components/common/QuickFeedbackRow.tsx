@@ -38,7 +38,7 @@ export function QuickFeedbackRow(_props: QuickFeedbackRowProps) {
 
   async function trySendFeedback() {
     const response = await axios.post(
-      `${constants.API_BASE_URL}/feedback`,
+      `${constants.ENV_API_BASE_URL}/feedback`,
       {
         feedback: feedbackText || '',
         location:
