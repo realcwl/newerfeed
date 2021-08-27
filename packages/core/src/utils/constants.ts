@@ -4,7 +4,11 @@ const pkg = require('../../package.json') // eslint-disable-line
 
 export let ENV_API_BASE_URL = ''
 import { Platform } from 'react-native'
-if (Platform.OS === 'ios') {
+// TODO(boning): compared with react(web) and golang, react native dotenv is not well supported.
+// The only package is not well implemented with quite a few issues
+// github.com/goatandsheep/react-native-dotenv
+// Will work on iOS dotenv in the future when needed(ex. when we have CI/CD for iOS)
+https: if (Platform.OS === 'ios') {
   ENV_API_BASE_URL = 'localhost:8080'
 } else {
   ENV_API_BASE_URL = process.env.API_BASE_URL as string
