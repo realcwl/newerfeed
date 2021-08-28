@@ -9,11 +9,34 @@ import {
   takeEvery,
   takeLatest,
 } from 'typed-redux-saga'
-
+import axios, { AxiosResponse } from 'axios'
 import { emitter } from '../../libs/emitter'
 import * as actions from '../actions'
+import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
+import { ColumnCreation, constants } from '@devhub/core'
+import { WrapUrlWithToken } from '../../utils/api'
+
+// Helper function to extract all subSources to create a column.
+function ExtractSubSourceIdsFromColumnCreation(
+  payload: ColumnCreation,
+): string[] {
+  const subSourceIds: string[] = []
+  for (const source of payload.sources) {
+    for (const subSourceId of source.subSourceIds) {
+      subSourceIds.push(subSourceId)
+    }
+  }
+  return subSourceIds
+}
+
+function EncodeDataExpressionFromColumnCreation(
+  payload: ColumnCreation,
+): string {
+  if (!payload.dataExpression) return ''
+  return JSON.stringify(payload)
+}
 
 // columnRefresher is a saga that indefinetly refresh columns if it's outdated.
 function* columnRefresher() {
@@ -49,21 +72,97 @@ function* columnRefresher() {
 function* onAddColumn(
   action: ExtractActionFromActionCreator<typeof actions.addColumn>,
 ) {
-  const columnId = action.payload.id
+  const placeHolderColumnId = action.payload.id
 
   if (AppState.currentState === 'active')
     yield* call(InteractionManager.runAfterInteractions)
 
   emitter.emit('FOCUS_ON_COLUMN', {
     animated: true,
-    columnId,
+    columnId: placeHolderColumnId,
     highlight: true,
     scrollTo: true,
   })
 
-  yield* put(
+  yield* put(actions.setColumnLoading({ columnId: placeHolderColumnId }))
+
+  const appToken = yield* select(selectors.appTokenSelector)
+  const userId = yield* select(selectors.userIdSelector)
+
+  let updatedId = ''
+  try {
+    // 1. Create Feed and get new feed Id
+    const createFeedResponse: AxiosResponse = yield axios.post(
+      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+      {
+        query: jsonToGraphQLQuery({
+          mutation: {
+            createFeed: {
+              __args: {
+                input: {
+                  userId: userId,
+                  name: action.payload.title,
+                  filterDataExpression: EncodeDataExpressionFromColumnCreation(
+                    action.payload,
+                  ),
+                  subSourceIds: ExtractSubSourceIdsFromColumnCreation(
+                    action.payload,
+                  ),
+                },
+              },
+              id: true,
+              updatedAt: true,
+            },
+          },
+        }),
+      },
+    )
+    const { id, updatedAt } = createFeedResponse.data.data.createFeed
+    updatedId = id
+
+    // 2. Subscribe to that feed.
+    const subscribeFeedResponse: AxiosResponse = yield axios.post(
+      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+      {
+        query: jsonToGraphQLQuery({
+          mutation: {
+            subscribe: {
+              __args: {
+                input: {
+                  userId: userId,
+                  feedId: updatedId,
+                },
+              },
+              id: true,
+            },
+          },
+        }),
+      },
+    )
+  } catch (err) {
+    const allIds = yield* select(selectors.columnIdsSelector)
+    const columnIndex = allIds.indexOf(placeHolderColumnId)
+    yield put(
+      actions.deleteColumn({ columnId: placeHolderColumnId, columnIndex }),
+    )
+
+    // TODO(chenweilunster): Also call deleteFeed() to handle the case where
+    // Feed is created successfully, while subscribe fails. Also show error
+    // banner with reason.
+    return
+  }
+
+  // Update column id to be the id returned from backend.
+  yield put(
+    actions.updateColumnId({
+      prevId: placeHolderColumnId,
+      updatedId: updatedId,
+    }),
+  )
+
+  yield put(
     actions.fetchColumnDataRequest({
-      columnId: columnId,
+      columnId: updatedId,
       // Initial request for fetching data is always of direction "OLD"
       direction: 'OLD',
     }),

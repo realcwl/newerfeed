@@ -136,6 +136,18 @@ export function changeIssueNumberFilter(payload: {
   return createAction('CHANGE_ISSUE_NUMBER_FILTER', payload)
 }
 
+// updateColumnId should only be called when creating a new feed. Frontend will
+// create a placeholder guid for fast response when user creates a column. Then,
+// once the backend responded with a new uuid, frontend should update the
+// columnId correspondingly.
+export function updateColumnId(payload: { prevId: string; updatedId: string }) {
+  return createAction('UPDATE_COLUMN_ID', payload)
+}
+
+export function setColumnLoading(payload: { columnId: string }) {
+  return createAction('SET_COLUMN_LOADING', payload)
+}
+
 export function fetchColumnDataRequest(payload: {
   // columnId is the subject column we're fetching data for
   columnId: string

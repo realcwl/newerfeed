@@ -133,10 +133,25 @@ export const columnsReducer: Reducer<State> = (
         })
       })
     case 'FETCH_COLUMN_DATA_REQUEST':
+    case 'SET_COLUMN_LOADING':
       return immer(state, (draft) => {
         const { columnId } = action.payload
         draft.byId[columnId].state = 'loading'
       })
+    case 'UPDATE_COLUMN_ID': {
+      return immer(state, (draft) => {
+        const { prevId, updatedId } = action.payload
+        const idx = draft.allIds.indexOf(prevId)
+        if (idx === -1) {
+          console.error('cannot find the original id: ' + prevId)
+          return
+        }
+        draft.allIds[idx] = updatedId
+        draft.byId[updatedId] = draft.byId[prevId]
+        draft.byId[updatedId].id = updatedId
+        delete draft.byId[prevId]
+      })
+    }
     case 'FETCH_COLUMN_DATA_SUCCESS':
       return immer(state, (draft) => {
         const {
