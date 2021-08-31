@@ -61,7 +61,6 @@ function* init() {
             if (err) {
               reject(err)
             }
-            console.log(data)
             resolve({ data })
           },
         )
