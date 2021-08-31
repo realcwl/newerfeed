@@ -23,6 +23,7 @@ import userPool from '../../libs/auth/userPool'
 import axios, { AxiosResponse } from 'axios'
 import { WrapUrlWithToken } from '../../utils/api'
 import { constants } from '@devhub/core'
+import { RootState } from '../types'
 
 function* init() {
   yield take('LOGIN_SUCCESS')
@@ -32,9 +33,17 @@ function* init() {
     const lastAuthTime = yield* select(selectors.lastAuthTimeSelector)
     const currentUser = yield* select(selectors.currentUserSelector)
     const refreshToken = yield* select(selectors.refreshTokenSelector)
-    if (!currentUser || !refreshToken) {
-      yield put(actions.authFailure(Error('login credential expired')))
-      continue
+
+    // User signed out, directly return
+    if (!currentUser) return
+
+    if (!refreshToken) {
+      yield put(
+        actions.authFailure(
+          Error('login credential not found, please login again'),
+        ),
+      )
+      return
     }
 
     const fourtyFiveMinutes = 1000 * 60 * 5
@@ -81,10 +90,25 @@ function* init() {
 }
 
 function* onRehydrate() {
-  const appToken = yield* select(selectors.appTokenSelector)
-  if (!appToken) return
+  const state: RootState = yield* select()
+  const auth = state.auth
+  if (!auth.appToken || !auth.refreshToken || !auth.user) {
+    yield put(
+      actions.authFailure(
+        Error('login credential not found, please login again'),
+      ),
+    )
+    return
+  }
 
-  // yield put(actions.loginRequest({}))
+  yield put(
+    actions.loginSuccess({
+      appToken: auth.appToken,
+      refreshToken: auth.refreshToken,
+      user: auth.user,
+      lastAuthTime: auth.lastAuthTime,
+    }),
+  )
 }
 
 function* onLoginRequest(
