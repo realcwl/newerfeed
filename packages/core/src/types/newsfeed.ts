@@ -17,6 +17,12 @@ export interface NewsFeedColumn extends BaseColumn {
   // Constant defined in another place.
   type: NewsFeedColumnType
 
+  // column icon to render in SideOrBottomBar
+  icon: {
+    family: string
+    name: string
+  }
+
   // itemListIds is a list containing all Newsfeed data that are going to be
   // rendered inside this column. Only data ids are stored, the actual data
   // should be retrieved from the data reducer.
