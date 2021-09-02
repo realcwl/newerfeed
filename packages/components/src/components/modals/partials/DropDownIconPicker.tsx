@@ -1,19 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useState, useRef } from 'react'
 import {
-  contentPadding,
-  normalTextSize,
-  avatarSize,
-  scaleFactor,
-} from '../../../styles/variables'
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Modal,
+  ScrollView,
+} from 'react-native'
+import { avatarSize, scaleFactor } from '../../../styles/variables'
 import { ThemedIcon, ThemedIconProps } from '../../themed/ThemedIcon'
-import { ThemedText, ThemedTextProps } from '../../themed/ThemedText'
 import { sharedStyles } from '../../../styles/shared'
 import { getThemeColorOrItself } from '../../themed/helpers'
 import { useTheme } from '../../context/ThemeContext'
 import { useFormik } from 'formik'
-import { Modal, ScrollView } from 'react-native-web'
-import { ScrollViewWithOverlay } from '../../common/ScrollViewWithOverlay'
 
 // All possible icons that user can select as the column icon for uniqueness.
 // We provide only limited set of icons so that user will not be overwhelmed
