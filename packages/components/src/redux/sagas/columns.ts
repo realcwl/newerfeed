@@ -97,7 +97,7 @@ function* onAddColumn(
       {
         query: jsonToGraphQLQuery({
           mutation: {
-            createFeed: {
+            upsertFeed: {
               __args: {
                 input: {
                   userId: userId,
@@ -111,13 +111,12 @@ function* onAddColumn(
                 },
               },
               id: true,
-              updatedAt: true,
             },
           },
         }),
       },
     )
-    const { id, updatedAt } = createFeedResponse.data.data.createFeed
+    const { id } = createFeedResponse.data.data.upsertFeed
     updatedId = id
 
     // 2. Subscribe to that feed.
@@ -140,6 +139,7 @@ function* onAddColumn(
       },
     )
   } catch (err) {
+    console.error(err)
     const allIds = yield* select(selectors.columnIdsSelector)
     const columnIndex = allIds.indexOf(placeHolderColumnId)
     yield put(
@@ -200,18 +200,48 @@ function* onDeleteColumn(
   action: ExtractActionFromActionCreator<typeof actions.deleteColumn>,
 ) {
   const ids: string[] = yield* select(selectors.columnIdsSelector)
-  if (!(ids && ids.length)) return
+  if (ids && ids.length) {
+    // Fixes blank screen on Android after removing the last column.
+    // If removed the last column,
+    // scroll to the new last valid column
+    if (action.payload.columnIndex > ids.length - 1) {
+      emitter.emit('FOCUS_ON_COLUMN', {
+        animated: false,
+        columnId: ids[ids.length - 1],
+        highlight: false,
+        scrollTo: true,
+      })
+    }
+  }
 
-  // Fixes blank screen on Android after removing the last column.
-  // If removed the last column,
-  // scroll to the new last valid column
-  if (action.payload.columnIndex > ids.length - 1) {
-    emitter.emit('FOCUS_ON_COLUMN', {
-      animated: false,
-      columnId: ids[ids.length - 1],
-      highlight: false,
-      scrollTo: true,
-    })
+  // call backend for feed deletion.
+  const appToken = yield* select(selectors.appTokenSelector)
+  const userId = yield* select(selectors.userIdSelector)
+  try {
+    const deleteFeedResponse: AxiosResponse = yield axios.post(
+      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+      {
+        query: jsonToGraphQLQuery({
+          mutation: {
+            deleteFeed: {
+              __args: {
+                input: {
+                  userId: userId,
+                  feedId: action.payload.columnId,
+                },
+              },
+              id: true,
+            },
+          },
+        }),
+      },
+    )
+  } catch (err) {
+    // intentionally not handling delete feed error. Reason being that fail to
+    // delete won't be a big problem. The feed might comeback in the next
+    // seedState push, but user could just try again to force the delete.
+    // Otherwise, we'll need to handle a very complex delete-reversion.
+    console.error('fail to delete feed ', action.payload.columnId, err)
   }
 }
 
