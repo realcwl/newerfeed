@@ -116,6 +116,15 @@ export const columnsReducer: Reducer<State> = (
           const columnCreation: ColumnCreation = {
             title: v.name,
             type: 'COLUMN_TYPE_NEWS_FEED',
+            icon: {
+              // TODO(chenweilunster): Since SeedState doesn't include icon as
+              // of today, for newly added feeds, we don't really know the icon
+              // for them, thus using default rss-feed instead. Later we should
+              // change this to be deduct from seedState once icon information
+              // is included.
+              family: 'material',
+              name: 'rss-feed',
+            },
             id: v.id,
             itemListIds: [],
             firstItemId: '',

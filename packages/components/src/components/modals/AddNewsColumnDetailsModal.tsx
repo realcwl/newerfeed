@@ -21,6 +21,7 @@ import { Separator } from '../common/Separator'
 import { Spacer } from '../common/Spacer'
 import { SubHeader } from '../common/SubHeader'
 import { TouchableWithoutFeedback } from '../common/TouchableWithoutFeedback'
+import { DropDownIconPicker } from './partials/DropDownIconPicker'
 import { DialogConsumer, DialogProviderState } from '../context/DialogContext'
 import { useAppLayout } from '../context/LayoutContext'
 import { ThemedIcon } from '../themed/ThemedIcon'
@@ -65,6 +66,11 @@ export const AddColumnDetailsModal = React.memo(
         // Create a creator expression by default.
         dataExpression: {
           id: guid(),
+        },
+        // Default icon is always material.rss-feed.
+        icon: {
+          family: 'material',
+          name: 'rss-feed',
         },
       }
       for (const source of allSources) {
@@ -111,6 +117,7 @@ export const AddColumnDetailsModal = React.memo(
         // Create a empty column.
         const columnCreation: ColumnCreation = {
           title: formValues['name'],
+          icon: formValues['icon'],
           type: 'COLUMN_TYPE_NEWS_FEED',
           id: columnId ? columnId : guid(),
           itemListIds: [],
@@ -388,6 +395,9 @@ export const AddColumnDetailsModal = React.memo(
                 <View style={sharedStyles.fullWidth}>
                   {renderSourceAndSubtypesSelectors()}
                 </View>
+
+                {renderHeader('Column Icon (Optional)')}
+                <DropDownIconPicker data={[]} formikProps={formikProps} />
 
                 {renderHeader('News Expression (Optional)')}
                 <View style={sharedStyles.fullWidth}>
