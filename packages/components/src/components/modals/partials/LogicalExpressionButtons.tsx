@@ -41,11 +41,15 @@ export function renderButtonByTextAndKey(props: renderButtonSettings) {
         label={text}
         colors={{
           backgroundHoverThemeColor: color,
-          backgroundThemeColor: color,
+          backgroundThemeColor: color
+            ? color
+            : theme.isDark
+            ? 'blueGray'
+            : undefined,
           foregroundThemeColor: color
             ? 'black'
             : theme.isDark
-            ? 'gray'
+            ? 'white'
             : 'black',
           foregroundHoverThemeColor: theme.isDark ? 'white' : 'black',
         }}
