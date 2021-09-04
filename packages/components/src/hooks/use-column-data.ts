@@ -24,7 +24,6 @@ function dataMatchesFilters(
 ): boolean {
   const { query } = filters
   if (!!query && !dataMatchesQuery(data, query)) {
-    console.log(query)
     return false
   }
   return true
