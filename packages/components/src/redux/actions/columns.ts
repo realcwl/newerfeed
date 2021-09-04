@@ -92,6 +92,13 @@ export function replaceColumnOwnerFilter(payload: {
   return createAction('REPLACE_COLUMN_OWNER_FILTER', payload)
 }
 
+export function replaceColumnFilters(payload: {
+  columnId: string
+  filter: ColumnFilter
+}) {
+  return createAction('REPLACE_COLUMN_FILTER', payload)
+}
+
 export function setColumnOwnerFilter(payload: {
   columnId: string
   owner: string
