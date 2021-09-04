@@ -136,7 +136,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
 
       return (
         <EmptyCards
-          clearMessage="No activity"
+          clearMessage="No new feed"
           columnId={columnId}
           disableLoadingIndicator={false}
           errorMessage={errorMessage}

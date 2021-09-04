@@ -1,13 +1,33 @@
-import { NewsFeedData } from '@devhub/core'
+import { ColumnFilter, NewsFeedData } from '@devhub/core'
 import _ from 'lodash'
 import { useCallback, useMemo, useRef } from 'react'
 
 import * as selectors from '../redux/selectors'
 import { EMPTY_ARRAY } from '../utils/constants'
-import { getItemNodeIdOrId } from '../utils/helpers/shared'
 import { useColumn } from './use-column'
 import { usePreviousRef } from './use-previous-ref'
 import { useReduxState } from './use-redux-state'
+
+// A match is considered as query string is a substring of either title or text.
+function dataMatchesQuery(data: NewsFeedData, query: string): boolean {
+  if (!query) return true
+  return (
+    (!!data.text && data.text.includes(query)) ||
+    (!!data.title && data.title.includes(query))
+  )
+}
+
+// The core matching function, for now it matches by text
+function dataMatchesFilters(
+  data: NewsFeedData,
+  filters: ColumnFilter,
+): boolean {
+  const { query } = filters
+  if (!!query && !dataMatchesQuery(data, query)) {
+    return false
+  }
+  return true
+}
 
 export function useColumnData<ItemT extends NewsFeedData>(
   columnId: string,
@@ -34,7 +54,12 @@ export function useColumnData<ItemT extends NewsFeedData>(
   const allItemsIds = useMemo(() => _allItemsIds, [_allItemsIds.join(',')])
 
   const filteredItemsIds = useMemo(() => {
-    return allItemsIds
+    const filters = column?.filters
+    if (!filters) return allItemsIds
+    return allItemsIds.filter((id) => {
+      const data = dataByNodeIdOrId[id]
+      return dataMatchesFilters(data, filters)
+    })
   }, [
     allItemsIds,
     column && column.filters,

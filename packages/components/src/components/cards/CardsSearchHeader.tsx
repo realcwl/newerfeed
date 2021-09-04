@@ -86,6 +86,14 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
     },
     onSubmit(values) {
       if (!column) return
+      dispatch(
+        actions.replaceColumnFilters({
+          columnId: column.id,
+          filter: {
+            query: values.query,
+          },
+        }),
+      )
     },
   })
 

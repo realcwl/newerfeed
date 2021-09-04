@@ -141,6 +141,11 @@ export const columnsReducer: Reducer<State> = (
             normalized.byId[normalized.allIds[0]]
         })
       })
+    case 'REPLACE_COLUMN_FILTER':
+      return immer(state, (draft) => {
+        const { columnId, filter } = action.payload
+        draft.byId[columnId].filters = filter
+      })
     case 'FETCH_COLUMN_DATA_REQUEST':
     case 'SET_COLUMN_LOADING':
       return immer(state, (draft) => {
