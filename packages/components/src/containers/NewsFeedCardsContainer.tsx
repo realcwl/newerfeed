@@ -58,7 +58,6 @@ export const NewsFeedCardsContainer = React.memo(
         columnId={columnId}
         errorMessage={''}
         fetchNextPage={() => {
-          console.log('load more')
           dispatch(
             actions.fetchColumnDataRequest({
               columnId,
