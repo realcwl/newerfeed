@@ -15,8 +15,8 @@ export function normalizeColumns(
 
     byId[id] = immer(column, (draft) => {
       draft.id = id
-      draft.createdAt = column.createdAt || 0
-      draft.updatedAt = column.updatedAt || 0
+      draft.createdAt = column.createdAt || new Date().toISOString()
+      draft.updatedAt = column.updatedAt || new Date().toISOString()
     }) as Column
 
     return id

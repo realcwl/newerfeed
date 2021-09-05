@@ -1,6 +1,12 @@
 import _ from 'lodash'
 
-import { Column, ColumnCreation, normalizeColumns } from '@devhub/core'
+import {
+  Column,
+  ColumnCreation,
+  NewsFeedColumn,
+  NewsFeedData,
+  normalizeColumns,
+} from '@devhub/core'
 import { Reducer } from '../types'
 import immer from 'immer'
 
@@ -19,6 +25,47 @@ export interface State {
 const initialState: State = {
   allIds: [],
   byId: {},
+}
+
+// Update the cursor window for this column
+function updateColumnCursor(
+  column: NewsFeedColumn,
+  data: NewsFeedData[],
+  dataByNodeId: Record<string, NewsFeedData>,
+): void {
+  if (data.length === 0) return
+
+  let maxCursor = -1,
+    minCursor = Number.MAX_SAFE_INTEGER,
+    maxIdx = -1,
+    minIdx = -1
+  for (let idx = 0; idx < data.length; idx++) {
+    if (data[idx].cursor > maxCursor) {
+      maxCursor = data[idx].cursor
+      maxIdx = idx
+    }
+    if (data[idx].cursor < minCursor) {
+      minCursor = data[idx].cursor
+      minIdx = idx
+    }
+  }
+
+  // Either cursor item doesn't exist (empty string), or exist but smaller/
+  // larger than the returning data's cursor.
+  if (
+    !column.newestItemId ||
+    (dataByNodeId[column.newestItemId] &&
+      dataByNodeId[column.newestItemId].cursor < maxCursor)
+  ) {
+    column.newestItemId = data[maxIdx].id
+  }
+  if (
+    !column.oldestItemId ||
+    (dataByNodeId[column.oldestItemId] &&
+      dataByNodeId[column.oldestItemId].cursor > minCursor)
+  ) {
+    column.oldestItemId = data[minIdx].id
+  }
 }
 
 export const columnsReducer: Reducer<State> = (
@@ -127,8 +174,8 @@ export const columnsReducer: Reducer<State> = (
             },
             id: v.id,
             itemListIds: [],
-            firstItemId: '',
-            lastItemId: '',
+            newestItemId: '',
+            oldestItemId: '',
             sources: [],
             state: 'not_loaded',
             dataExpression: undefined,
@@ -179,6 +226,8 @@ export const columnsReducer: Reducer<State> = (
           direction,
           dropExistingData,
           dataExpression,
+          sources,
+          dataByNodeId,
         } = action.payload
 
         const column = draft.byId[columnId]
@@ -187,21 +236,26 @@ export const columnsReducer: Reducer<State> = (
         // if explicit drop is requested, we should clear all the data ids
         column.itemListIds = dropExistingData ? [] : column.itemListIds
 
-        // append of insert front based on the direction.
-        data.forEach((d) => {
-          direction == 'NEW'
-            ? column.itemListIds.unshift(d.id)
-            : column.itemListIds.push(d.id)
-        })
+        // update cursor
+        updateColumnCursor(column, data, dataByNodeId)
 
-        // if data expression or filters is used, update them.
+        // append of insert front based on the direction. Assuming there's no
+        // overlap between returned data and original data.
+        if (direction == 'NEW') {
+          column.itemListIds = data.map((d) => d.id).concat(column.itemListIds)
+        } else {
+          column.itemListIds.concat(data.map((d) => d.id))
+        }
+
+        // if data expression or sources is returned, update them.
         column.dataExpression = dataExpression
           ? dataExpression
           : column.dataExpression
+        column.sources = sources ? sources : column.sources
 
         // update the updatedAt timestamp.
         column.updatedAt = updatedAt
-        column.refreshedAt = Date.now()
+        column.refreshedAt = new Date().toISOString()
         column.state = 'loaded'
       })
     default:

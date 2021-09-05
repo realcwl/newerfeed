@@ -217,7 +217,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     height,
 
     author,
-    timestamp,
+    time,
     isRead,
     isSaved: isSaved,
     link,
@@ -226,7 +226,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     title,
     type,
   } = props
-
+  const timestamp = Date.parse(time)
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
 
   const [textShown, setTextShown] = useState(true)

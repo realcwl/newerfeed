@@ -28,11 +28,11 @@ export interface NewsFeedColumn extends BaseColumn {
   // should be retrieved from the data reducer.
   itemListIds: string[]
 
-  // Id of the last item (earliest item) in this column.
-  lastItemId: string
+  // Id of the last item (oldest item) in this column.
+  oldestItemId: string
 
-  // Id of the first item (latest item) in this column.
-  firstItemId: string
+  // Id of the first item (newest item) in this column.
+  newestItemId: string
 
   // Each news column must also have multiple News Sources. Each source is
   // comprised of main type and subtype. E.g. (Weibo, <user_id>).
@@ -68,10 +68,10 @@ export interface BaseColumn {
   title: string
 
   // Last update time in timestamp in micro seconds.
-  updatedAt: number
+  updatedAt: string
 
   // timestamp of the last refresh in micro seconds.
-  refreshedAt: number
+  refreshedAt: string
 
   // the current state of the column.
   state: LoadState
@@ -148,7 +148,7 @@ export interface Avatar {
   imageURL?: string
 }
 
-export interface Author {
+export interface SubSource {
   avatar?: Avatar
   name: string
   profileURL?: string
@@ -160,17 +160,17 @@ export interface NewsFeedData {
   title?: string
   // message shown to user.
   text?: string
-  // author info, ex. weibo/twitter users
-  author?: Author
+  // author info, aka subsource, ex. weibo/twitter users
+  subSource?: SubSource
   // if this is not null, user can click a card to go to original page.
   url?: string
   // A list of attachment that will be rendered together with this card.
   attachments?: Attachment[]
   // This is the timestamp of original post
-  postTimestamp?: Date
+  postTime?: string
   // We might not be able to get postTimestamp
   // in which case we use crawledTimestamp as alternative
-  crawledTimestamp: Date
+  crawledTime?: string
   // It is a linked list of all repost/retweet
   repostedFrom?: NewsFeedData
   // When this field is a string,
@@ -178,6 +178,8 @@ export interface NewsFeedData {
   parentId?: string
   // Put all deplicate children messages.
   duplicateIds?: string[]
+  // cursor associated with this feed that backend uses.
+  cursor: number
   // Indicate that whether this item is already saved by user.
   isSaved: boolean
   // Indicate whether this card has been read by the user.
@@ -330,9 +332,14 @@ export type GenericColumnCreation<ColumnType extends NewsFeedColumn> = Omit<
   ColumnType,
   'createdAt' | 'updatedAt' | 'refreshedAt'
 > & {
+<<<<<<< HEAD
   isUpdate?: boolean
   createdAt?: number
   updatedAt?: number
+=======
+  createdAt?: string
+  updatedAt?: string
+>>>>>>> ddf5f6f (load more - call backend)
 }
 
 // Identifies a column creation activity for a news feed column.

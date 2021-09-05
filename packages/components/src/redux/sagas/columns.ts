@@ -12,11 +12,114 @@ import {
 import axios, { AxiosResponse } from 'axios'
 import { emitter } from '../../libs/emitter'
 import * as actions from '../actions'
-import { jsonToGraphQLQuery } from 'json-to-graphql-query'
+import { jsonToGraphQLQuery, EnumType } from 'json-to-graphql-query'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
-import { ColumnCreation, constants, NewsFeedColumnCreation } from '@devhub/core'
+import {
+  ColumnCreation,
+  constants,
+  guid,
+  NewsFeedColumn,
+  NewsFeedColumnCreation,
+  NewsFeedColumnSource,
+  NewsFeedData,
+  NewsFeedDataExpressionWrapper,
+} from '@devhub/core'
 import { WrapUrlWithToken } from '../../utils/api'
+import { EMPTY_ARRAY } from '@devhub/core/src/utils/constants'
+import { string } from 'yup'
+
+interface FeedsResponse {
+  data: {
+    feeds: {
+      id: string
+      updatedAt: string
+      name: string
+      filterDataExpression: string
+      subSources: {
+        id: string
+        source: {
+          id: string
+        }
+      }[]
+      posts: {
+        id: string
+        title: string
+        content: string
+        cursor: number
+        subSource: {
+          id: string
+          iconUrl: string
+        }
+        imageUrls: string[]
+        contentGeneratedAt: string
+        crawledAt: string
+      }[]
+    }[]
+  }
+}
+
+// clean data when:
+// 1. mismatch updatedAt
+// 2. post.length == limit
+function shouldDropExistingData(
+  response: FeedsResponse,
+  originalUpdatedAt: string,
+  currentUpdatedAt: string,
+): boolean {
+  if (response.data.feeds.length === 0) return false
+  return (
+    originalUpdatedAt != currentUpdatedAt ||
+    response.data.feeds[0].posts.length === constants.FEED_FETCH_LIMIT
+  )
+}
+
+function convertFeedsResponseToSources(response: FeedsResponse) {
+  let sources: NewsFeedColumnSource[] = []
+  if (response.data.feeds.length === 0) return sources
+  for (let subSource of response.data.feeds[0].subSources) {
+    const source = sources.find((s) => s.sourceId == subSource.source.id)
+    if (source) {
+      source.subSourceIds.push(subSource.id)
+      continue
+    }
+    sources.push({
+      sourceId: subSource.source.id,
+      subSourceIds: [subSource.id],
+    })
+  }
+}
+
+function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
+  if (response.data.feeds.length === 0) return EMPTY_ARRAY
+  return response.data.feeds[0].posts.map((post) => {
+    let newsFeedData: NewsFeedData = {
+      id: post.id,
+      title: post.title,
+      text: post.content,
+      crawledTime: post.crawledAt,
+      postTime: post.contentGeneratedAt ? post.contentGeneratedAt : undefined,
+      cursor: post.cursor,
+      isRead: false,
+      isSaved: false,
+      attachments: post.imageUrls.map((url) => {
+        return {
+          id: url,
+          dataType: 'img',
+          url: url,
+        }
+      }),
+    }
+    return newsFeedData
+  })
+}
+
+function stringToDataExpressionWrapper(
+  jsonString: string,
+): NewsFeedDataExpressionWrapper {
+  const wrapper: NewsFeedDataExpressionWrapper = JSON.parse(jsonString)
+  return wrapper
+}
 
 // Helper function to extract all subSources to create a column.
 function ExtractSubSourceIdsFromColumnCreation(
@@ -85,7 +188,67 @@ function EncodeDataExpressionFromColumnCreation(
   payload: ColumnCreation,
 ): string {
   if (!payload.dataExpression) return ''
-  return JSON.stringify(payload)
+  return JSON.stringify(payload.dataExpression)
+}
+
+function constructFeedRequest(
+  userId: string,
+  column: NewsFeedColumn,
+  direction: 'NEW' | 'OLD',
+  dataByNodeId: Record<string, NewsFeedData>,
+): string {
+  const { updatedAt } = column
+  let cursor = -1
+  if (direction == 'NEW') {
+    const data = dataByNodeId[column.newestItemId]
+    if (data) cursor = data.cursor
+  } else {
+    cursor = Number.MAX_SAFE_INTEGER
+    const data = dataByNodeId[column.oldestItemId]
+    if (data) cursor = data.cursor
+  }
+  return jsonToGraphQLQuery({
+    query: {
+      feeds: {
+        __args: {
+          input: {
+            userId: userId,
+            feedRefreshInputs: [
+              {
+                feedId: column.id,
+                limit: constants.FEED_FETCH_LIMIT,
+                cursor: cursor,
+                direction: new EnumType(direction),
+                feedUpdatedTime: new Date(updatedAt).toISOString(),
+              },
+            ],
+          },
+        },
+        id: true,
+        updatedAt: true,
+        name: true,
+        posts: {
+          id: true,
+          title: true,
+          content: true,
+          cursor: true,
+          subSource: {
+            id: true,
+            iconUrl: true,
+          },
+          imageUrls: true,
+          contentGeneratedAt: true,
+        },
+        subSources: {
+          id: true,
+          source: {
+            id: true,
+          },
+        },
+        filterDataExpression: true,
+      },
+    },
+  })
 }
 
 // columnRefresher is a saga that indefinetly refresh columns if it's outdated.
@@ -102,7 +265,8 @@ function* columnRefresher() {
       allColumnsWithRefreshTime.map(function* (columnWithRefreshTime) {
         if (!columnWithRefreshTime) return
         const oneMinutes = 1000 * 60 * 1
-        const timeDiff = Date.now() - columnWithRefreshTime.refreshedAt
+        const timeDiff =
+          Date.now() - Date.parse(columnWithRefreshTime.refreshedAt)
 
         if (timeDiff < oneMinutes) {
           return
@@ -298,184 +462,79 @@ function* onClearColumnOrColumns(
 }
 
 // fetchColumnData is the unified saga that handles feed request.
+// There are 4 scenarios this saga is executed:
+// 1. At normal feed refresh time:
+// In this case, requesting updatedAt is getting from redux store, direction is
+// set to NEW, and cursor is set as the largest in feed. If the coming request
+// contains ${feedRefreshLimit} items, it (most likely) means there's a gap
+// between current data and returning data, and frontend should drop all
+// existing data by setting ${dropExistingData}.
+// 2. At normal feed load more:
+// This case requesting updatedAt is getting from redux store, and direction is
+// set to OLD, with cursor setting as smallest in feed. Frontend should just
+// append the incoming items to the data list of the column under action.
+// 3. At column creation time:
+// In this case, requesting updatedAt is undefined, and direction is set to OLD,
+// with cursor setting as integer.MAX. Response is a bit slow in this case
+// because it requires on-the-fly database join.
+// 4. At column update time:
+// Requesting with updatedAt getting from Redux store, direction is set to NEW
+// and cursor is set to largest in feed. If the returning response contains
+// different updatedAt, it means local feed's attributes/content is out-of-sync,
+// and frontend should drop all existing data by setting ${dropExistingData} for
+// the column under action.
 function* onFetchColumnDataRequest(
   action: ExtractActionFromActionCreator<typeof actions.fetchColumnDataRequest>,
 ) {
-  // TODO(boning): Construct the actual post request here and call backend for
-  // more data.
-
-  // TODO(boning): This is just to simulate the delay for actual data fetching,
-  // should be removed once the data fetching is implemented.
-  yield delay(1000)
-
-  yield put(
-    actions.fetchColumnDataSuccess({
-      columnId: action.payload.columnId,
-      data: [
-        {
-          id: 'dummyCard1',
-          title: `I am dummyCard's dummy title with more than one line as well`,
-          text: `first card with some real real real long descriptions www.google.com and real long text and see if it works shorturl.at/ijksA !`,
-          author: {
-            avatar: {
-              imageURL:
-                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-            },
-            name: 'John Doe',
-            profileURL: '/',
-          },
-          crawledTimestamp: new Date('2021-01-02'),
-          attachments: [
-            {
-              id: 'dummyImg',
-              dataType: 'img',
-              url: 'https://images.unsplash.com/photo-1544526226-d4568090ffb8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aGQlMjBpbWFnZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80',
-            },
-            {
-              id: 'dummyImg2',
-              dataType: 'img',
-              url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/2560px-Image_created_with_a_mobile_phone.png',
-            },
-          ],
-          isSaved: false,
-          isRead: false,
-        },
-        {
-          id: 'dummyCard2',
-          title: `I am dummyCard2's dummy title with more than one line as well`,
-          text: `www.facebook.com second card with some descriptions!`,
-          author: {
-            avatar: {
-              imageURL:
-                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-            },
-            name: 'John Doe',
-            profileURL: '/',
-          },
-          attachments: [
-            {
-              id: 'dummyData3',
-              dataType: 'img',
-              url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/TEIDE.JPG/2880px-TEIDE.JPG',
-            },
-            {
-              id: 'dummyData4',
-              dataType: 'img',
-              url: 'https://hbimg.huabanimg.com/300251098bb1d62a1d89f40c2e8018bbb415414c912fc-5z5wMR_fw658',
-            },
-          ],
-          crawledTimestamp: new Date('2021-05-02'),
-          isSaved: false,
-          isRead: false,
-        },
-        {
-          id: 'dummyCard3',
-          title: `I am dummyCard3's dummy title with more than one line as well`,
-          text: `third card with some longest descriptions \nwww.google.com and real long text \n
-        and see if it works shorturl.at/ijksA again\n let's see!`,
-          author: {
-            avatar: {
-              imageURL:
-                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-            },
-            name: 'John Doe',
-            profileURL: '/',
-          },
-          crawledTimestamp: new Date('2021-06-02'),
-          isSaved: false,
-          isRead: false,
-        },
-        {
-          id: 'dummyCard4',
-          title: `I am dummyCard3's dummy title with more than one line as well`,
-          text: `third card with some longest descriptions \nwww.google.com and real long text \n
-        and see if it works shorturl.at/ijksA again\n let's see!`,
-          author: {
-            avatar: {
-              imageURL:
-                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-            },
-            name: 'John Doe',
-            profileURL: '/',
-          },
-          crawledTimestamp: new Date('2021-06-02'),
-          isSaved: false,
-          isRead: false,
-        },
-        {
-          id: 'dummyCard5',
-          title: `I am dummyCard3's dummy title with more than one line as well`,
-          text: `third card with some longest descriptions \nwww.google.com and real long text \n
-        and see if it works shorturl.at/ijksA again\n let's see!`,
-          author: {
-            avatar: {
-              imageURL:
-                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-            },
-            name: 'John Doe',
-            profileURL: '/',
-          },
-          crawledTimestamp: new Date('2021-06-02'),
-          isSaved: false,
-          isRead: false,
-        },
-        {
-          id: 'dummyCard6',
-          title: `I am dummyCard3's dummy title with more than one line as well`,
-          text: `third card with some longest descriptions \nwww.google.com and real long text \n
-        and see if it works shorturl.at/ijksA again\n let's see!`,
-          author: {
-            avatar: {
-              imageURL:
-                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-            },
-            name: 'John Doe',
-            profileURL: '/',
-          },
-          crawledTimestamp: new Date('2021-06-02'),
-          isSaved: false,
-          isRead: false,
-        },
-        {
-          id: 'dummyCard7',
-          title: `I am dummyCard3's dummy title with more than one line as well`,
-          text: `third card with some longest descriptions \nwww.google.com and real long text \n
-        and see if it works shorturl.at/ijksA again\n let's see!`,
-          author: {
-            avatar: {
-              imageURL:
-                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-            },
-            name: 'John Doe',
-            profileURL: '/',
-          },
-          crawledTimestamp: new Date('2021-06-02'),
-          isSaved: false,
-          isRead: false,
-        },
-        {
-          id: 'dummyCard8',
-          title: `I am dummyCard3's dummy title with more than one line as well`,
-          text: `third card with some longest descriptions \nwww.google.com and real long text \n
-        and see if it works shorturl.at/ijksA again\n let's see!`,
-          author: {
-            avatar: {
-              imageURL:
-                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
-            },
-            name: 'John Doe',
-            profileURL: '/',
-          },
-          crawledTimestamp: new Date('2021-06-02'),
-          isSaved: false,
-          isRead: false,
-        },
-      ],
-      updatedAt: 0,
-      dropExistingData: true,
-      direction: 'OLD',
-    }),
+  const appToken = yield* select(selectors.appTokenSelector)
+  const userId = yield* select(selectors.userIdSelector)
+  const column = yield* select(
+    selectors.columnSelector,
+    action.payload.columnId,
   )
+  if (!appToken || !column || !userId) return
+  const dataByNodeId = yield* select(selectors.dataByNodeIdOrId)
+
+  const { updatedAt } = column
+
+  try {
+    const fetchDataResponse: AxiosResponse<FeedsResponse> = yield axios.post(
+      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+      {
+        query: constructFeedRequest(
+          userId,
+          column,
+          action.payload.direction,
+          dataByNodeId,
+        ),
+      },
+    )
+
+    if (fetchDataResponse.data.data.feeds.length !== 1) return
+    const feed = fetchDataResponse.data.data.feeds[0]
+    console.log(fetchDataResponse)
+
+    yield put(
+      actions.fetchColumnDataSuccess({
+        columnId: column.id,
+        data: convertFeedsResponseToPosts(fetchDataResponse.data),
+        updatedAt: fetchDataResponse.data.data.feeds[0].updatedAt,
+        direction: action.payload.direction,
+        dropExistingData: shouldDropExistingData(
+          fetchDataResponse.data,
+          updatedAt,
+          feed.updatedAt,
+        ),
+        sources: convertFeedsResponseToSources(fetchDataResponse.data),
+        dataExpression: stringToDataExpressionWrapper(
+          feed.filterDataExpression,
+        ),
+        dataByNodeId: dataByNodeId,
+      }),
+    )
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 export function* columnsSagas() {

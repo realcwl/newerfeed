@@ -1,6 +1,6 @@
 import {
   Attachment,
-  Author,
+  SubSource,
   Column,
   constants,
   NewsFeedData,
@@ -75,9 +75,9 @@ export interface BaseCardProps extends AdditionalCardProps {
     }
     text: string
   }
-  author?: Author
+  author?: SubSource
   attachments?: Attachment[]
-  timestamp: Date
+  time: string
   isRead: boolean
   isSaved: boolean
   link?: string
@@ -98,9 +98,9 @@ function _getCardPropsForItem(
     attachments: item.attachments,
     isRead: item.isRead,
     isSaved: item.isSaved,
-    timestamp: item.postTimestamp ?? item.crawledTimestamp,
+    time: item.postTime ?? item.crawledTime ?? new Date().toISOString(),
     text: item.text,
-    author: item.author,
+    author: item.subSource,
     nodeIdOrId: item.id,
   }
 }
