@@ -75,9 +75,9 @@ function shouldDropExistingData(
 }
 
 function convertFeedsResponseToSources(response: FeedsResponse) {
-  let sources: NewsFeedColumnSource[] = []
+  const sources: NewsFeedColumnSource[] = []
   if (response.data.feeds.length === 0) return sources
-  for (let subSource of response.data.feeds[0].subSources) {
+  for (const subSource of response.data.feeds[0].subSources) {
     const source = sources.find((s) => s.sourceId == subSource.source.id)
     if (source) {
       source.subSourceIds.push(subSource.id)
@@ -93,7 +93,7 @@ function convertFeedsResponseToSources(response: FeedsResponse) {
 function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
   if (response.data.feeds.length === 0) return EMPTY_ARRAY
   return response.data.feeds[0].posts.map((post) => {
-    let newsFeedData: NewsFeedData = {
+    const newsFeedData: NewsFeedData = {
       id: post.id,
       title: post.title,
       text: post.content,
