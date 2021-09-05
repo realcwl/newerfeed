@@ -385,6 +385,91 @@ function* onFetchColumnDataRequest(
           isSaved: false,
           isRead: false,
         },
+        {
+          id: 'dummyCard4',
+          title: `I am dummyCard3's dummy title with more than one line as well`,
+          text: `third card with some longest descriptions \nwww.google.com and real long text \n
+        and see if it works shorturl.at/ijksA again\n let's see!`,
+          author: {
+            avatar: {
+              imageURL:
+                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
+            },
+            name: 'John Doe',
+            profileURL: '/',
+          },
+          crawledTimestamp: new Date('2021-06-02'),
+          isSaved: false,
+          isRead: false,
+        },
+        {
+          id: 'dummyCard5',
+          title: `I am dummyCard3's dummy title with more than one line as well`,
+          text: `third card with some longest descriptions \nwww.google.com and real long text \n
+        and see if it works shorturl.at/ijksA again\n let's see!`,
+          author: {
+            avatar: {
+              imageURL:
+                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
+            },
+            name: 'John Doe',
+            profileURL: '/',
+          },
+          crawledTimestamp: new Date('2021-06-02'),
+          isSaved: false,
+          isRead: false,
+        },
+        {
+          id: 'dummyCard6',
+          title: `I am dummyCard3's dummy title with more than one line as well`,
+          text: `third card with some longest descriptions \nwww.google.com and real long text \n
+        and see if it works shorturl.at/ijksA again\n let's see!`,
+          author: {
+            avatar: {
+              imageURL:
+                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
+            },
+            name: 'John Doe',
+            profileURL: '/',
+          },
+          crawledTimestamp: new Date('2021-06-02'),
+          isSaved: false,
+          isRead: false,
+        },
+        {
+          id: 'dummyCard7',
+          title: `I am dummyCard3's dummy title with more than one line as well`,
+          text: `third card with some longest descriptions \nwww.google.com and real long text \n
+        and see if it works shorturl.at/ijksA again\n let's see!`,
+          author: {
+            avatar: {
+              imageURL:
+                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
+            },
+            name: 'John Doe',
+            profileURL: '/',
+          },
+          crawledTimestamp: new Date('2021-06-02'),
+          isSaved: false,
+          isRead: false,
+        },
+        {
+          id: 'dummyCard8',
+          title: `I am dummyCard3's dummy title with more than one line as well`,
+          text: `third card with some longest descriptions \nwww.google.com and real long text \n
+        and see if it works shorturl.at/ijksA again\n let's see!`,
+          author: {
+            avatar: {
+              imageURL:
+                'https://gravatar.com/avatar/09644abc0162e221e1c9ffb8a20c57ed?s=400&d=robohash&r=x',
+            },
+            name: 'John Doe',
+            profileURL: '/',
+          },
+          crawledTimestamp: new Date('2021-06-02'),
+          isSaved: false,
+          isRead: false,
+        },
       ],
       updatedAt: 0,
       dropExistingData: true,

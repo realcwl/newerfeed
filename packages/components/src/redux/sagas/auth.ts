@@ -27,6 +27,7 @@ import { RootState } from '../types'
 
 function* init() {
   yield take('LOGIN_SUCCESS')
+  console.log('auth')
 
   // do a token refresher every 45 minutes, but check every 5 minutes.
   while (true) {
@@ -47,7 +48,9 @@ function* init() {
     }
 
     const fourtyFiveMinutes = 1000 * 60 * 5
+    console.log(lastAuthTime)
     if (Date.now() - lastAuthTime > fourtyFiveMinutes) {
+      console.log('refresh token')
       const user = new CognitoUser({
         Username: currentUser.email,
         Pool: userPool,
@@ -100,6 +103,7 @@ function* onRehydrate() {
     return
   }
 
+  console.log(auth.lastAuthTime)
   yield put(
     actions.loginSuccess({
       appToken: auth.appToken,

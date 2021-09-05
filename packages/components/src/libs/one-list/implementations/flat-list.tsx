@@ -5,6 +5,7 @@ import { sharedStyles } from '../../../styles/shared'
 import { AutoSizer } from '../../auto-sizer'
 import { bugsnag } from '../../bugsnag'
 import { Platform } from '../../platform'
+import { useDispatch } from 'react-redux'
 import { OneListInstance, OneListProps } from '../index.shared'
 
 export type { OneListProps }
@@ -90,6 +91,7 @@ export const OneList = React.memo(
       renderItem,
       safeAreaInsets,
       snapToAlignment,
+      onReachingListEnd,
       ...restProps
     } = props
 
@@ -136,6 +138,16 @@ export const OneList = React.memo(
     >(() => {
       return ({ viewableItems }) => {
         if (!onVisibleItemsChangedRef.current) return undefined
+
+        const lastData = data[data.length - 1]
+        if (
+          footer &&
+          viewableItems.find((item) => {
+            return item.item == lastData
+          })
+        ) {
+          if (onReachingListEnd) onReachingListEnd()
+        }
 
         const visibleIndexes = viewableItems
           .filter((v) => v.isViewable && typeof v.index === 'number')
@@ -219,6 +231,13 @@ export const OneList = React.memo(
                       />
                     )
                   }}
+                  ListFooterComponent={
+                    footer && footer.size > 0 && !footer.sticky
+                      ? footer.Component
+                      : undefined
+                  }
+                  onViewableItemsChanged={onViewableItemsChanged}
+                  contentContainerStyle={contentContainerStyle}
                   keyExtractor={keyExtractor}
                   data={data}
                   horizontal={horizontal}
@@ -230,13 +249,6 @@ export const OneList = React.memo(
             <ListEmptyComponent />
           ) : null}
         </View>
-
-        {footer &&
-        footer.size > 0 &&
-        footer.Component &&
-        (footer.sticky || !data.length) ? (
-          <footer.Component />
-        ) : null}
       </View>
     )
   }),
