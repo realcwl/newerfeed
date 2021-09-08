@@ -155,6 +155,10 @@ export const columnsReducer: Reducer<State> = (
     case 'UPDATE_COLUMN_ID': {
       return immer(state, (draft) => {
         const { prevId, updatedId } = action.payload
+        if (prevId === updatedId) {
+          // This could happen when updating feed, where same feedId is returned
+          return
+        }
         const idx = draft.allIds.indexOf(prevId)
         if (idx === -1) {
           console.error('cannot find the original id: ' + prevId)

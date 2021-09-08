@@ -330,6 +330,7 @@ export type GenericColumnCreation<ColumnType extends NewsFeedColumn> = Omit<
   ColumnType,
   'createdAt' | 'updatedAt' | 'refreshedAt'
 > & {
+  isUpdate?: boolean
   createdAt?: number
   updatedAt?: number
 }

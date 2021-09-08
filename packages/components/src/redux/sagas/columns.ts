@@ -15,7 +15,7 @@ import * as actions from '../actions'
 import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
-import { ColumnCreation, constants } from '@devhub/core'
+import { ColumnCreation, constants, NewsFeedColumnCreation } from '@devhub/core'
 import { WrapUrlWithToken } from '../../utils/api'
 
 // Helper function to extract all subSources to create a column.
@@ -29,6 +29,56 @@ function ExtractSubSourceIdsFromColumnCreation(
     }
   }
   return subSourceIds
+}
+
+// The only different is that input should contain 'feedId' on column update,
+// otherwise no feedId should be provided on feed creation. Due to the
+// limitation of jsonToGraphQLQuery, there isn't an easy way of omitting
+// certain field at runtime, thus we have to duplicate it.
+// P.S. It might be possible to ignoring certain field with the following
+// method, but I've not tested whether nested field can adopt the same approach.
+// https://github.com/vkolgi/json-to-graphql-query#ignoring-fields-in-the-query-object
+function getUpsertFeedRequest(
+  columnCreation: NewsFeedColumnCreation,
+  userId: string,
+  isUpdate: boolean,
+): string {
+  if (isUpdate) {
+    return jsonToGraphQLQuery({
+      mutation: {
+        upsertFeed: {
+          __args: {
+            input: {
+              feedId: columnCreation.id,
+              userId: userId,
+              name: columnCreation.title,
+              filterDataExpression:
+                EncodeDataExpressionFromColumnCreation(columnCreation),
+              subSourceIds:
+                ExtractSubSourceIdsFromColumnCreation(columnCreation),
+            },
+          },
+          id: true,
+        },
+      },
+    })
+  }
+  return jsonToGraphQLQuery({
+    mutation: {
+      upsertFeed: {
+        __args: {
+          input: {
+            userId: userId,
+            name: columnCreation.title,
+            filterDataExpression:
+              EncodeDataExpressionFromColumnCreation(columnCreation),
+            subSourceIds: ExtractSubSourceIdsFromColumnCreation(columnCreation),
+          },
+        },
+        id: true,
+      },
+    },
+  })
 }
 
 function EncodeDataExpressionFromColumnCreation(
@@ -72,90 +122,83 @@ function* columnRefresher() {
 function* onAddColumn(
   action: ExtractActionFromActionCreator<typeof actions.addColumn>,
 ) {
-  const placeHolderColumnId = action.payload.id
+  const placeHolderOrColumnId = action.payload.id
+
+  const isUpdate = !!action.payload.isUpdate
 
   if (AppState.currentState === 'active')
     yield* call(InteractionManager.runAfterInteractions)
 
   emitter.emit('FOCUS_ON_COLUMN', {
     animated: true,
-    columnId: placeHolderColumnId,
+    columnId: placeHolderOrColumnId,
     highlight: true,
     scrollTo: true,
   })
 
-  yield* put(actions.setColumnLoading({ columnId: placeHolderColumnId }))
+  yield* put(actions.setColumnLoading({ columnId: placeHolderOrColumnId }))
 
   const appToken = yield* select(selectors.appTokenSelector)
   const userId = yield* select(selectors.userIdSelector)
-
-  let updatedId = ''
-  try {
-    // 1. Create Feed and get new feed Id
-    const createFeedResponse: AxiosResponse = yield axios.post(
-      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
-      {
-        query: jsonToGraphQLQuery({
-          mutation: {
-            upsertFeed: {
-              __args: {
-                input: {
-                  userId: userId,
-                  name: action.payload.title,
-                  filterDataExpression: EncodeDataExpressionFromColumnCreation(
-                    action.payload,
-                  ),
-                  subSourceIds: ExtractSubSourceIdsFromColumnCreation(
-                    action.payload,
-                  ),
-                },
-              },
-              id: true,
-            },
-          },
-        }),
-      },
-    )
-    const { id } = createFeedResponse.data.data.upsertFeed
-    updatedId = id
-
-    // 2. Subscribe to that feed.
-    const subscribeFeedResponse: AxiosResponse = yield axios.post(
-      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
-      {
-        query: jsonToGraphQLQuery({
-          mutation: {
-            subscribe: {
-              __args: {
-                input: {
-                  userId: userId,
-                  feedId: updatedId,
-                },
-              },
-              id: true,
-            },
-          },
-        }),
-      },
-    )
-  } catch (err) {
-    console.error(err)
-    const allIds = yield* select(selectors.columnIdsSelector)
-    const columnIndex = allIds.indexOf(placeHolderColumnId)
-    yield put(
-      actions.deleteColumn({ columnId: placeHolderColumnId, columnIndex }),
-    )
-
-    // TODO(chenweilunster): Also call deleteFeed() to handle the case where
-    // Feed is created successfully, while subscribe fails. Also show error
-    // banner with reason.
+  if (!userId) {
+    yield put(actions.authFailure(Error('no user id found')))
     return
   }
 
-  // Update column id to be the id returned from backend.
+  let updatedId = ''
+  try {
+    // 1. Upsert Feed and get new/old feed Id
+    const createFeedResponse: AxiosResponse = yield axios.post(
+      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+      {
+        query: getUpsertFeedRequest(action.payload, userId, isUpdate),
+      },
+    )
+
+    const { id } = createFeedResponse.data.data.upsertFeed
+    updatedId = id
+
+    // 2. Subscribe to that feed if this is a feed creation (isUpdate == false)
+    if (!isUpdate) {
+      const subscribeFeedResponse: AxiosResponse = yield axios.post(
+        WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+        {
+          query: jsonToGraphQLQuery({
+            mutation: {
+              subscribe: {
+                __args: {
+                  input: {
+                    userId: userId,
+                    feedId: updatedId,
+                  },
+                },
+                id: true,
+              },
+            },
+          }),
+        },
+      )
+    }
+  } catch (err) {
+    console.error(err)
+
+    // Fail to create should trigger feed deletion.
+    if (!isUpdate) {
+      const allIds = yield* select(selectors.columnIdsSelector)
+      const columnIndex = allIds.indexOf(placeHolderOrColumnId)
+      yield put(
+        actions.deleteColumn({ columnId: placeHolderOrColumnId, columnIndex }),
+      )
+    }
+
+    return
+  }
+
+  // Update column id to be the id returned from backend. In the case of feed
+  // update, this action is no-op.
   yield put(
     actions.updateColumnId({
-      prevId: placeHolderColumnId,
+      prevId: placeHolderOrColumnId,
       updatedId: updatedId,
     }),
   )

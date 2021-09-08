@@ -120,6 +120,7 @@ export const AddColumnDetailsModal = React.memo(
           icon: formValues['icon'],
           type: 'COLUMN_TYPE_NEWS_FEED',
           id: columnId ? columnId : guid(),
+          isUpdate: !!columnId,
           itemListIds: [],
           firstItemId: '',
           lastItemId: '',
