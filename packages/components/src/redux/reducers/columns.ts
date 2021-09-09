@@ -230,7 +230,6 @@ export const columnsReducer: Reducer<State> = (
           dataByNodeId,
         } = action.payload
 
-
         const column = draft.byId[columnId]
         if (!column) return
 
