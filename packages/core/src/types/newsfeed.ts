@@ -332,14 +332,9 @@ export type GenericColumnCreation<ColumnType extends NewsFeedColumn> = Omit<
   ColumnType,
   'createdAt' | 'updatedAt' | 'refreshedAt'
 > & {
-<<<<<<< HEAD
   isUpdate?: boolean
-  createdAt?: number
-  updatedAt?: number
-=======
   createdAt?: string
   updatedAt?: string
->>>>>>> ddf5f6f (load more - call backend)
 }
 
 // Identifies a column creation activity for a news feed column.

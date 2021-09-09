@@ -258,6 +258,15 @@ export const columnsReducer: Reducer<State> = (
         column.refreshedAt = new Date().toISOString()
         column.state = 'loaded'
       })
+    case 'FETCH_COLUMN_DATA_FAILURE':
+      return immer(state, (draft) => {
+        const { columnId } = action.payload
+        const column = draft.byId[columnId]
+        if (!column) return
+
+        column.refreshedAt = new Date().toISOString()
+        column.state = 'not_loaded'
+      })
     default:
       return state
   }

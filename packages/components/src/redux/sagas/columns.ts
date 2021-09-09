@@ -510,9 +510,14 @@ function* onFetchColumnDataRequest(
       },
     )
 
-    if (fetchDataResponse.data.data.feeds.length !== 1) return
+    if (
+      !fetchDataResponse.data.data ||
+      fetchDataResponse.data.data.feeds.length !== 1
+    ) {
+      yield put(actions.fetchColumnDataFailure({ columnId: column.id }))
+      return
+    }
     const feed = fetchDataResponse.data.data.feeds[0]
-    console.log(fetchDataResponse)
 
     yield put(
       actions.fetchColumnDataSuccess({
@@ -533,6 +538,7 @@ function* onFetchColumnDataRequest(
       }),
     )
   } catch (err) {
+    yield put(actions.fetchColumnDataFailure({ columnId: column.id }))
     console.error(err)
   }
 }

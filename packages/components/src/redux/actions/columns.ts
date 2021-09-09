@@ -166,6 +166,10 @@ export function fetchColumnDataRequest(payload: {
   return createAction('FETCH_COLUMN_DATA_REQUEST', payload)
 }
 
+export function fetchColumnDataFailure(payload: { columnId: string }) {
+  return createAction('FETCH_COLUMN_DATA_FAILURE', payload)
+}
+
 export function fetchColumnDataSuccess(payload: {
   // columnId is the subject column we're fetching data for
   columnId: string
