@@ -1,11 +1,10 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
-import { Dimensions, FlatList, FlatListProps, View } from 'react-native'
+import React, { useMemo, useRef, useState } from 'react'
+import { FlatList, FlatListProps, View } from 'react-native'
 
 import { sharedStyles } from '../../../styles/shared'
 import { AutoSizer } from '../../auto-sizer'
 import { bugsnag } from '../../bugsnag'
 import { Platform } from '../../platform'
-import { useDispatch } from 'react-redux'
 import { OneListInstance, OneListProps } from '../index.shared'
 
 export type { OneListProps }

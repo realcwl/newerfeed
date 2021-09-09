@@ -27,7 +27,6 @@ import {
 } from '@devhub/core'
 import { WrapUrlWithToken } from '../../utils/api'
 import { EMPTY_ARRAY } from '@devhub/core/src/utils/constants'
-import { string } from 'yup'
 
 interface FeedsResponse {
   data: {
@@ -245,7 +244,7 @@ function constructFeedRequest(
             id: true,
             iconUrl: true,
           },
-          // imageUrls: true,
+          imageUrls: true,
           contentGeneratedAt: true,
         },
         subSources: {
