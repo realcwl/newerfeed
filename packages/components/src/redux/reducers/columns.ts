@@ -230,6 +230,7 @@ export const columnsReducer: Reducer<State> = (
           dataByNodeId,
         } = action.payload
 
+
         const column = draft.byId[columnId]
         if (!column) return
 
@@ -244,7 +245,7 @@ export const columnsReducer: Reducer<State> = (
         if (direction == 'NEW') {
           column.itemListIds = data.map((d) => d.id).concat(column.itemListIds)
         } else {
-          column.itemListIds.concat(data.map((d) => d.id))
+          column.itemListIds = column.itemListIds.concat(data.map((d) => d.id))
         }
 
         // if data expression or sources is returned, update them.

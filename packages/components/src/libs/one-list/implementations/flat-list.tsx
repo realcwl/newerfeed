@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { Dimensions, FlatList, FlatListProps, View } from 'react-native'
 
 import { sharedStyles } from '../../../styles/shared'
@@ -32,7 +32,7 @@ export const OneList = React.memo(
             flatListRef.current.scrollToOffset({ animated, offset: 0 })
           } catch (error) {
             console.error(error)
-            bugsnag.notify(error)
+            bugsnag.notify(error as Error)
           }
         },
         scrollToEnd: ({ animated }: { animated?: boolean } = {}) => {
@@ -41,7 +41,7 @@ export const OneList = React.memo(
             flatListRef.current.scrollToEnd({ animated })
           } catch (error) {
             console.error(error)
-            bugsnag.notify(error)
+            bugsnag.notify(error as Error)
           }
         },
         scrollToIndex: (index, params) => {
@@ -60,7 +60,7 @@ export const OneList = React.memo(
             })
           } catch (error) {
             console.error(error)
-            bugsnag.notify(error)
+            bugsnag.notify(error as Error)
           }
         },
       }),
@@ -68,6 +68,7 @@ export const OneList = React.memo(
     )
 
     const flatListRef = useRef<FlatList<any>>(null)
+    const [lastItemId, setLastItemId] = useState<string>('')
 
     const {
       ListEmptyComponent,
@@ -97,6 +98,10 @@ export const OneList = React.memo(
 
     const onVisibleItemsChangedRef = useRef(onVisibleItemsChanged)
     onVisibleItemsChangedRef.current = onVisibleItemsChanged
+
+    const getData = () => data
+    const dataRef = useRef(getData)
+    dataRef.current = getData
 
     const getItemLayout = useMemo<
       NonNullable<FlatListProps<any>['getItemLayout']>
@@ -138,7 +143,7 @@ export const OneList = React.memo(
     >(() => {
       return ({ viewableItems }) => {
         if (!onVisibleItemsChangedRef.current) return undefined
-
+        const data = dataRef.current()
         const lastData = data[data.length - 1]
         if (
           footer &&

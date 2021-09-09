@@ -74,7 +74,9 @@ function shouldDropExistingData(
   )
 }
 
-function convertFeedsResponseToSources(response: FeedsResponse) {
+function convertFeedsResponseToSources(
+  response: FeedsResponse,
+): NewsFeedColumnSource[] {
   const sources: NewsFeedColumnSource[] = []
   if (response.data.feeds.length === 0) return sources
   for (const subSource of response.data.feeds[0].subSources) {
@@ -88,6 +90,7 @@ function convertFeedsResponseToSources(response: FeedsResponse) {
       subSourceIds: [subSource.id],
     })
   }
+  return sources
 }
 
 function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
@@ -102,13 +105,15 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
       cursor: post.cursor,
       isRead: false,
       isSaved: false,
-      attachments: post.imageUrls.map((url) => {
-        return {
-          id: url,
-          dataType: 'img',
-          url: url,
-        }
-      }),
+      attachments: post.imageUrls
+        ? post.imageUrls.map((url) => {
+            return {
+              id: url,
+              dataType: 'img',
+              url: url,
+            }
+          })
+        : [],
     }
     return newsFeedData
   })
@@ -197,16 +202,18 @@ function constructFeedRequest(
   direction: 'NEW' | 'OLD',
   dataByNodeId: Record<string, NewsFeedData>,
 ): string {
-  const { updatedAt } = column
-  let cursor = -1
+  let { updatedAt } = column
+  let cursor = 0
   if (direction == 'NEW') {
     const data = dataByNodeId[column.newestItemId]
     if (data) cursor = data.cursor
+    else updatedAt = ''
   } else {
-    cursor = Number.MAX_SAFE_INTEGER
     const data = dataByNodeId[column.oldestItemId]
     if (data) cursor = data.cursor
+    else updatedAt = ''
   }
+
   return jsonToGraphQLQuery({
     query: {
       feeds: {
@@ -219,7 +226,9 @@ function constructFeedRequest(
                 limit: constants.FEED_FETCH_LIMIT,
                 cursor: cursor,
                 direction: new EnumType(direction),
-                feedUpdatedTime: new Date(updatedAt).toISOString(),
+                feedUpdatedTime: !!updatedAt
+                  ? new Date(updatedAt).toISOString()
+                  : null,
               },
             ],
           },
@@ -236,7 +245,7 @@ function constructFeedRequest(
             id: true,
             iconUrl: true,
           },
-          imageUrls: true,
+          // imageUrls: true,
           contentGeneratedAt: true,
         },
         subSources: {
