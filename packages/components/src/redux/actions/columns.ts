@@ -1,6 +1,7 @@
 import {
   ColumnCreation,
   ColumnFilter,
+  NewsFeedColumnSource,
   NewsFeedData,
   NewsFeedDataExpressionWrapper,
 } from '@devhub/core'
@@ -165,6 +166,10 @@ export function fetchColumnDataRequest(payload: {
   return createAction('FETCH_COLUMN_DATA_REQUEST', payload)
 }
 
+export function fetchColumnDataFailure(payload: { columnId: string }) {
+  return createAction('FETCH_COLUMN_DATA_FAILURE', payload)
+}
+
 export function fetchColumnDataSuccess(payload: {
   // columnId is the subject column we're fetching data for
   columnId: string
@@ -173,16 +178,20 @@ export function fetchColumnDataSuccess(payload: {
   direction: 'NEW' | 'OLD'
   // a list of NewsFeedData that we fetched
   data: NewsFeedData[]
-  // Timestamp in seconds. Backend should return updatedAt to make sure the
+  // Timestamp in miliseconds. Backend should return updatedAt to make sure the
   // frontend is always up to date with this timestamp.
-  updatedAt: number
+  updatedAt: string
   // the caller should decide whether to drop existing data in this column.
   // e.g. when the data fetched reached the limit, it's very likely that there's
   // a "gap" between existing data and newly fetched data, and thus should drop
   // the existing ones.
   dropExistingData: boolean
+  // providing access to the data store, which is needed to get current cursor.
+  dataByNodeId: Record<string, NewsFeedData>
   // optionally, pass data expression to update the column attributes.
   dataExpression?: NewsFeedDataExpressionWrapper
+  // optionall, pass in sources which can update the existing column's attribute
+  sources?: NewsFeedColumnSource[]
 }) {
   return createAction('FETCH_COLUMN_DATA_SUCCESS', payload)
 }

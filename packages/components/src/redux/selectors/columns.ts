@@ -14,7 +14,7 @@ export const columnSelector = (state: RootState, columnId: string) => {
 }
 
 export const columnsWithRefreshTimeSelector = (state: RootState) => {
-  const result: { id: string; refreshedAt: number }[] = []
+  const result: { id: string; refreshedAt: string }[] = []
   const byId: Record<string, Column> = s(state).byId
   for (const columnId in byId) {
     result.push({

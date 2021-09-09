@@ -12,6 +12,7 @@ import {
 import { GenericMessageWithButtonView } from '../components/cards/GenericMessageWithButtonView'
 import { NoTokenView } from '../components/cards/NoTokenView'
 import { Button } from '../components/common/Button'
+import * as actions from '../redux/actions'
 import { ButtonLink } from '../components/common/ButtonLink'
 import { Spacer } from '../components/common/Spacer'
 import { useColumn } from '../hooks/use-column'
@@ -43,6 +44,7 @@ export const NewsFeedCardsContainer = React.memo(
       useColumnData<NewsFeedData>(columnId, { mergeSimilar: false })
 
     const { isLoggingIn } = useLoginHelpers()
+    const dispatch = useDispatch()
 
     const appToken = useReduxState(selectors.appTokenSelector)
     const { column, hasCrossedColumnsLimit } = useColumn(columnId)
@@ -55,7 +57,14 @@ export const NewsFeedCardsContainer = React.memo(
         key={`event-cards-${columnId}`}
         columnId={columnId}
         errorMessage={''}
-        fetchNextPage={() => undefined}
+        fetchNextPage={() => {
+          dispatch(
+            actions.fetchColumnDataRequest({
+              columnId,
+              direction: 'OLD',
+            }),
+          )
+        }}
         getItemByNodeIdOrId={getItemByNodeIdOrId}
         isShowingOnlyBookmarks={!!(column.filters && column.filters.saved)}
         itemNodeIdOrIds={filteredItemsIds}

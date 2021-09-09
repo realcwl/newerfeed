@@ -4,11 +4,9 @@ import { View, ViewProps } from 'react-native'
 
 import { useCardsKeyboard } from '../../hooks/use-cards-keyboard'
 import { DataItemT, useCardsProps } from '../../hooks/use-cards-props'
-import { useReduxState } from '../../hooks/use-redux-state'
 import { BlurView } from '../../libs/blur-view/BlurView'
 import { ErrorBoundary } from '../../libs/bugsnag'
 import { OneList, OneListProps } from '../../libs/one-list'
-import * as selectors from '../../redux/selectors'
 import { sharedStyles } from '../../styles/shared'
 import { EmptyCards, EmptyCardsProps } from './EmptyCards'
 import { NewsFeedCard } from './NewsFeedCard'
@@ -179,9 +177,12 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
         }
         data={data}
         estimatedItemSize={getItemSize(data[0], 0) || 123}
-        // footer={footer}
+        footer={footer}
         forceRerenderOnRefChange={getItemByNodeIdOrId}
         getItemKey={getItemKey}
+        onReachingListEnd={() => {
+          if (fetchNextPage) fetchNextPage()
+        }}
         getItemSize={getItemSize}
         header={header}
         horizontal={false}

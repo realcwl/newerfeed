@@ -53,6 +53,7 @@ export interface OneListProps<ItemT> {
     item: ItemT
     index: number
   }) => React.ReactElement | null
+  onReachingListEnd?: () => void
   safeAreaInsets?: {
     top?: number
     bottom?: number

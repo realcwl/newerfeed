@@ -16,6 +16,7 @@ interface SourcesResponse {
       subsources: {
         id: string
         name: string
+        updatedAt: string
       }[]
     }[]
   }

@@ -87,3 +87,5 @@ export const EMPTY_OBJ = {}
 // banner related
 // delay for banner auto closure in ms.
 export const BANNER_AUTO_CLOSE_DURATION = 3000
+
+export const FEED_FETCH_LIMIT = 10

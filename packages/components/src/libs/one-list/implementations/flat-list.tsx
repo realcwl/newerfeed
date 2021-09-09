@@ -1,5 +1,5 @@
-import React, { useMemo, useRef } from 'react'
-import { Dimensions, FlatList, FlatListProps, View } from 'react-native'
+import React, { useMemo, useRef, useState } from 'react'
+import { FlatList, FlatListProps, View } from 'react-native'
 
 import { sharedStyles } from '../../../styles/shared'
 import { AutoSizer } from '../../auto-sizer'
@@ -31,7 +31,7 @@ export const OneList = React.memo(
             flatListRef.current.scrollToOffset({ animated, offset: 0 })
           } catch (error) {
             console.error(error)
-            bugsnag.notify(error)
+            bugsnag.notify(error as Error)
           }
         },
         scrollToEnd: ({ animated }: { animated?: boolean } = {}) => {
@@ -40,7 +40,7 @@ export const OneList = React.memo(
             flatListRef.current.scrollToEnd({ animated })
           } catch (error) {
             console.error(error)
-            bugsnag.notify(error)
+            bugsnag.notify(error as Error)
           }
         },
         scrollToIndex: (index, params) => {
@@ -59,7 +59,7 @@ export const OneList = React.memo(
             })
           } catch (error) {
             console.error(error)
-            bugsnag.notify(error)
+            bugsnag.notify(error as Error)
           }
         },
       }),
@@ -67,6 +67,7 @@ export const OneList = React.memo(
     )
 
     const flatListRef = useRef<FlatList<any>>(null)
+    const [lastItemId, setLastItemId] = useState<string>('')
 
     const {
       ListEmptyComponent,
@@ -90,11 +91,16 @@ export const OneList = React.memo(
       renderItem,
       safeAreaInsets,
       snapToAlignment,
+      onReachingListEnd,
       ...restProps
     } = props
 
     const onVisibleItemsChangedRef = useRef(onVisibleItemsChanged)
     onVisibleItemsChangedRef.current = onVisibleItemsChanged
+
+    const getData = () => data
+    const dataRef = useRef(getData)
+    dataRef.current = getData
 
     const getItemLayout = useMemo<
       NonNullable<FlatListProps<any>['getItemLayout']>
@@ -136,6 +142,16 @@ export const OneList = React.memo(
     >(() => {
       return ({ viewableItems }) => {
         if (!onVisibleItemsChangedRef.current) return undefined
+        const data = dataRef.current()
+        const lastData = data[data.length - 1]
+        if (
+          footer &&
+          viewableItems.find((item) => {
+            return item.item == lastData
+          })
+        ) {
+          if (onReachingListEnd) onReachingListEnd()
+        }
 
         const visibleIndexes = viewableItems
           .filter((v) => v.isViewable && typeof v.index === 'number')
@@ -219,6 +235,13 @@ export const OneList = React.memo(
                       />
                     )
                   }}
+                  ListFooterComponent={
+                    footer && footer.size > 0 && !footer.sticky
+                      ? footer.Component
+                      : undefined
+                  }
+                  onViewableItemsChanged={onViewableItemsChanged}
+                  contentContainerStyle={contentContainerStyle}
                   keyExtractor={keyExtractor}
                   data={data}
                   horizontal={horizontal}
@@ -230,13 +253,6 @@ export const OneList = React.memo(
             <ListEmptyComponent />
           ) : null}
         </View>
-
-        {footer &&
-        footer.size > 0 &&
-        footer.Component &&
-        (footer.sticky || !data.length) ? (
-          <footer.Component />
-        ) : null}
       </View>
     )
   }),

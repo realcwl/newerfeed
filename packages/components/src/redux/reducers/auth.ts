@@ -69,7 +69,9 @@ export const authReducer: Reducer<State> = (state = initialState, action) => {
         isLoggingIn: false,
         error: undefined,
         refreshToken: action.payload.refreshToken,
-        lastAuthTime: Date.now(),
+        lastAuthTime: action.payload.lastAuthTime
+          ? action.payload.lastAuthTime
+          : Date.now(),
         signUpSuccessMsg: '',
       }
     }
