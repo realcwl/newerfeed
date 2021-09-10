@@ -223,6 +223,7 @@ export const OneList = React.memo(
             >
               {({ width, height }) => (
                 <FlatList
+                  ref={flatListRef}
                   ItemSeparatorComponent={({ leadingItem }) => {
                     return (
                       <View
