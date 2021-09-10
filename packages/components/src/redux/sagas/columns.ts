@@ -552,7 +552,6 @@ function* onFetchColumnDataRequest(
       }),
     )
   } catch (err) {
-    console.log(err)
     yield put(actions.fetchColumnDataFailure({ columnId: column.id }))
     console.error(err)
   }
