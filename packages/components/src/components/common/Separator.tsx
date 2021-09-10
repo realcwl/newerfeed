@@ -13,7 +13,7 @@ export function getSeparatorThemeColor({
 }: {
   isDark: boolean
 }): keyof ThemeColors {
-  return isDark ? 'backgroundColorLighther1' : 'backgroundColorDarker1'
+  return isDark ? 'backgroundColorLighther2' : 'backgroundColorDarker2'
 }
 
 const styles = StyleSheet.create({

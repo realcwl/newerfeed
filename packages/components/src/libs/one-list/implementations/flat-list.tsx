@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { FlatList, FlatListProps, View } from 'react-native'
+import { useTheme } from '../../../components/context/ThemeContext'
 
 import { sharedStyles } from '../../../styles/shared'
 import { AutoSizer } from '../../auto-sizer'
@@ -67,6 +68,7 @@ export const OneList = React.memo(
     )
 
     const flatListRef = useRef<FlatList<any>>(null)
+    const theme = useTheme()
     const [lastItemId, setLastItemId] = useState<string>('')
 
     const {
@@ -230,7 +232,9 @@ export const OneList = React.memo(
                         style={{
                           height: 1,
                           width: '100%',
-                          backgroundColor: '#000',
+                          backgroundColor: theme.isDark
+                            ? 'rgb(10, 10, 12)'
+                            : 'rgb(223, 229, 239)',
                         }}
                       />
                     )
