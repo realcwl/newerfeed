@@ -46,6 +46,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from 'react-native-web'
+import { useReduxState } from '../../hooks/use-redux-state'
+import { idToNameMapSelector } from '../../redux/selectors'
 
 const GestureHandlerTouchableOpacity = Platform.select({
   android: () => require('react-native-gesture-handler').TouchableOpacity,
@@ -269,6 +271,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     return res
   }
 
+  const idToNameMap = useReduxState(idToNameMapSelector)
+
   const [hasMore, setHasMore] = useState(false)
   const checkHasMore = useCallback(
     ({
@@ -318,7 +322,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               web: { title: getFullDateText(timestamp) },
             })}
           >
-            {author?.name}
+            {author?.id && idToNameMap[author?.id]
+              ? idToNameMap[author?.id]
+              : author?.id}
           </ThemedText>
           {/* <Spacer width={sizes.horizontalSpaceSize} /> */}
           <View

@@ -43,20 +43,22 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
       })
     case 'MARK_ITEM_AS_READ':
       return immer(state, (draft) => {
-        const { itemNodeId, read } = action.payload
+        const { itemNodeIds, read } = action.payload
         const now = new Date().toISOString()
-        if (!(itemNodeId in draft.byId)) {
-          // if the item isn't in the data list, it indicates that we might
-          // encountered an error and should return directly.
-          console.warn(
-            "trying to favorite/unfavorite an item that's not in the data list: ",
-            itemNodeId,
-          )
-          return
+        for (const itemNodeId of itemNodeIds) {
+          if (!(itemNodeId in draft.byId)) {
+            // if the item isn't in the data list, it indicates that we might
+            // encountered an error and should return directly.
+            console.warn(
+              "trying to favorite/unfavorite an item that's not in the data list: ",
+              itemNodeId,
+            )
+            return
+          }
+          const entry = draft.byId[itemNodeId]
+          entry.isRead = read
+          draft.updatedAt = now
         }
-        const entry = draft.byId[itemNodeId]
-        entry.isRead = read
-        draft.updatedAt = now
       })
     case 'FETCH_COLUMN_DATA_SUCCESS':
       return immer(state, (draft) => {

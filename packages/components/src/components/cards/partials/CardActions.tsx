@@ -92,7 +92,7 @@ export function CardActions(props: CardActionsProps) {
         onPress={() => {
           dispatch(
             actions.markItemAsRead({
-              itemNodeId: itemNodeId,
+              itemNodeIds: [itemNodeId],
               read: !isRead,
             }),
           )

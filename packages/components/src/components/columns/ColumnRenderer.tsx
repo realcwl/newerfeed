@@ -102,16 +102,11 @@ export const ColumnRenderer = React.memo((props: ColumnRendererProps) => {
   const columnData = useColumnData(columnId, {
     mergeSimilar: false,
   })
-  const { hasCrossedColumnsLimit, filteredItemsIds } = columnData
+  const { hasCrossedColumnsLimit, filteredItemsIds, getItemByNodeIdOrId } =
+    columnData
 
   const dispatch = useDispatch()
   const store = useStore()
-
-  const hasItemsToMarkAsDone = true
-
-  const refresh = useCallback(() => {
-    console.log('Column refreshed')
-  }, [columnId])
 
   function focusColumn() {
     emitter.emit('FOCUS_ON_COLUMN', {
@@ -157,31 +152,6 @@ export const ColumnRenderer = React.memo((props: ColumnRendererProps) => {
         right={
           <>
             <ColumnHeader.Button
-              key="column-options-button-clear-column"
-              analyticsLabel={
-                hasItemsToMarkAsDone ? 'clear_column' : 'unclear_column'
-              }
-              disabled={hasCrossedColumnsLimit || !hasItemsToMarkAsDone}
-              family="octicon"
-              name="check"
-              onPress={() => {
-                dispatch(
-                  actions.setColumnClearedAtFilter({
-                    columnId,
-                    clearedAt: hasItemsToMarkAsDone
-                      ? new Date().toISOString()
-                      : null,
-                  }),
-                )
-
-                focusColumn()
-
-                if (!hasItemsToMarkAsDone) refresh()
-              }}
-              tooltip="Done"
-            />
-
-            <ColumnHeader.Button
               key="column-options-button-toggle-mark-as-read"
               analyticsLabel={
                 !hasOneUnreadItem ? 'mark_as_unread' : 'mark_as_read'
@@ -190,8 +160,16 @@ export const ColumnRenderer = React.memo((props: ColumnRendererProps) => {
               family="octicon"
               name={!hasOneUnreadItem ? 'eye-closed' : 'eye'}
               onPress={() => {
-                console.log('TODO: Mark all as read')
+                dispatch(
+                  actions.markItemAsRead({
+                    itemNodeIds: filteredItemsIds,
+                    read: true,
+                  }),
+                )
+
+                focusColumn()
               }}
+              tooltip="Mark all as read"
             />
 
             <ColumnHeader.Button

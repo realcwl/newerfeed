@@ -25,7 +25,7 @@ export function SwipeableCard(props: CardWithLinkProps) {
     if (!item) return null
     dispatch(
       actions.markItemAsRead({
-        itemNodeId: item.id,
+        itemNodeIds: [item.id],
         read: !isRead,
       }),
     )

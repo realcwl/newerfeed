@@ -67,7 +67,6 @@ export const OneList = React.memo(
     )
 
     const flatListRef = useRef<FlatList<any>>(null)
-    const [lastItemId, setLastItemId] = useState<string>('')
 
     const {
       ListEmptyComponent,
@@ -224,6 +223,7 @@ export const OneList = React.memo(
             >
               {({ width, height }) => (
                 <FlatList
+                  ref={flatListRef}
                   ItemSeparatorComponent={({ leadingItem }) => {
                     return (
                       <View

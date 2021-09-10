@@ -542,7 +542,16 @@ export const SidebarOrBottomBarColumnItem = React.memo(
       }
     }, [columnId, !!currentOpenedModal, isColumnFocused, small])
 
-    const showUnreadIndicator = true
+    const { filteredItemsIds, getItemByNodeIdOrId } = useColumnData(columnId, {
+      mergeSimilar: false,
+    })
+
+    const showUnreadIndicator =
+      !!column &&
+      filteredItemsIds.some((itemId) => {
+        const item = getItemByNodeIdOrId(itemId)
+        return item && !item.isRead
+      })
 
     const unreadIndicatorColor = 'lightRed'
 
