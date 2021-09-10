@@ -548,6 +548,8 @@ export const SidebarOrBottomBarColumnItem = React.memo(
 
     const showUnreadIndicator =
       !!column &&
+      !!column.options &&
+      !!column.options.enableAppIconUnreadIndicator &&
       filteredItemsIds.some((itemId) => {
         const item = getItemByNodeIdOrId(itemId)
         return item && !item.isRead

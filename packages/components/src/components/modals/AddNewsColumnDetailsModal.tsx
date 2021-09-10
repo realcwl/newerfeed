@@ -127,6 +127,10 @@ export const AddColumnDetailsModal = React.memo(
           sources: getColumnSourcesFromFormValues(formValues),
           dataExpression: formValues['dataExpression'],
           state: 'not_loaded',
+          options: newsFeedColumnAttributes?.options ?? {
+            // show unread by default.
+            enableAppIconUnreadIndicator: true,
+          },
         }
         dispatch(actions.addColumn(columnCreation))
 

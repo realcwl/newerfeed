@@ -1,6 +1,7 @@
 import {
   ColumnCreation,
   ColumnFilter,
+  ColumnOptions,
   NewsFeedColumnSource,
   NewsFeedData,
   NewsFeedDataExpressionWrapper,
@@ -122,6 +123,14 @@ export function setColumnClearedAtFilter(payload: {
   clearedAt: string | null
 }) {
   return createAction('SET_COLUMN_CLEARED_AT_FILTER', payload)
+}
+
+export function setColumnOption<O extends keyof ColumnOptions>(payload: {
+  columnId: string
+  option: O
+  value: ColumnOptions[O] | undefined
+}) {
+  return createAction('SET_COLUMN_OPTION', payload)
 }
 
 export function clearAllColumnsWithConfirmation(

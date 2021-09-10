@@ -179,6 +179,7 @@ export const columnsReducer: Reducer<State> = (
             sources: [],
             state: 'not_loaded',
             dataExpression: undefined,
+            options: { enableAppIconUnreadIndicator: true },
           }
           const normalized = normalizeColumns([{ ...columnCreation }])
 
@@ -201,6 +202,21 @@ export const columnsReducer: Reducer<State> = (
           saved: saved,
         }
       })
+    case 'SET_COLUMN_OPTION': {
+      return immer(state, (draft) => {
+        const { columnId, option, value } = action.payload
+        if (!draft.byId) return
+
+        const column = draft.byId[columnId]
+        if (!column) return
+
+        if (!option) return
+
+        column.options = column.options || {}
+
+        column.options[option] = value
+      })
+    }
     case 'FETCH_COLUMN_DATA_REQUEST':
     case 'SET_COLUMN_LOADING':
       return immer(state, (draft) => {
