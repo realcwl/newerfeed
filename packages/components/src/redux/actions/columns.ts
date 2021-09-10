@@ -41,7 +41,7 @@ export function clearColumnFilters(payload: { columnId: string }) {
 
 export function setColumnSavedFilter(payload: {
   columnId: string
-  saved?: boolean | null
+  saved?: boolean
 }) {
   return createAction('SET_COLUMN_SAVED_FILTER', payload)
 }

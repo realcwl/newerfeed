@@ -67,7 +67,6 @@ export const OneList = React.memo(
     )
 
     const flatListRef = useRef<FlatList<any>>(null)
-    const [lastItemId, setLastItemId] = useState<string>('')
 
     const {
       ListEmptyComponent,

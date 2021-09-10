@@ -90,6 +90,7 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
         actions.replaceColumnFilters({
           columnId: column.id,
           filter: {
+            ...column.filters,
             query: values.query,
           },
         }),
@@ -146,7 +147,6 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
     if (!column) return null
 
     const saved = column.filters && column.filters.saved
-
     const FilterTagBookmark = (
       <View
         key={`filter-tag-bookmark`}
@@ -155,13 +155,7 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
         <TagToken
           icon={{
             family: 'octicon',
-            name: saved
-              ? 'bookmark-fill'
-              : saved === false
-              ? 'bookmark-slash-fill'
-              : 'bookmark',
-            color:
-              typeof saved === 'boolean' ? undefined : 'foregroundColorMuted65',
+            name: saved ? 'bookmark-fill' : 'bookmark',
           }}
           onPress={() => {
             vibrateHapticFeedback()
@@ -169,11 +163,7 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
             dispatch(
               actions.setColumnSavedFilter({
                 columnId,
-                saved: KeyboardKeyIsPressed.alt
-                  ? false
-                  : saved === true
-                  ? null
-                  : true,
+                saved: !saved,
               }),
             )
           }}
@@ -181,7 +171,7 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
           size={searchBarMainContentHeight}
           strikethrough={saved === false}
           transparent={typeof saved !== 'boolean'}
-          tooltip="Toggle bookmark filter"
+          tooltip="Saved only"
         />
       </View>
     )

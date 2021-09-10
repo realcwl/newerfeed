@@ -193,6 +193,14 @@ export const columnsReducer: Reducer<State> = (
         const { columnId, filter } = action.payload
         draft.byId[columnId].filters = filter
       })
+    case 'SET_COLUMN_SAVED_FILTER':
+      return immer(state, (draft) => {
+        const { columnId, saved } = action.payload
+        draft.byId[columnId].filters = {
+          ...draft.byId[columnId].filters,
+          saved: saved,
+        }
+      })
     case 'FETCH_COLUMN_DATA_REQUEST':
     case 'SET_COLUMN_LOADING':
       return immer(state, (draft) => {

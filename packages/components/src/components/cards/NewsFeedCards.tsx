@@ -122,7 +122,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
         return (
           <EmptyCards
             clearEmoji="bookmark"
-            clearMessage="No bookmarks matching your filters"
+            clearMessage="No saved post"
             columnId={columnId}
             disableLoadingIndicator
             errorMessage={errorMessage}
