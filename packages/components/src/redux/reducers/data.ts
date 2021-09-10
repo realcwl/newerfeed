@@ -45,7 +45,7 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
       return immer(state, (draft) => {
         const { itemNodeIds, read } = action.payload
         const now = new Date().toISOString()
-        for (let itemNodeId of itemNodeIds) {
+        for (const itemNodeId of itemNodeIds) {
           if (!(itemNodeId in draft.byId)) {
             // if the item isn't in the data list, it indicates that we might
             // encountered an error and should return directly.
