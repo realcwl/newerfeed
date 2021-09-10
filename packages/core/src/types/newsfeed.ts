@@ -150,7 +150,7 @@ export interface Avatar {
 
 export interface SubSource {
   avatar?: Avatar
-  name: string
+  id: string
   profileURL?: string
 }
 

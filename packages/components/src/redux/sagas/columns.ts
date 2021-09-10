@@ -102,6 +102,12 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
       crawledTime: post.crawledAt,
       postTime: post.contentGeneratedAt ? post.contentGeneratedAt : undefined,
       cursor: post.cursor,
+      subSource: {
+        id: post.subSource.id,
+        avatar: {
+          imageURL: post.subSource.iconUrl,
+        },
+      },
       isRead: false,
       isSaved: false,
       attachments: post.imageUrls
@@ -546,6 +552,7 @@ function* onFetchColumnDataRequest(
       }),
     )
   } catch (err) {
+    console.log(err)
     yield put(actions.fetchColumnDataFailure({ columnId: column.id }))
     console.error(err)
   }

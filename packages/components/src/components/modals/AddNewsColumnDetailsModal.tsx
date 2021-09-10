@@ -121,7 +121,7 @@ export const AddColumnDetailsModal = React.memo(
           type: 'COLUMN_TYPE_NEWS_FEED',
           id: columnId ? columnId : guid(),
           isUpdate: !!columnId,
-          itemListIds: [],
+          itemListIds: newsFeedColumnAttributes?.itemListIds ?? [],
           newestItemId: '',
           oldestItemId: '',
           sources: getColumnSourcesFromFormValues(formValues),
