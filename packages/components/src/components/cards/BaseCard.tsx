@@ -8,24 +8,18 @@ import {
   Image,
   Linking,
 } from 'react-native'
-import { useDispatch } from 'react-redux'
-
-import ImageViewer from '../../libs/image-viewer'
 import { Attachment, getDateSmallText, getFullDateText } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
 import { Separator } from '../common/Separator'
 import { sharedStyles } from '../../styles/shared'
 import {
-  avatarSize,
-  contentPadding,
   normalTextSize,
   scaleFactor,
   smallAvatarSize,
   smallerTextSize,
   smallTextSize,
 } from '../../styles/variables'
-import { getCardBackgroundThemeColor } from '../columns/ColumnRenderer'
 import { Avatar } from '../common/Avatar'
 import { IntervalRefresh } from '../common/IntervalRefresh'
 import { smallLabelHeight } from '../common/Label'
@@ -34,11 +28,11 @@ import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
 import { BaseCardProps, renderCardActions, sizes } from './BaseCard.shared'
 import { CardActions } from './partials/CardActions'
-import { CardItemSeparator } from './partials/CardItemSeparator'
 import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
 import { TouchableHighlight } from '../common/TouchableHighlight'
 import { useTheme } from '../context/ThemeContext'
-import { RetweetCard } from './RetweetCard'
+import { useReduxState } from '../../hooks/use-redux-state'
+import { idToNameMapSelector } from '../../redux/selectors'
 
 const NUM_OF_LINES = 2
 
@@ -253,6 +247,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     return res
   }
 
+  const idToNameMap = useReduxState(idToNameMapSelector)
+
   const [hasMore, setHasMore] = useState(false)
   const theme = useTheme()
   const checkHasMore = useCallback(
@@ -310,7 +306,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               web: { title: getFullDateText(timestamp) },
             })}
           >
-            {author?.name}
+            {author?.id && idToNameMap[author?.id]
+              ? idToNameMap[author?.id]
+              : author?.id}
           </ThemedText>
           {/* <Spacer width={sizes.horizontalSpaceSize} /> */}
           <View

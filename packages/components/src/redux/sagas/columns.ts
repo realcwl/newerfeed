@@ -102,6 +102,12 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
       crawledTime: post.crawledAt,
       postTime: post.contentGeneratedAt ? post.contentGeneratedAt : undefined,
       cursor: post.cursor,
+      subSource: {
+        id: post.subSource.id,
+        avatar: {
+          imageURL: post.subSource.iconUrl,
+        },
+      },
       isRead: false,
       isSaved: false,
       attachments: post.imageUrls

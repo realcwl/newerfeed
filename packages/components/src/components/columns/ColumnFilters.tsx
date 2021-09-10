@@ -189,7 +189,7 @@ export const ColumnFilters = React.memo((props: ColumnFiltersProps) => {
                     dispatch(
                       actions.setColumnSavedFilter({
                         columnId: column.id,
-                        saved: checked,
+                        saved: !!checked,
                       }),
                     )
                   }}

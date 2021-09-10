@@ -11,7 +11,7 @@ export function markItemAsSaved(payload: {
 
 export function markItemAsRead(payload: {
   // Indicate the item under action.
-  itemNodeId: string
+  itemNodeIds: string[]
   // Indicate whether user read this item or not
   read: boolean
 }) {
