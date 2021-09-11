@@ -15,12 +15,12 @@ export const scaleFactor =
 export const avatarSize = 40 * scaleFactor
 export const smallAvatarSize = 18 * scaleFactor
 
-export const contentPadding = 16 * scaleFactor
+export const contentPadding = 14 * scaleFactor
 
 export const mutedOpacity = 0.6
 export const superMutedOpacity = 0.1
 export const radius = 4
 
-export const normalTextSize = 14 * scaleFactor
-export const smallTextSize = 13 * scaleFactor
-export const smallerTextSize = 12 * scaleFactor
+export const normalTextSize = 13 * scaleFactor
+export const smallTextSize = 11 * scaleFactor
+export const smallerTextSize = 10 * scaleFactor

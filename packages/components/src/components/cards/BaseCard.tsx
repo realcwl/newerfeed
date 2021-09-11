@@ -8,24 +8,18 @@ import {
   Image,
   Linking,
 } from 'react-native'
-import { useDispatch } from 'react-redux'
-
-import ImageViewer from '../../libs/image-viewer'
 import { Attachment, getDateSmallText, getFullDateText } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
 import { Separator } from '../common/Separator'
 import { sharedStyles } from '../../styles/shared'
 import {
-  avatarSize,
-  contentPadding,
   normalTextSize,
   scaleFactor,
   smallAvatarSize,
   smallerTextSize,
   smallTextSize,
 } from '../../styles/variables'
-import { getCardBackgroundThemeColor } from '../columns/ColumnRenderer'
 import { Avatar } from '../common/Avatar'
 import { IntervalRefresh } from '../common/IntervalRefresh'
 import { smallLabelHeight } from '../common/Label'
@@ -34,38 +28,21 @@ import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
 import { BaseCardProps, renderCardActions, sizes } from './BaseCard.shared'
 import { CardActions } from './partials/CardActions'
-import {
-  CardItemSeparator,
-  cardItemSeparatorSize,
-} from './partials/CardItemSeparator'
 import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
 import { TouchableHighlight } from '../common/TouchableHighlight'
-import { Button } from '../common/Button'
-import {
-  Pressable,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from 'react-native-web'
+import { useTheme } from '../context/ThemeContext'
 import { useReduxState } from '../../hooks/use-redux-state'
 import { idToNameMapSelector } from '../../redux/selectors'
-
-const GestureHandlerTouchableOpacity = Platform.select({
-  android: () => require('react-native-gesture-handler').TouchableOpacity,
-  ios: () => require('react-native-gesture-handler').TouchableOpacity,
-  default: () => require('../common/TouchableOpacity').TouchableOpacity,
-})()
+import ImageViewer from '../../libs/image-viewer'
 
 const NUM_OF_LINES = 2
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'transparent',
     overflow: 'hidden',
   },
 
   innerContainer: {
-    width: '100%',
-    height: '100%',
     paddingHorizontal: sizes.cardPaddingHorizontal,
     paddingVertical: sizes.cardPaddingVertical,
   },
@@ -82,15 +59,14 @@ const styles = StyleSheet.create({
   },
 
   authorName: {
+    fontSize: smallTextSize,
     lineHeight: sizes.titleLineHeight,
-    fontSize: smallerTextSize,
-    // width: '300',
     flexGrow: 1,
     overflow: 'hidden',
-    // ...Platform.select({ web: { fontFeatureSettings: '"tnum"' } }),
+    paddingTop: 2 * scaleFactor,
   },
 
-  avatar: {},
+  avatar: { marginBottom: 5 * scaleFactor },
 
   iconContainer: {
     position: 'absolute',
@@ -214,10 +190,7 @@ const styles = StyleSheet.create({
 
 export const BaseCard = React.memo((props: BaseCardProps) => {
   const {
-    action,
     attachments,
-    height,
-
     author,
     time,
     isRead,
@@ -227,7 +200,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     text,
     title,
     type,
+    repostedFrom,
+    isRetweeted,
+    columnId,
   } = props
+
   const timestamp = Date.parse(time)
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
 
@@ -274,6 +251,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const idToNameMap = useReduxState(idToNameMapSelector)
 
   const [hasMore, setHasMore] = useState(false)
+  const theme = useTheme()
   const checkHasMore = useCallback(
     ({
       nativeEvent: {
@@ -287,21 +265,21 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         setHasMore(true)
       }
     },
-    [height, hasMore, textShown],
+    [hasMore, textShown],
   )
 
   return (
     <View
       key={`base-card-container-${type}-${nodeIdOrId}-inner`}
-      style={[styles.container]}
+      style={{
+        backgroundColor: !isRetweeted
+          ? 'transparent'
+          : theme.backgroundColorLess2,
+        overflow: 'hidden',
+      }}
     >
       <ImageViewer image={imageToView} setImage={setImageToView} />
-      <View
-        style={[
-          styles.innerContainer,
-          // { height: height - cardItemSeparatorSize },
-        ]}
-      >
+      <View style={[styles.innerContainer]}>
         <View
           style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
         >
@@ -326,13 +304,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               ? idToNameMap[author?.id]
               : author?.id}
           </ThemedText>
-          {/* <Spacer width={sizes.horizontalSpaceSize} /> */}
-          <View
-            style={[
-              sharedStyles.horizontal,
-              sharedStyles.marginVerticalQuarter,
-            ]}
-          >
+          <View style={[sharedStyles.horizontal]}>
             <IntervalRefresh interval={60000} date={timestamp}>
               {() => {
                 const dateText = getDateSmallText(timestamp)
@@ -355,7 +327,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 )
               }}
             </IntervalRefresh>
-            {!!isSaved && (
+            {!!isSaved && !isRetweeted && (
               <>
                 <Text>{'  '}</Text>
                 <ThemedIcon
@@ -367,7 +339,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               </>
             )}
 
-            {!isRead && (
+            {!isRead && !isRetweeted && (
               <>
                 <Text>{'  '}</Text>
                 <ThemedIcon
@@ -381,7 +353,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           </View>
         </View>
 
-        <Separator horizontal backgroundThemeColor="backgroundColorLighther2" />
+        <Separator
+          horizontal
+          backgroundThemeColor={
+            isRetweeted ? 'backgroundColorLess3' : undefined
+          }
+        />
 
         <View
           style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
@@ -402,30 +379,32 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           </View>
         </View>
 
-        <View style={sharedStyles.horizontal}>
-          <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
-            <View style={sharedStyles.horizontalAndVerticallyAligned}>
-              <ThemedText
-                color="foregroundColorMuted65"
-                numberOfLines={textShown ? undefined : NUM_OF_LINES}
-                onLayout={checkHasMore}
-              >
-                {parseTextWithLinks(text ?? 'no content')}
-              </ThemedText>
-            </View>
-            {hasMore && (
+        {text && (
+          <View style={sharedStyles.horizontal}>
+            <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
               <View style={sharedStyles.horizontalAndVerticallyAligned}>
                 <ThemedText
-                  color="primaryBackgroundColor"
-                  onPress={toggleShowMoreText}
-                  style={[styles.text, sharedStyles.flex]}
+                  color="foregroundColorMuted65"
+                  numberOfLines={textShown ? undefined : NUM_OF_LINES}
+                  onLayout={checkHasMore}
                 >
-                  {textShown ? 'show less' : 'show more'}
+                  {parseTextWithLinks(text ?? 'no content')}
                 </ThemedText>
               </View>
-            )}
+              {hasMore && (
+                <View style={sharedStyles.horizontalAndVerticallyAligned}>
+                  <ThemedText
+                    color="primaryBackgroundColor"
+                    onPress={toggleShowMoreText}
+                    style={[styles.text, sharedStyles.flex]}
+                  >
+                    {textShown ? 'show less' : 'show more'}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
           </View>
-        </View>
+        )}
 
         {!!attachments && (
           <View
@@ -450,8 +429,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                         uri: attachment.url,
                       }}
                       style={{
-                        width: 100 * scaleFactor,
-                        height: 100 * scaleFactor,
+                        width: 60 * scaleFactor,
+                        height: 60 * scaleFactor,
                       }}
                       resizeMode="cover"
                     />
@@ -462,18 +441,29 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           </View>
         )}
 
-        {!!renderCardActions && (
-          <>
+        {repostedFrom && (
+          <View>
             <Spacer height={sizes.verticalSpaceSize} />
+            <BaseCard
+              {...repostedFrom}
+              columnId={columnId}
+              isRetweeted={true}
+            />
+          </View>
+        )}
 
+        <Spacer height={sizes.verticalSpaceSize * 2} />
+
+        {!!renderCardActions && !isRetweeted && (
+          <>
             <CardActions
               commentsCount={
                 undefined
                 // issueOrPullRequest ? issueOrPullRequest.comments : undefined
               }
               commentsLink={link}
-              isRead={isRead}
-              isSaved={isSaved}
+              isRead={!!isRead}
+              isSaved={!!isSaved}
               itemNodeId={nodeIdOrId}
               type={type}
             />
@@ -481,18 +471,16 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             <Spacer height={sizes.verticalSpaceSize} />
           </>
         )}
-
-        <Spacer flex={1} />
       </View>
 
-      <CardItemSeparator
+      {/* <CardItemSeparator
         leftOffset={
           sizes.cardPaddingHorizontal +
           sizes.avatarContainerWidth +
           sizes.horizontalSpaceSize
         }
         muted={isMuted}
-      />
+      /> */}
     </View>
   )
 })

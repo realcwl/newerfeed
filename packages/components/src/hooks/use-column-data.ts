@@ -19,7 +19,7 @@ function dataMatchesQuery(data: NewsFeedData, query: string): boolean {
 
 // Return true if data is saved.
 function dataIsSaved(data: NewsFeedData): boolean {
-  return data.isSaved
+  return !!data.isSaved
 }
 
 // The core matching function, return true iif the input data matches all column

@@ -34,7 +34,7 @@ const _actionFontSize = smallerTextSize
 const _subitemFontSize = smallTextSize
 const _subitemLineHeight = _subitemFontSize + 2 * scaleFactor
 export const sizes = {
-  cardPaddingVertical: contentPadding,
+  cardPaddingVertical: contentPadding / 2,
   cardPaddingHorizontal: contentPadding,
   iconSize: PixelRatio.roundToNearestPixel(_iconSize),
   iconContainerSize: _iconContainerSize,
@@ -64,27 +64,21 @@ export const renderCardActions =
 export interface AdditionalCardProps {
   // appViewMode: AppViewMode
   columnId: string
-  height: number
 }
 
 export interface BaseCardProps extends AdditionalCardProps {
-  action?: {
-    avatar: {
-      imageURL: string
-      linkURL: string
-    }
-    text: string
-  }
   author?: SubSource
   attachments?: Attachment[]
-  time: string
-  isRead: boolean
-  isSaved: boolean
   link?: string
   nodeIdOrId: string
   text?: string
   title?: string
   type: Column['type']
+  time: string
+  isRead?: boolean
+  isSaved?: boolean
+  repostedFrom?: Omit<BaseCardProps, keyof AdditionalCardProps>
+  isRetweeted?: boolean
 }
 
 function _getCardPropsForItem(
@@ -102,6 +96,9 @@ function _getCardPropsForItem(
     text: item.text,
     author: item.subSource,
     nodeIdOrId: item.id,
+    repostedFrom: item.repostedFrom
+      ? _getCardPropsForItem(type, item.repostedFrom)
+      : undefined,
   }
 }
 
@@ -123,10 +120,9 @@ export function getCardPropsForItem(
   type: string,
   columnId: string,
   item: NewsFeedData,
-): Omit<BaseCardProps, keyof AdditionalCardProps> &
-  Pick<AdditionalCardProps, 'height'> {
+): Omit<BaseCardProps, keyof AdditionalCardProps> {
   const props = _memoizedGetCardPropsForItem(type, columnId, item)
-  return { ...props, height: getCardSizeForProps(props) }
+  return { ...props }
 }
 
 export function getCardSizeForProps(
@@ -141,9 +137,6 @@ export function getCardSizeForProps(
         (props.title ? sizes.titleLineHeight : 0) +
           (props.text ? sizes.textLineHeight + sizes.verticalSpaceSize : 0),
       ) +
-      (props.action && props.action.text
-        ? sizes.actionContainerHeight + sizes.verticalSpaceSize
-        : 0) +
       (renderCardActions ? cardActionsHeight + sizes.verticalSpaceSize : 0) +
       cardItemSeparatorSize,
   )

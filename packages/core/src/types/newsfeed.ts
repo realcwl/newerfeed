@@ -188,9 +188,9 @@ export interface NewsFeedData {
   // cursor associated with this feed that backend uses.
   cursor: number
   // Indicate that whether this item is already saved by user.
-  isSaved: boolean
+  isSaved?: boolean
   // Indicate whether this card has been read by the user.
-  isRead: boolean
+  isRead?: boolean
 }
 
 export interface Attachment {
