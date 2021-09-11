@@ -143,7 +143,7 @@ export const ModalColumn = React.memo((props: ModalColumnProps) => {
                 sharedStyles.paddingHorizontal,
               ]}
             >
-              <QuickFeedbackRow />
+              {/* <QuickFeedbackRow /> */}
             </View>
           )}
 
