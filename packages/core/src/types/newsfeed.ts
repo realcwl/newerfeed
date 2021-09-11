@@ -152,8 +152,9 @@ export interface Avatar {
 }
 
 export interface SubSource {
-  avatar?: Avatar
+  avatar: Avatar
   id: string
+  name: string
   profileURL?: string
 }
 
