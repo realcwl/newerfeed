@@ -1,4 +1,9 @@
-import { ColumnCreation, guid, NewsFeedColumnSource } from '@devhub/core'
+import {
+  ColumnCreation,
+  guid,
+  mapSourceIdToName,
+  NewsFeedColumnSource,
+} from '@devhub/core'
 import { useFormik } from 'formik'
 import _ from 'lodash'
 import React, { Fragment, useEffect, useRef, useState } from 'react'
@@ -12,7 +17,6 @@ import * as actions from '../../redux/actions'
 import * as selectors from '../../redux/selectors'
 import { sharedStyles } from '../../styles/shared'
 import { contentPadding, scaleFactor } from '../../styles/variables'
-import { mapSourceIdToName } from '../../utils/naming'
 import { ModalColumn } from '../columns/ModalColumn'
 import { AccordionView } from '../common/AccordionView'
 import { Button } from '../common/Button'
@@ -43,7 +47,9 @@ export const AddColumnDetailsModal = React.memo(
   (props: AddColumnDetailsModalProps) => {
     const { showBackButton, columnId } = props
     const store = useStore()
-    const idToNameMap = useReduxState(selectors.idToNameMapSelector)
+    const idToSourceOrSubSourceMap = useReduxState(
+      selectors.idToSourceOrSubSourceMapSelector,
+    )
     const availableNewsFeedSources = useReduxState(
       selectors.availableNewsFeedSourcesSelector,
     )
@@ -233,11 +239,13 @@ export const AddColumnDetailsModal = React.memo(
             <View>
               <View style={[sharedStyles.flex, sharedStyles.horizontal]}>
                 <H3>
-                  {mapSourceIdToName(source.sourceId, idToNameMap) +
-                    getNumberOfSelectionLabel(
-                      formikProps.values[source.sourceId],
-                      source,
-                    )}
+                  {`${mapSourceIdToName(
+                    source.sourceId,
+                    idToSourceOrSubSourceMap,
+                  )}${getNumberOfSelectionLabel(
+                    formikProps.values[source.sourceId],
+                    source,
+                  )}`}
                 </H3>
                 <Spacer flex={1} />
                 <ThemedIcon

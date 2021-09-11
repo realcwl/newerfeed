@@ -35,6 +35,7 @@ interface Post {
   cursor: number
   subSource: {
     id: string
+    name: string
     iconUrl: string
   }
   sharedFromPost: Post
@@ -56,7 +57,21 @@ interface FeedsResponse {
           id: string
         }
       }[]
-      posts: Post[]
+      posts: {
+        id: string
+        title: string
+        content: string
+        cursor: number
+        subSource: {
+          id: string
+          name: string
+          iconUrl: string
+        }
+        sharedFromPost: Post
+        imageUrls: string[]
+        contentGeneratedAt: string
+        crawledAt: string
+      }[]
     }[]
   }
 }
@@ -108,9 +123,8 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
       cursor: post.cursor,
       subSource: {
         id: post.subSource.id,
-        avatar: {
-          imageURL: post.subSource.iconUrl,
-        },
+        name: post.subSource.name,
+        avatarURL: post.subSource.iconUrl,
       },
       repostedFrom: post.sharedFromPost
         ? postToNewsFeedData(post.sharedFromPost)
@@ -257,6 +271,7 @@ function constructFeedRequest(
           cursor: true,
           subSource: {
             id: true,
+            name: true,
             iconUrl: true,
           },
           imageUrls: true,

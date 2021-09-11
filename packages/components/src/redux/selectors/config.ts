@@ -14,7 +14,8 @@ export const themePairSelector = (state: RootState) =>
 export const availableNewsFeedSourcesSelector = (state: RootState) =>
   s(state).availableNewsFeedSources
 
-export const idToNameMapSelector = (state: RootState) => s(state).idToNameMap
+export const idToSourceOrSubSourceMapSelector = (state: RootState) =>
+  s(state).idToSourceOrSubSourceMap
 
 export const themeSelector = createSelector(
   themePairSelector,

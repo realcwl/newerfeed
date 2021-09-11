@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import moment, { MomentInput } from 'moment'
 import { Column, ColumnOptions } from '..'
+import { SourceOrSubSource } from '..'
 
 export function capitalize(str: string) {
   return str.toLowerCase().replace(/^.| ./g, _.toUpper)
@@ -448,4 +449,14 @@ export function getColumnOption<O extends keyof ColumnOptions>(
   option: O,
 ): ColumnOptions[O] {
   return column.options && column.options[option]
+}
+
+// Converts from id to actual naming within a source. If we could find a mapping
+// inside the provided naming map, convert it to the actual naming, otherwise
+// just use id for rendering.
+export function mapSourceIdToName(
+  id: string,
+  idToSubSourceMap: Record<string, SourceOrSubSource>,
+): string {
+  return idToSubSourceMap[id].name || id
 }

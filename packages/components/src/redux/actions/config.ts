@@ -1,6 +1,10 @@
 import { ColorSchemeName } from 'react-native'
 
-import { NewsFeedColumnSource, ThemePair } from '@devhub/core'
+import {
+  NewsFeedColumnSource,
+  SourceOrSubSource,
+  ThemePair,
+} from '@devhub/core'
 import { createAction } from '../helpers'
 
 export function setTheme(payload: {
@@ -12,7 +16,7 @@ export function setTheme(payload: {
 
 export function setSourcesAndIdMap(payload: {
   sources: NewsFeedColumnSource[]
-  idToNameMap: Record<string, string>
+  idToSourceOrSubSourceMap: Record<string, SourceOrSubSource>
 }) {
   return createAction('SET_SOURCES_AND_ID_MAP', payload)
 }
