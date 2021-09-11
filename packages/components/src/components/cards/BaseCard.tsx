@@ -33,6 +33,7 @@ import { TouchableHighlight } from '../common/TouchableHighlight'
 import { useTheme } from '../context/ThemeContext'
 import { useReduxState } from '../../hooks/use-redux-state'
 import { idToNameMapSelector } from '../../redux/selectors'
+import ImageViewer from '../../libs/image-viewer'
 
 const NUM_OF_LINES = 2
 
@@ -273,19 +274,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       style={{
         backgroundColor: !isRetweeted
           ? 'transparent'
-          : // : theme.isDark
-            // ? theme.backgroundColorDarker5
-            theme.backgroundColorLess2,
+          : theme.backgroundColorLess2,
         overflow: 'hidden',
       }}
     >
-      <View
-        style={[
-          // styles.innerContainer,
-          styles.innerContainer,
-          // { height: height - cardItemSeparatorSize },
-        ]}
-      >
+      <ImageViewer image={imageToView} setImage={setImageToView} />
+      <View style={[styles.innerContainer]}>
         <View
           style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
         >
@@ -310,13 +304,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               ? idToNameMap[author?.id]
               : author?.id}
           </ThemedText>
-          {/* <Spacer width={sizes.horizontalSpaceSize} /> */}
-          <View
-            style={[
-              sharedStyles.horizontal,
-              // sharedStyles.marginVerticalQuarter,
-            ]}
-          >
+          <View style={[sharedStyles.horizontal]}>
             <IntervalRefresh interval={60000} date={timestamp}>
               {() => {
                 const dateText = getDateSmallText(timestamp)
@@ -474,8 +462,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 // issueOrPullRequest ? issueOrPullRequest.comments : undefined
               }
               commentsLink={link}
-              isRead={isRead ?? false}
-              isSaved={isSaved ?? false}
+              isRead={!!isRead}
+              isSaved={!!isSaved}
               itemNodeId={nodeIdOrId}
               type={type}
             />
