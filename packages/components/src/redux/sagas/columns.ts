@@ -26,7 +26,10 @@ import {
   NewsFeedDataExpressionWrapper,
 } from '@devhub/core'
 import { WrapUrlWithToken } from '../../utils/api'
-import { EMPTY_ARRAY } from '@devhub/core/src/utils/constants'
+import {
+  COLUMN_OUT_OF_SYNC_TIME_IN_MILLI_SECOND,
+  EMPTY_ARRAY,
+} from '@devhub/core/src/utils/constants'
 
 interface FeedsResponse {
   data: {
@@ -266,35 +269,39 @@ function constructFeedRequest(
   })
 }
 
+function* refreshAllOutdatedColumn() {
+  const allColumnsWithRefreshTime = yield* select(
+    selectors.columnsWithRefreshTimeSelector,
+  )
+
+  yield* all(
+    allColumnsWithRefreshTime.map(function* (columnWithRefreshTime) {
+      if (!columnWithRefreshTime) return
+      const timeDiff =
+        Date.now() - Date.parse(columnWithRefreshTime.refreshedAt)
+
+      if (timeDiff < COLUMN_OUT_OF_SYNC_TIME_IN_MILLI_SECOND) {
+        return
+      }
+
+      return yield put(
+        actions.fetchColumnDataRequest({
+          columnId: columnWithRefreshTime.id,
+          direction: 'NEW',
+        }),
+      )
+    }),
+  )
+}
+
 // columnRefresher is a saga that indefinetly refresh columns if it's outdated.
 function* columnRefresher() {
   while (true) {
     // Try refresh all columns every 10 seconds.
     yield delay(10 * 1000)
 
-    const allColumnsWithRefreshTime = yield* select(
-      selectors.columnsWithRefreshTimeSelector,
-    )
-
-    yield* all(
-      allColumnsWithRefreshTime.map(function* (columnWithRefreshTime) {
-        if (!columnWithRefreshTime) return
-        const oneMinutes = 1000 * 60 * 1
-        const timeDiff =
-          Date.now() - Date.parse(columnWithRefreshTime.refreshedAt)
-
-        if (timeDiff < oneMinutes) {
-          return
-        }
-
-        return yield put(
-          actions.fetchColumnDataRequest({
-            columnId: columnWithRefreshTime.id,
-            direction: 'NEW',
-          }),
-        )
-      }),
-    )
+    // Refresh all outdated column
+    yield* refreshAllOutdatedColumn()
   }
 }
 
@@ -561,6 +568,7 @@ function* onFetchColumnDataRequest(
 export function* columnsSagas() {
   yield* all([
     yield* fork(columnRefresher),
+    yield* takeEvery('UPDATE_SEED_STATE', refreshAllOutdatedColumn),
     yield* takeEvery('ADD_COLUMN', onAddColumn),
     yield* takeEvery('FETCH_COLUMN_DATA_REQUEST', onFetchColumnDataRequest),
     yield* takeEvery('MOVE_COLUMN', onMoveColumn),
