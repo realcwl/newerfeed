@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Column, constants } from '@devhub/core'
+import { Column, constants, getColumnOption } from '@devhub/core'
 import { View } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { useAppViewMode } from '../../hooks/use-app-view-mode'
@@ -50,7 +50,7 @@ export const ColumnOptions = React.memo(
 
         <Checkbox
           analyticsLabel="column_option_in_app_unread_indicator"
-          checked={false}
+          checked={!!getColumnOption(column, 'enableAppIconUnreadIndicator')}
           containerStyle={
             sharedColumnOptionsStyles.fullWidthCheckboxContainerWithPadding
           }
@@ -64,7 +64,13 @@ export const ColumnOptions = React.memo(
             appOrientation === 'portrait' ? 'bottom bar' : 'sidebar'
           }`}
           onChange={(value) => {
-            console.log('Checkbox Changed for Column Options')
+            dispatch(
+              actions.setColumnOption({
+                columnId,
+                option: 'enableAppIconUnreadIndicator',
+                value: !!value,
+              }),
+            )
           }}
         />
 

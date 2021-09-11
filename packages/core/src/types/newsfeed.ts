@@ -75,6 +75,9 @@ export interface BaseColumn {
 
   // the current state of the column.
   state: LoadState
+
+  // ColumnOptions that can customize the behavior of a column.
+  options: ColumnOptions
 }
 
 // Contains the actual news feed data expression.
@@ -152,6 +155,10 @@ export interface SubSource {
   avatar?: Avatar
   id: string
   profileURL?: string
+}
+
+export interface ColumnOptions {
+  enableAppIconUnreadIndicator?: boolean
 }
 
 export interface NewsFeedData {

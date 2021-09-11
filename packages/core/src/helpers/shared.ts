@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import moment, { MomentInput } from 'moment'
+import { Column, ColumnOptions } from '..'
 
 export function capitalize(str: string) {
   return str.toLowerCase().replace(/^.| ./g, _.toUpper)
@@ -440,4 +441,11 @@ export function addDashesToString(str: string | undefined, addDashEvery = 0) {
       return [...arr, char]
     }, [])
     .join('-')
+}
+
+export function getColumnOption<O extends keyof ColumnOptions>(
+  column: Column,
+  option: O,
+): ColumnOptions[O] {
+  return column.options && column.options[option]
 }
