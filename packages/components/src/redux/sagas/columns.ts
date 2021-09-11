@@ -28,6 +28,21 @@ import {
 import { WrapUrlWithToken } from '../../utils/api'
 import { EMPTY_ARRAY } from '@devhub/core/src/utils/constants'
 
+interface Post {
+  id: string
+  title: string
+  content: string
+  cursor: number
+  subSource: {
+    id: string
+    iconUrl: string
+  }
+  sharedFromPost: Post
+  imageUrls: string[]
+  contentGeneratedAt: string
+  crawledAt: string
+}
+
 interface FeedsResponse {
   data: {
     feeds: {
@@ -41,19 +56,7 @@ interface FeedsResponse {
           id: string
         }
       }[]
-      posts: {
-        id: string
-        title: string
-        content: string
-        cursor: number
-        subSource: {
-          id: string
-          iconUrl: string
-        }
-        imageUrls: string[]
-        contentGeneratedAt: string
-        crawledAt: string
-      }[]
+      posts: Post[]
     }[]
   }
 }
@@ -94,8 +97,9 @@ function convertFeedsResponseToSources(
 
 function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
   if (response.data.feeds.length === 0) return EMPTY_ARRAY
-  return response.data.feeds[0].posts.map((post) => {
-    const newsFeedData: NewsFeedData = {
+
+  const postToNewsFeedData = (post: Post): NewsFeedData => {
+    return {
       id: post.id,
       title: post.title,
       text: post.content,
@@ -108,6 +112,9 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
           imageURL: post.subSource.iconUrl,
         },
       },
+      repostedFrom: post.sharedFromPost
+        ? postToNewsFeedData(post.sharedFromPost)
+        : undefined,
       isRead: false,
       isSaved: false,
       attachments: post.imageUrls
@@ -120,7 +127,9 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
           })
         : [],
     }
-    return newsFeedData
+  }
+  return response.data.feeds[0].posts.map((post) => {
+    return postToNewsFeedData(post)
   })
 }
 
@@ -252,6 +261,17 @@ function constructFeedRequest(
           },
           imageUrls: true,
           contentGeneratedAt: true,
+          sharedFromPost: {
+            id: true,
+            title: true,
+            content: true,
+            subSource: {
+              id: true,
+              iconUrl: true,
+            },
+            imageUrls: true,
+            contentGeneratedAt: true,
+          },
         },
         subSources: {
           id: true,
