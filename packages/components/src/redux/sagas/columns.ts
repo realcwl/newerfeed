@@ -48,6 +48,7 @@ interface FeedsResponse {
         cursor: number
         subSource: {
           id: string
+          name: string
           iconUrl: string
         }
         imageUrls: string[]
@@ -104,9 +105,8 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
       cursor: post.cursor,
       subSource: {
         id: post.subSource.id,
-        avatar: {
-          imageURL: post.subSource.iconUrl,
-        },
+        name: post.subSource.name,
+        avatarURL: post.subSource.iconUrl,
       },
       isRead: false,
       isSaved: false,
@@ -248,6 +248,7 @@ function constructFeedRequest(
           cursor: true,
           subSource: {
             id: true,
+            name: true,
             iconUrl: true,
           },
           imageUrls: true,

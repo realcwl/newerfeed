@@ -1,6 +1,12 @@
 import immer from 'immer'
 
-import { constants, NewsFeedColumnSource, ThemePair } from '@devhub/core'
+import {
+  constants,
+  NewsFeedColumnSource,
+  NewsFeedData,
+  SourceOrSubSource,
+  ThemePair,
+} from '@devhub/core'
 import { Reducer } from '../types'
 
 // Config reducer stores global environment variables, such as the current
@@ -10,9 +16,8 @@ export interface State {
   // all available sources, which will be fetched everytime we launch NewsFeed.
   availableNewsFeedSources: NewsFeedColumnSource[]
 
-  // maps the source/subtype id to the actual naming. This is required in
-  // config. The key is a compound id, which for source is source + subtype
-  idToNameMap: Record<string, string>
+  // maps the source/subtype id to the actual attributes.
+  idToSourceOrSubSourceMap: Record<string, SourceOrSubSource>
 }
 
 const initialState: State = {
@@ -20,7 +25,20 @@ const initialState: State = {
 
   availableNewsFeedSources: [],
 
-  idToNameMap: {},
+  idToSourceOrSubSourceMap: {},
+}
+
+// Recursively include all sources or subsources into the id map.
+function addDataSourceToIdMap(
+  data: NewsFeedData,
+  idToSourceOrSubSourceMap: typeof initialState['idToSourceOrSubSourceMap'],
+): void {
+  if (data.subSource && !(data.subSource.id in idToSourceOrSubSourceMap)) {
+    idToSourceOrSubSourceMap[data.subSource.id] = data.subSource
+  }
+  if (data.repostedFrom) {
+    addDataSourceToIdMap(data.repostedFrom, idToSourceOrSubSourceMap)
+  }
 }
 
 export const configReducer: Reducer<State> = (state = initialState, action) => {
@@ -32,7 +50,15 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
     case 'SET_SOURCES_AND_ID_MAP': {
       return immer(state, (draft) => {
         draft.availableNewsFeedSources = action.payload.sources
-        draft.idToNameMap = action.payload.idToNameMap
+        draft.idToSourceOrSubSourceMap = action.payload.idToSourceOrSubSourceMap
+      })
+    }
+    case 'FETCH_COLUMN_DATA_SUCCESS': {
+      return immer(state, (draft) => {
+        const { data } = action.payload
+        for (const d of data) {
+          addDataSourceToIdMap(d, draft.idToSourceOrSubSourceMap)
+        }
       })
     }
     default:

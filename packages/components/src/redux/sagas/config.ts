@@ -1,4 +1,8 @@
-import { constants, NewsFeedColumnSource } from '@devhub/core'
+import {
+  constants,
+  NewsFeedColumnSource,
+  SourceOrSubSource,
+} from '@devhub/core'
 import { all, select, takeLatest, delay, put } from 'typed-redux-saga'
 import axios, { AxiosResponse } from 'axios'
 import { analytics } from '../../libs/analytics'
@@ -16,6 +20,7 @@ interface SourcesResponse {
       subsources: {
         id: string
         name: string
+        iconUrl: string
         updatedAt: string
       }[]
     }[]
@@ -39,14 +44,21 @@ function GetAvailableSourcesFromSourcesResponse(
   return res
 }
 
-function GetIdToNameMapFromSourcesResponse(
+function GetIdMapFromSourcesResponse(
   sourcesResponse: SourcesResponse,
-): Record<string, string> {
-  const res: Record<string, string> = {}
+): Record<string, SourceOrSubSource> {
+  const res: Record<string, SourceOrSubSource> = {}
   for (const source of sourcesResponse.data.sources) {
-    res[source.id] = source.name
+    res[source.id] = {
+      id: source.id,
+      name: source.name,
+    }
     for (const subSource of source.subsources) {
-      res[subSource.id] = subSource.name
+      res[subSource.id] = {
+        id: subSource.id,
+        name: subSource.name,
+        avatarURL: subSource.iconUrl,
+      }
     }
   }
   return res
@@ -76,6 +88,7 @@ function* fetchAvailableSourcesAndIdMap() {
             subsources: {
               id: true,
               name: true,
+              iconUrl: true,
             },
           },
         },
@@ -86,7 +99,9 @@ function* fetchAvailableSourcesAndIdMap() {
   yield put(
     setSourcesAndIdMap({
       sources: GetAvailableSourcesFromSourcesResponse(sourcesResponse.data),
-      idToNameMap: GetIdToNameMapFromSourcesResponse(sourcesResponse.data),
+      idToSourceOrSubSourceMap: GetIdMapFromSourcesResponse(
+        sourcesResponse.data,
+      ),
     }),
   )
 }
