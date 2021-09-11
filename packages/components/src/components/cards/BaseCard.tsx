@@ -35,7 +35,7 @@ import { useReduxState } from '../../hooks/use-redux-state'
 import { idToNameMapSelector } from '../../redux/selectors'
 import ImageViewer from '../../libs/image-viewer'
 
-const NUM_OF_LINES = 2
+const NUM_OF_LINES = 3
 
 const styles = StyleSheet.create({
   container: {
@@ -92,11 +92,9 @@ const styles = StyleSheet.create({
 
   title: {
     flex: 1,
-    // height: sizes.titleLineHeight,
     lineHeight: sizes.titleLineHeight,
     fontSize: normalTextSize,
-    // fontWeight: '500',
-    // overflow: 'hidden',
+    fontWeight: '800',
   },
 
   subtitle: {
@@ -353,13 +351,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           </View>
         </View>
 
-        <Separator
-          horizontal
-          backgroundThemeColor={
-            isRetweeted ? 'backgroundColorLess3' : undefined
-          }
-        />
-
         <View
           style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
         >
@@ -406,7 +397,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           </View>
         )}
 
-        {!!attachments && (
+        {!!attachments && attachments.length !== 0 && (
           <View
             style={{
               flexDirection: 'row',
@@ -452,7 +443,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           </View>
         )}
 
-        <Spacer height={sizes.verticalSpaceSize * 2} />
+        <Spacer height={sizes.verticalSpaceSize} />
 
         {!!renderCardActions && !isRetweeted && (
           <>
