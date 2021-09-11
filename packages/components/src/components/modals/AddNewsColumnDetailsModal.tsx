@@ -239,14 +239,13 @@ export const AddColumnDetailsModal = React.memo(
             <View>
               <View style={[sharedStyles.flex, sharedStyles.horizontal]}>
                 <H3>
-                  {mapSourceIdToName(
+                  {`${mapSourceIdToName(
                     source.sourceId,
                     idToSourceOrSubSourceMap,
-                  ) +
-                    getNumberOfSelectionLabel(
-                      formikProps.values[source.sourceId],
-                      source,
-                    )}
+                  )}${getNumberOfSelectionLabel(
+                    formikProps.values[source.sourceId],
+                    source,
+                  )}`}
                 </H3>
                 <Spacer flex={1} />
                 <ThemedIcon
