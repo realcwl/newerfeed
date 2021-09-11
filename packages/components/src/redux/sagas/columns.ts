@@ -31,6 +31,22 @@ import {
   EMPTY_ARRAY,
 } from '@devhub/core/src/utils/constants'
 
+interface Post {
+  id: string
+  title: string
+  content: string
+  cursor: number
+  subSource: {
+    id: string
+    name: string
+    iconUrl: string
+  }
+  sharedFromPost: Post
+  imageUrls: string[]
+  contentGeneratedAt: string
+  crawledAt: string
+}
+
 interface FeedsResponse {
   data: {
     feeds: {
@@ -54,6 +70,7 @@ interface FeedsResponse {
           name: string
           iconUrl: string
         }
+        sharedFromPost: Post
         imageUrls: string[]
         contentGeneratedAt: string
         crawledAt: string
@@ -98,8 +115,9 @@ function convertFeedsResponseToSources(
 
 function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
   if (response.data.feeds.length === 0) return EMPTY_ARRAY
-  return response.data.feeds[0].posts.map((post) => {
-    const newsFeedData: NewsFeedData = {
+
+  const postToNewsFeedData = (post: Post): NewsFeedData => {
+    return {
       id: post.id,
       title: post.title,
       text: post.content,
@@ -111,6 +129,9 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
         name: post.subSource.name,
         avatarURL: post.subSource.iconUrl,
       },
+      repostedFrom: post.sharedFromPost
+        ? postToNewsFeedData(post.sharedFromPost)
+        : undefined,
       isRead: false,
       isSaved: false,
       attachments: post.imageUrls
@@ -123,7 +144,9 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
           })
         : [],
     }
-    return newsFeedData
+  }
+  return response.data.feeds[0].posts.map((post) => {
+    return postToNewsFeedData(post)
   })
 }
 
@@ -256,6 +279,17 @@ function constructFeedRequest(
           },
           imageUrls: true,
           contentGeneratedAt: true,
+          sharedFromPost: {
+            id: true,
+            title: true,
+            content: true,
+            subSource: {
+              id: true,
+              iconUrl: true,
+            },
+            imageUrls: true,
+            contentGeneratedAt: true,
+          },
         },
         subSources: {
           id: true,
