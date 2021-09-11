@@ -96,9 +96,11 @@ export const AddColumnDetailsModal = React.memo(
       for (const columnSource of newsFeedColumnAttributes.sources) {
         res[columnSource.sourceId] = columnSource.subSourceIds
       }
+
       return {
         ...res,
         name: newsFeedColumnAttributes.title,
+        icon: newsFeedColumnAttributes.icon,
         // Make a deepcopy, otherwise every addtion or removal is happening on
         // the real redux object.
         dataExpression: _.cloneDeep(newsFeedColumnAttributes.dataExpression),
