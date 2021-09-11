@@ -32,7 +32,7 @@ import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
 import { TouchableHighlight } from '../common/TouchableHighlight'
 import { useTheme } from '../context/ThemeContext'
 import { useReduxState } from '../../hooks/use-redux-state'
-import { idToNameMapSelector } from '../../redux/selectors'
+import { idToSourceOrSubSourceMapSelector } from '../../redux/selectors'
 import ImageViewer from '../../libs/image-viewer'
 
 const NUM_OF_LINES = 3
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
 export const BaseCard = React.memo((props: BaseCardProps) => {
   const {
     attachments,
-    author,
+    subSourceId,
     time,
     isRead,
     isSaved: isSaved,
@@ -246,7 +246,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     return res
   }
 
-  const idToNameMap = useReduxState(idToNameMapSelector)
+  const idToSourceOrSubSourceMap = useReduxState(
+    idToSourceOrSubSourceMapSelector,
+  )
+  const subSource = idToSourceOrSubSourceMap[subSourceId]
 
   const [hasMore, setHasMore] = useState(false)
   const theme = useTheme()
@@ -283,9 +286,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         >
           <View style={styles.smallAvatarContainer}>
             <Avatar
-              avatarUrl={author?.avatar?.imageURL}
-              disableLink={author?.profileURL === link}
-              linkURL={author?.profileURL}
+              avatarUrl={subSource ? subSource.avatarURL : ''}
+              // TODO(chenweilunster): Enable link
+              disableLink={false}
+              linkURL={subSource ? subSource.profileURL : ''}
               style={styles.avatar}
               size={smallAvatarSize}
             />
@@ -298,9 +302,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               web: { title: getFullDateText(timestamp) },
             })}
           >
-            {author?.id && idToNameMap[author?.id]
-              ? idToNameMap[author?.id]
-              : author?.id}
+            {subSource ? subSource.name : ''}
           </ThemedText>
           <View style={[sharedStyles.horizontal]}>
             <IntervalRefresh interval={60000} date={timestamp}>

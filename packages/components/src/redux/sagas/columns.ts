@@ -106,9 +106,7 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
       subSource: {
         id: post.subSource.id,
         name: post.subSource.name,
-        avatar: {
-          imageURL: post.subSource.iconUrl,
-        },
+        avatarURL: post.subSource.iconUrl,
       },
       isRead: false,
       isSaved: false,

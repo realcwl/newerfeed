@@ -147,14 +147,13 @@ export interface ColumnFilter {
   // more filters when needed...
 }
 
-export interface Avatar {
-  imageURL?: string
-}
-
-export interface SubSource {
-  avatar: Avatar
+// Identify key attribute of souce or sub source
+export interface SourceOrSubSource {
   id: string
   name: string
+  // Required for subsource, this leads to the sub source image.
+  avatarURL?: string
+  // profile URL leads to the home page.
   profileURL?: string
 }
 
@@ -169,7 +168,7 @@ export interface NewsFeedData {
   // message shown to user.
   text?: string
   // author info, aka subsource, ex. weibo/twitter users
-  subSource?: SubSource
+  subSource?: SourceOrSubSource
   // if this is not null, user can click a card to go to original page.
   url?: string
   // A list of attachment that will be rendered together with this card.

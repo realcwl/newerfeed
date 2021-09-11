@@ -1,4 +1,8 @@
-import { NewsFeedColumnSource, ThemeColors } from '@devhub/core'
+import {
+  mapSourceIdToName,
+  NewsFeedColumnSource,
+  ThemeColors,
+} from '@devhub/core'
 import React, { useState } from 'react'
 import { View } from 'react-native'
 import { useReduxState } from '../../../hooks/use-redux-state'
@@ -12,7 +16,6 @@ import {
   ThemedTextInput,
   ThemedTextInputProps,
 } from '../../themed/ThemedTextInput'
-import { mapSourceIdToName } from '../../../utils/naming'
 import { useFormik } from 'formik'
 
 // We shoud a search bar if there are more than 9 subtypes to be selected.
@@ -26,7 +29,9 @@ export interface NewsSubtypesWithFilterProps {
 export const NewsSubtypesWithFilter = React.memo(
   (props: NewsSubtypesWithFilterProps) => {
     const { source, formikProps } = props
-    const idToNameMap = useReduxState(selectors.idToNameMapSelector)
+    const idToSourceOrSubSourceMap = useReduxState(
+      selectors.idToSourceOrSubSourceMapSelector,
+    )
 
     // A string filter that will be changed by text input.
     const [filter, setFilter] = useState('')
@@ -34,7 +39,9 @@ export const NewsSubtypesWithFilter = React.memo(
     // Show error if all subtypes doesn't contain the specified text f
     function shouldShowError(source: NewsFeedColumnSource) {
       for (const subtype of source.subSourceIds) {
-        if (mapSourceIdToName(subtype, idToNameMap).includes(filter)) {
+        if (
+          mapSourceIdToName(subtype, idToSourceOrSubSourceMap).includes(filter)
+        ) {
           return false
         }
       }
@@ -90,7 +97,9 @@ export const NewsSubtypesWithFilter = React.memo(
       return source.subSourceIds.map((subtype) => {
         const selectedSubtype = formikProps.values[source.sourceId]
         // Filter by the actual name, instead of by id.
-        return mapSourceIdToName(subtype, idToNameMap).includes(filter) ? (
+        return mapSourceIdToName(subtype, idToSourceOrSubSourceMap).includes(
+          filter,
+        ) ? (
           <View key={`add-news-column-details-source-subtype-${subtype}`}>
             <Checkbox
               checked={selectedSubtype.includes(subtype)}
@@ -98,7 +107,7 @@ export const NewsSubtypesWithFilter = React.memo(
                 sharedColumnOptionsStyles.fullWidthCheckboxContainer
               }
               defaultValue={false}
-              label={mapSourceIdToName(subtype, idToNameMap)}
+              label={mapSourceIdToName(subtype, idToSourceOrSubSourceMap)}
               onChange={(checked) => {
                 if (selectedSubtype.includes(subtype)) {
                   const newlySelectedSubtypes = selectedSubtype.filter(
