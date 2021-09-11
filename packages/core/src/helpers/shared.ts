@@ -457,6 +457,6 @@ export function getColumnOption<O extends keyof ColumnOptions>(
 export function mapSourceIdToName(
   id: string,
   idToSubSourceMap: Record<string, SourceOrSubSource>,
-) {
+): string {
   return idToSubSourceMap[id].name || id
 }
