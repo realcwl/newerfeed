@@ -525,6 +525,7 @@ export const SidebarOrBottomBarColumnItem = React.memo(
         headerDetails.avatarProps &&
         headerDetails.avatarProps.imageURL,
       headerDetails && headerDetails.icon,
+      column && column.icon,
     ])
 
     const onPress = useCallback(() => {
