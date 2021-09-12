@@ -52,16 +52,7 @@ export const MainScreen = React.memo(() => {
       },
     )
 
-    client.onError((e) =>
-      dispatch(
-        setBannerMessage({
-          id: 'fail_initial_connection',
-          type: 'BANNER_TYPE_ERROR',
-          autoClose: true,
-          message: 'Websocket fail to connect',
-        }),
-      ),
-    )
+    client.onError((e) => console.error(e))
 
     client
       .request({
@@ -86,16 +77,7 @@ export const MainScreen = React.memo(() => {
           const seedState: SeedState = v.data?.syncDown
           dispatch(updateSeedState(seedState))
         },
-        error: (v) => {
-          dispatch(
-            setBannerMessage({
-              id: 'fail_initial_connection',
-              type: 'BANNER_TYPE_ERROR',
-              autoClose: true,
-              message: 'Fail to subscribe to backend',
-            }),
-          )
-        },
+        error: (e) => console.error(e),
       })
   }, [appToken])
 
