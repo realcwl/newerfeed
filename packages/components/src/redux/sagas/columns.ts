@@ -356,7 +356,7 @@ function* onAddColumn(
   try {
     // 1. Upsert Feed and get new/old feed Id
     const createFeedResponse: AxiosResponse = yield axios.post(
-      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
       {
         query: getUpsertFeedRequest(action.payload, userId, isUpdate),
       },
@@ -368,7 +368,7 @@ function* onAddColumn(
     // 2. Subscribe to that feed if this is a feed creation (isUpdate == false)
     if (!isUpdate) {
       const subscribeFeedResponse: AxiosResponse = yield axios.post(
-        WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+        WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
         {
           query: jsonToGraphQLQuery({
             mutation: {
@@ -469,7 +469,7 @@ function* onDeleteColumn(
   const userId = yield* select(selectors.userIdSelector)
   try {
     const deleteFeedResponse: AxiosResponse = yield axios.post(
-      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
       {
         query: jsonToGraphQLQuery({
           mutation: {
@@ -542,7 +542,7 @@ function* onFetchColumnDataRequest(
 
   try {
     const fetchDataResponse: AxiosResponse<FeedsResponse> = yield axios.post(
-      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
       {
         query: constructFeedRequest(
           userId,

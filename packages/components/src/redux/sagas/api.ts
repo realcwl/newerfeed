@@ -29,7 +29,7 @@ async function syncUp(state: RootState) {
 
   try {
     const response = await axios.post(
-      WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appTokenSelector(state)),
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appTokenSelector(state)),
       {
         query: jsonToGraphQLQuery({
           mutation: {

@@ -41,7 +41,7 @@ export const MainScreen = React.memo(() => {
 
   useEffect(() => {
     const client = new SubscriptionClient(
-      WrapUrlWithToken(constants.DEV_GRAPHQL_SUBSCRIPTION_ENDPOINT, appToken),
+      WrapUrlWithToken(constants.GRAPHQL_SUBSCRIPTION_ENDPOINT, appToken),
       {
         reconnect: true,
         connectionParams: {
