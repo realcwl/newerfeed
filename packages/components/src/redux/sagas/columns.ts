@@ -39,7 +39,7 @@ interface Post {
   subSource: {
     id: string
     name: string
-    iconUrl: string
+    avatarUrl: string
   }
   sharedFromPost: Post
   imageUrls: string[]
@@ -60,21 +60,7 @@ interface FeedsResponse {
           id: string
         }
       }[]
-      posts: {
-        id: string
-        title: string
-        content: string
-        cursor: number
-        subSource: {
-          id: string
-          name: string
-          iconUrl: string
-        }
-        sharedFromPost: Post
-        imageUrls: string[]
-        contentGeneratedAt: string
-        crawledAt: string
-      }[]
+      posts: Post[]
     }[]
   }
 }
@@ -127,7 +113,7 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
       subSource: {
         id: post.subSource.id,
         name: post.subSource.name,
-        avatarURL: post.subSource.iconUrl,
+        avatarURL: post.subSource.avatarUrl,
       },
       repostedFrom: post.sharedFromPost
         ? postToNewsFeedData(post.sharedFromPost)
@@ -275,7 +261,7 @@ function constructFeedRequest(
           subSource: {
             id: true,
             name: true,
-            iconUrl: true,
+            avatarUrl: true,
           },
           imageUrls: true,
           contentGeneratedAt: true,
@@ -285,7 +271,8 @@ function constructFeedRequest(
             content: true,
             subSource: {
               id: true,
-              iconUrl: true,
+              name: true,
+              avatarUrl: true,
             },
             imageUrls: true,
             contentGeneratedAt: true,
@@ -573,6 +560,7 @@ function* onFetchColumnDataRequest(
       yield put(actions.fetchColumnDataFailure({ columnId: column.id }))
       return
     }
+
     const feed = fetchDataResponse.data.data.feeds[0]
 
     yield put(

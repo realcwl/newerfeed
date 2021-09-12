@@ -20,7 +20,7 @@ interface SourcesResponse {
       subsources: {
         id: string
         name: string
-        iconUrl: string
+        avatarUrl: string
         updatedAt: string
       }[]
     }[]
@@ -57,7 +57,7 @@ function GetIdMapFromSourcesResponse(
       res[subSource.id] = {
         id: subSource.id,
         name: subSource.name,
-        avatarURL: subSource.iconUrl,
+        avatarURL: subSource.avatarUrl,
       }
     }
   }
@@ -77,18 +77,24 @@ function* onThemeChange() {
 // On each login success we fetch all login sources available.
 function* fetchAvailableSourcesAndIdMap() {
   const appToken = yield* select(selectors.appTokenSelector)
+
   const sourcesResponse: AxiosResponse<SourcesResponse> = yield axios.post(
     WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
     {
       query: jsonToGraphQLQuery({
         query: {
           sources: {
+            __args: {
+              input: {
+                subSourceFromSharedPost: false,
+              },
+            },
             id: true,
             name: true,
             subsources: {
               id: true,
               name: true,
-              iconUrl: true,
+              avatarUrl: true,
             },
           },
         },
