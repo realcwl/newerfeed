@@ -11,7 +11,7 @@ export const AppIconBadge = React.memo((_props: AppIconBadgeProps) => {
   if (Platform.isElectron) {
     window.ipc.send('unread-counter', unreadCount)
   } else {
-    const title = `${document.title || 'DevHub'}`
+    const title = `${document.title || 'NewsFeed'}`
     const titleWithoutBadge = title.replace(/^\([\d]+\+?\) /, '')
 
     document.title = `${

@@ -160,7 +160,7 @@ export function getBrowserWindowOptions() {
         : path.join(__dirname, '../assets/icons/icon.png'),
     resizable: true,
     show: !!(getMainWindow() && getMainWindow()!.isVisible()),
-    title: 'DevHub',
+    title: 'NewsFeed',
     webPreferences: {
       affinity: 'main-window',
       backgroundThrottling: false,
