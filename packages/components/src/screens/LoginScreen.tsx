@@ -125,8 +125,8 @@ export const LoginScreen = React.memo(() => {
           <Link
             analyticsCategory="loginscreen"
             analyticsLabel="logo"
-            href={constants.DEVHUB_LINKS.GITHUB_REPOSITORY}
             openOnNewTab
+            disabled={true}
             style={styles.footerLink}
             textProps={{
               color: 'foregroundColorMuted65',

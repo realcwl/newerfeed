@@ -24,7 +24,7 @@ function setupBrowserExtensions() {
 export let forceQuit = false
 
 function init() {
-  app.setName('DevHub')
+  app.setName('NewsFeed')
   // app.commandLine.appendSwitch('disable-renderer-backgrounding')
 
   const openAtLoginChangeCount = config.store.get('openAtLoginChangeCount')
@@ -57,11 +57,8 @@ function init() {
 
     if (process.platform === 'darwin') {
       app.setAboutPanelOptions({
-        applicationName: 'DevHub',
+        applicationName: 'NewsFeed',
         applicationVersion: app.getVersion(),
-        copyright: 'Copyright 2019',
-        credits: 'Bruno Lemos',
-        website: 'https://devhubapp.com/',
       })
     }
 
