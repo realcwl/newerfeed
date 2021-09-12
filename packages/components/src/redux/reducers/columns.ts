@@ -264,11 +264,19 @@ export const columnsReducer: Reducer<State> = (
         updateColumnCursor(column, data, dataByNodeId)
 
         // append of insert front based on the direction. Assuming there's no
-        // overlap between returned data and original data.
+        // overlap between returned data and original data. We don't insert the
+        // same data into column item list to keep this reducer idempotent.
+        const filteredData = data.filter(
+          (d) => !column.itemListIds.includes(d.id),
+        )
         if (direction == 'NEW') {
-          column.itemListIds = data.map((d) => d.id).concat(column.itemListIds)
+          column.itemListIds = filteredData
+            .map((d) => d.id)
+            .concat(column.itemListIds)
         } else {
-          column.itemListIds = column.itemListIds.concat(data.map((d) => d.id))
+          column.itemListIds = column.itemListIds.concat(
+            filteredData.map((d) => d.id),
+          )
         }
 
         // if data expression or sources is returned, update them.
