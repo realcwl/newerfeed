@@ -50,13 +50,18 @@ export const LOCAL_ONLY_PERSONAL_ACCESS_TOKEN = true
 export const APPSTORE_ID = '1191864199'
 export const GOOGLEPLAY_ID = 'com.devhubapp'
 
-export const APP_BASE_URL = 'https://app.devhubapp.com'
+export const APP_BASE_URL = 'loadbalancer-298670769.us-west-1.elb.amazonaws.com'
 export const DEVHUB_BETA_URL = 'https://beta.devhubapp.com'
 export const API_BASE_URL = 'https://api.devhubapp.com'
-export const GRAPHQL_ENDPOINT = `${API_BASE_URL}/graphql`
-export const DEV_GRAPHQL_ENDPOINT = 'http://localhost:8080/graphql'
-export const DEV_GRAPHQL_SUBSCRIPTION_ENDPOINT =
-  'ws://localhost:8080/subscription'
+export const GRAPHQL_ENDPOINT =
+  process.env.NODE_ENV === 'production'
+    ? `http://${APP_BASE_URL}/api/graphql`
+    : 'http://localhost:8080/graphql'
+export const GRAPHQL_SUBSCRIPTION_ENDPOINT =
+  process.env.NODE_ENV === 'production'
+    ? `ws://${APP_BASE_URL}/api/subscription`
+    : 'ws://localhost:8080/subscription'
+
 const LANDING_BASE_URL = 'https://devhubapp.com'
 export const DEVHUB_LINKS = {
   LANDING_PAGE_HOME: LANDING_BASE_URL,

@@ -139,10 +139,7 @@ function* onLoginRequest(
 
     // Create user if it's not already exist
     const userResponse: AxiosResponse = yield axios.post(
-      WrapUrlWithToken(
-        constants.DEV_GRAPHQL_ENDPOINT,
-        data.accessToken.jwtToken,
-      ),
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, data.accessToken.jwtToken),
       {
         query: jsonToGraphQLQuery({
           mutation: {

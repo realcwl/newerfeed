@@ -79,7 +79,7 @@ function* fetchAvailableSourcesAndIdMap() {
   const appToken = yield* select(selectors.appTokenSelector)
 
   const sourcesResponse: AxiosResponse<SourcesResponse> = yield axios.post(
-    WrapUrlWithToken(constants.DEV_GRAPHQL_ENDPOINT, appToken),
+    WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
     {
       query: jsonToGraphQLQuery({
         query: {
