@@ -218,7 +218,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     let match: RegExpExecArray | null = null
     const res: any[] = []
     while ((match = REGEX_IS_URL.exec(text ?? 'no content')) !== null) {
-      const link = text.slice(match.index, match.index + match[0].length)
+      const textLink = text.slice(match.index, match.index + match[0].length)
       res.push(
         <ThemedText color="foregroundColorMuted65" key={res.length}>
           {text.slice(prev, match.index)}
@@ -230,10 +230,14 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           key={res.length}
           // assume most website will redirect http to https
           onPress={() =>
-            Linking.openURL(link.startsWith('http') ? link : `http://${link}`)
+            Linking.openURL(
+              textLink.startsWith('http') || textLink.startsWith('https')
+                ? textLink
+                : `http://${textLink}`,
+            )
           }
         >
-          {link}
+          {textLink}
         </ThemedText>,
       )
       prev = match.index + match[0].length
@@ -424,6 +428,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                       style={{
                         width: 60 * scaleFactor,
                         height: 60 * scaleFactor,
+                        margin: 2 * scaleFactor,
                       }}
                       resizeMode="cover"
                     />
@@ -446,7 +451,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         )}
 
         <Spacer height={sizes.verticalSpaceSize} />
-
         {!!renderCardActions && !isRetweeted && (
           <>
             <CardActions
