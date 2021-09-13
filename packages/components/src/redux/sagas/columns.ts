@@ -45,6 +45,7 @@ interface Post {
   imageUrls: string[]
   contentGeneratedAt: string
   crawledAt: string
+  originUrl: string
 }
 
 interface FeedsResponse {
@@ -118,17 +119,19 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
       repostedFrom: post.sharedFromPost
         ? postToNewsFeedData(post.sharedFromPost)
         : undefined,
+      url: post.originUrl,
       isRead: false,
       isSaved: false,
-      attachments: post.imageUrls
-        ? post.imageUrls.map((url) => {
-            return {
-              id: url,
-              dataType: 'img',
-              url: url,
-            }
-          })
-        : [],
+      attachments:
+        post.imageUrls.length !== 0
+          ? post.imageUrls.map((url) => {
+              return {
+                id: url,
+                dataType: 'img',
+                url: url,
+              }
+            })
+          : [],
     }
   }
   return response.data.feeds[0].posts.map((post) => {
@@ -263,6 +266,7 @@ function constructFeedRequest(
             name: true,
             avatarUrl: true,
           },
+          originUrl: true,
           imageUrls: true,
           contentGeneratedAt: true,
           sharedFromPost: {
@@ -276,6 +280,7 @@ function constructFeedRequest(
             },
             imageUrls: true,
             contentGeneratedAt: true,
+            originUrl: true,
           },
         },
         subSources: {
