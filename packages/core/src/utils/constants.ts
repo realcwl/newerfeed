@@ -94,7 +94,7 @@ export const EMPTY_OBJ = {}
 export const BANNER_AUTO_CLOSE_DURATION = 3000
 
 // how many posts to fetch in one batch.
-export const FEED_FETCH_LIMIT = 10
+export const FEED_FETCH_LIMIT = 15
 
 // how long in milli-second do we consider a column to be out of sync.
 export const COLUMN_OUT_OF_SYNC_TIME_IN_MILLI_SECOND = 1000 * 60 * 1 // 1 minute

@@ -73,11 +73,13 @@ function shouldDropExistingData(
   response: FeedsResponse,
   originalUpdatedAt: string,
   currentUpdatedAt: string,
+  direction: 'NEW' | 'OLD',
 ): boolean {
   if (response.data.feeds.length === 0) return false
   return (
     originalUpdatedAt != currentUpdatedAt ||
-    response.data.feeds[0].posts.length === constants.FEED_FETCH_LIMIT
+    (direction === 'NEW' &&
+      response.data.feeds[0].posts.length === constants.FEED_FETCH_LIMIT)
   )
 }
 
@@ -578,6 +580,7 @@ function* onFetchColumnDataRequest(
           fetchDataResponse.data,
           updatedAt,
           feed.updatedAt,
+          action.payload.direction,
         ),
         sources: convertFeedsResponseToSources(fetchDataResponse.data),
         dataExpression: stringToDataExpressionWrapper(
