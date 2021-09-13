@@ -58,7 +58,7 @@ export const SettingsModal = React.memo((props: SettingsModalProps) => {
 
         <Spacer height={contentPadding} />
 
-        {Platform.OS === 'ios' || Platform.OS === 'android' ? (
+        {/* {Platform.OS === 'ios' || Platform.OS === 'android' ? (
           <SubHeader title="Rate this app">
             <Spacer flex={1} />
 
@@ -92,7 +92,7 @@ export const SettingsModal = React.memo((props: SettingsModalProps) => {
               />
             </Button>
           </SubHeader>
-        ) : null}
+        ) : null} */}
 
         <Spacer flex={1} minHeight={contentPadding} />
 
