@@ -50,7 +50,10 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
     case 'SET_SOURCES_AND_ID_MAP': {
       return immer(state, (draft) => {
         draft.availableNewsFeedSources = action.payload.sources
-        draft.idToSourceOrSubSourceMap = action.payload.idToSourceOrSubSourceMap
+        draft.idToSourceOrSubSourceMap = {
+          ...draft.idToSourceOrSubSourceMap,
+          ...action.payload.idToSourceOrSubSourceMap,
+        }
       })
     }
     case 'FETCH_COLUMN_DATA_SUCCESS': {
