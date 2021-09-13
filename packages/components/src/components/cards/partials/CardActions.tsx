@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { Platform } from '../../../libs/platform'
 import * as actions from '../../../redux/actions'
 import { sharedStyles } from '../../../styles/shared'
+import { ThemedIcon } from '../../themed/ThemedIcon'
 import {
   contentPadding,
   scaleFactor,
@@ -16,7 +17,7 @@ import { sizes } from '../BaseCard.shared'
 
 export interface CardActionsProps {
   commentsCount: number | undefined
-  commentsLink: string | (() => void) | undefined
+  commentsLink: string | undefined
   isRead: boolean
   isSaved: boolean
   itemNodeId: string
@@ -105,38 +106,37 @@ export function CardActions(props: CardActionsProps) {
         {isRead ? 'mark as unread' : 'mark as read'}
       </Link>
 
-      {typeof commentsCount === 'number' &&
-        commentsCount >= 0 &&
-        !!commentsLink && (
-          <>
-            <Spacer width={contentPadding / 2} />
+      <Spacer width={contentPadding / 2} />
 
-            <Link
-              analyticsCategory="card_action"
-              analyticsLabel="commentsCount"
-              hitSlop={{
-                top: 2,
-                bottom: 2,
-                left: contentPadding / 4,
-                right: contentPadding / 4,
-              }}
-              onPress={
-                typeof commentsLink === 'function' ? commentsLink : undefined
-              }
-              openOnNewTab
-              textProps={{
-                color: muted
-                  ? 'foregroundColorMuted40'
-                  : 'foregroundColorMuted65',
-                style: { fontSize: smallerTextSize },
-              }}
-            >
-              {commentsCount === 1
-                ? 'comment (1)'
-                : `comments (${commentsCount})`}
-            </Link>
-          </>
-        )}
+      {!!commentsLink && (
+        <>
+          <ThemedIcon
+            family={'material'}
+            name={'link'}
+            color={muted ? 'foregroundColorMuted40' : 'foregroundColorMuted65'}
+          />
+          <Link
+            analyticsCategory="card_action"
+            analyticsLabel={'card_link'}
+            enableUnderlineHover
+            hitSlop={{
+              top: 2,
+              bottom: 2,
+              left: contentPadding / 4,
+              right: contentPadding / 4,
+            }}
+            href={commentsLink}
+            textProps={{
+              color: muted
+                ? 'foregroundColorMuted40'
+                : 'foregroundColorMuted65',
+              style: { fontSize: smallerTextSize },
+            }}
+          >
+            {'link'}
+          </Link>
+        </>
+      )}
 
       {rightSpacing > 0 && <Spacer width={rightSpacing} />}
     </View>
