@@ -382,7 +382,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               <View style={sharedStyles.horizontalAndVerticallyAligned}>
                 <ThemedText
                   color="foregroundColorMuted65"
-                  numberOfLines={textShown ? undefined : NUM_OF_LINES}
+                  // set a really large number of lines that's impossible to
+                  // reach, so that expanded text will wrap long word instead
+                  // of extending out of area.
+                  // This is to resolve: https://rrcapital.atlassian.net/jira/software/projects/NEWS/boards/4?selectedIssue=NEWS-160
+                  numberOfLines={textShown ? 9999 : NUM_OF_LINES}
                   onLayout={checkHasMore}
                 >
                   {parseTextWithLinks(text ?? 'no content')}
