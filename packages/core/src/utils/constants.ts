@@ -15,7 +15,7 @@ export const IS_BETA =
   APP_VERSION.includes('beta') || (!!HOSTNAME && HOSTNAME.includes('beta'))
 
 export const REGEX_IS_URL =
-  /^((ftp|http|https):\/\/)?(www.)?(?!.*(ftp|http|https|www.))[a-zA-Z0-9_-]+(\.[a-zA-Z]+)+((\/)[\w#]+)*(\/\w+\?[a-zA-Z0-9_]+=\w+(&[a-zA-Z0-9_]+=\w+)*)?\/?$/gm
+  /((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*/g
 
 export const COLUMNS_LIMIT = 25
 export const MIN_COLUMN_WIDTH = 300
