@@ -111,7 +111,9 @@ export function getDateSmallText(
   }
 
   if (momentDate.year() !== moment().year()) {
-    return `${fullDatePrefix}${momentDate.format('ll')}${fullDateSuffix}`
+    return `${fullDatePrefix}${momentDate.format(
+      'YYYY-M-D hh:mm',
+    )}${fullDateSuffix}`
   }
 
   return `${fullDatePrefix}${momentDate.format('M-D hh:mm')}${fullDateSuffix}`
