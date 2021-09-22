@@ -110,17 +110,13 @@ export function getDateSmallText(
     }`
   }
 
-  if (daysDiff <= 3) {
-    return `${prefix}${daysDiff}d${suffix}${
-      includeExactTime ? ` (${timeText})` : ''
-    }`
-  }
-
   if (momentDate.year() !== moment().year()) {
-    return `${fullDatePrefix}${momentDate.format('ll')}${fullDateSuffix}`
+    return `${fullDatePrefix}${momentDate.format(
+      'YYYY-M-D hh:mm',
+    )}${fullDateSuffix}`
   }
 
-  return `${fullDatePrefix}${momentDate.format('MMM Do')}${fullDateSuffix}`
+  return `${fullDatePrefix}${momentDate.format('M-D hh:mm')}${fullDateSuffix}`
 }
 
 // sizes will be multiples of 50 for caching (e.g 50, 100, 150, ...)
