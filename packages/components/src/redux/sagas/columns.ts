@@ -16,6 +16,7 @@ import { jsonToGraphQLQuery, EnumType } from 'json-to-graphql-query'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
 import {
+  Attachment,
   ColumnCreation,
   constants,
   guid,
@@ -43,6 +44,7 @@ interface Post {
   }
   sharedFromPost: Post
   imageUrls: string[]
+  fileUrls: string[]
   contentGeneratedAt: string
   crawledAt: string
   originUrl: string
@@ -106,6 +108,27 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
   if (response.data.feeds.length === 0) return EMPTY_ARRAY
 
   const postToNewsFeedData = (post: Post): NewsFeedData => {
+    let attachments: Attachment[] = []
+    if (post.imageUrls.length !== 0) {
+      attachments = attachments.concat(
+        post.imageUrls.map((url) => {
+          return { id: url, dataType: 'img', url: url }
+        }),
+      )
+    }
+    if (post.fileUrls.length !== 0) {
+      attachments = attachments.concat(
+        post.fileUrls.map((url) => {
+          return {
+            id: url,
+            dataType: 'file',
+            name: url.split('/')[url.split('/').length - 1],
+            url: url,
+          }
+        }),
+      )
+      console.log('attchments', attachments)
+    }
     return {
       id: post.id,
       title: post.title,
@@ -124,16 +147,7 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
       url: post.originUrl,
       isRead: false,
       isSaved: false,
-      attachments:
-        post.imageUrls.length !== 0
-          ? post.imageUrls.map((url) => {
-              return {
-                id: url,
-                dataType: 'img',
-                url: url,
-              }
-            })
-          : [],
+      attachments: attachments,
     }
   }
   return response.data.feeds[0].posts.map((post) => {
@@ -270,6 +284,7 @@ function constructFeedRequest(
           },
           originUrl: true,
           imageUrls: true,
+          fileUrls: true,
           contentGeneratedAt: true,
           sharedFromPost: {
             id: true,
