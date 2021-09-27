@@ -116,7 +116,7 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
         }),
       )
     }
-    if (post.fileUrls.length !== 0) {
+    if (post.fileUrls && post.fileUrls.length !== 0) {
       attachments = attachments.concat(
         post.fileUrls.map((url) => {
           return {

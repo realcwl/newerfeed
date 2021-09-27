@@ -11,7 +11,7 @@ const FileDownloaderWeb = ({ file }: Prop) => {
   const ext = file.name?.split('/')[file.name?.split('/').length - 1]
   return (
     <View style={{ marginBottom: 2 * scaleFactor, width: '100%' }}>
-      <a href={file.url}>
+      <a href={file.url} target="_blank">
         <Button
           round={false}
           type={'custom'}

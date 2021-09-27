@@ -419,6 +419,8 @@ PODS:
   - RNFBApp (10.1.0):
     - Firebase/CoreOnly (~> 7.1.0)
     - React-Core
+  - RNFS (2.18.0):
+    - React
   - RNGestureHandler (1.9.0):
     - React-Core
   - RNInAppBrowser (3.5.1):
@@ -492,6 +494,7 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-async-storage/async-storage`)"
   - "RNFBAnalytics (from `../../../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../../../node_modules/@react-native-firebase/app`)"
+  - RNFS (from `../../../node_modules/react-native-fs`)
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNInAppBrowser (from `../../../node_modules/react-native-inappbrowser-reborn`)
   - RNReactNativeHapticFeedback (from `../../../node_modules/react-native-haptic-feedback`)
@@ -601,6 +604,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@react-native-firebase/analytics"
   RNFBApp:
     :path: "../../../node_modules/@react-native-firebase/app"
+  RNFS:
+    :path: "../../../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../../../node_modules/react-native-gesture-handler"
   RNInAppBrowser:
@@ -621,7 +626,7 @@ SPEC CHECKSUMS:
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: e686045572151edef46010a6f819ade377dfeb4b
-  FBReactNativeSpec: 53b395487413f0a1c2aaa16304cfddf4e48b7c66
+  FBReactNativeSpec: d4d2a19d6561f3657c0fb0006858d17ab9569c17
   Firebase: 78e8dd2e39d653de6270432ad84fe8b59f7bf4e8
   FirebaseAnalytics: 7f165a56dea86ddd5b8ce02af3bee982c683405c
   FirebaseCore: 20046127eef0fcb8fa25df7fc12f7b97d4e48611
@@ -675,6 +680,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 56a3355a10b5d660c48c6e37325ac85ebfd09885
   RNFBAnalytics: da48ff33f20c26ee63745271ae9c0fb252422e66
   RNFBApp: 2b4e07dfca4cf780b9e2d61bcc21e34d890cd654
+  RNFS: 3ab21fa6c56d65566d1fb26c2228e2b6132e5e32
   RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
   RNInAppBrowser: 48b95ba7a4eaff5cc223bca338d3e319561dbd1b
   RNReactNativeHapticFeedback: 653a8c126a0f5e88ce15ffe280b3ff37e1fbb285
