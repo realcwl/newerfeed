@@ -494,9 +494,13 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 justifyContent: 'flex-start',
               }}
             >
-              {attachments.map((attachment) => {
-                return <FileDownloader key={attachment.id} file={attachment} />
-              })}
+              {attachments
+                .filter((a) => a.dataType === 'file')
+                .map((attachment) => {
+                  return (
+                    <FileDownloader key={attachment.id} file={attachment} />
+                  )
+                })}
             </View>
           )}
 
