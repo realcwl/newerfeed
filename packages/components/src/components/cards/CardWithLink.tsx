@@ -64,14 +64,7 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
 
   // const isReadRef = useDynamicRef(!!(cardProps && cardProps.isRead))
 
-  const onPress = useCallback<NonNullable<LinkProps['onPress']>>(
-    (e) => {
-      isHoveredRef.current = false
-
-      if (e && e.isDefaultPrevented()) return
-    },
-    [type, columnId],
-  )
+  const dispatch = useDispatch()
 
   const updateStyles = useCallback(
     () => {
@@ -142,6 +135,14 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
         } else {
           updateStyles()
         }
+
+        // Hover on card should be considered as "read"
+        dispatch(
+          actions.markItemAsRead({
+            itemNodeIds: [nodeIdOrId],
+            read: true,
+          }),
+        )
       },
       [columnId],
     ),
