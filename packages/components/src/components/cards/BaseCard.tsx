@@ -11,7 +11,6 @@ import {
 import { Attachment, getDateSmallText, getFullDateText } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
-import { Separator } from '../common/Separator'
 import { sharedStyles } from '../../styles/shared'
 import {
   normalTextSize,
@@ -33,6 +32,7 @@ import { useTheme } from '../context/ThemeContext'
 import { useReduxState } from '../../hooks/use-redux-state'
 import { idToSourceOrSubSourceMapSelector } from '../../redux/selectors'
 import ImageViewer from '../../libs/image-viewer'
+import FileDownloader from '../../libs/file-downloader'
 import { useDispatch } from 'react-redux'
 import { markItemAsRead, markItemAsSaved } from '../../redux/actions'
 import { Link } from '../common/Link'
@@ -447,41 +447,58 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           </View>
         )}
 
-        {!!attachments && attachments.length !== 0 && (
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              marginTop: 10 * scaleFactor,
-              justifyContent: 'flex-start',
-            }}
-          >
-            {attachments.map((attachment) => {
-              if (attachment.dataType === 'img') {
-                return (
-                  <TouchableHighlight
-                    onPress={() => {
-                      setImageToView(attachment)
-                    }}
-                    key={attachment.id}
-                  >
-                    <Image
-                      source={{
-                        uri: attachment.url,
+        {!!attachments &&
+          attachments.filter((a) => a.dataType === 'img').length !== 0 && (
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                marginTop: 10 * scaleFactor,
+                justifyContent: 'flex-start',
+              }}
+            >
+              {attachments.map((attachment) => {
+                if (attachment.dataType === 'img') {
+                  return (
+                    <TouchableHighlight
+                      onPress={() => {
+                        setImageToView(attachment)
                       }}
-                      style={{
-                        width: 60 * scaleFactor,
-                        height: 60 * scaleFactor,
-                        margin: 2 * scaleFactor,
-                      }}
-                      resizeMode="cover"
-                    />
-                  </TouchableHighlight>
-                )
-              }
-            })}
-          </View>
-        )}
+                      key={attachment.id}
+                    >
+                      <Image
+                        source={{
+                          uri: attachment.url,
+                        }}
+                        style={{
+                          width: 60 * scaleFactor,
+                          height: 60 * scaleFactor,
+                          margin: 2 * scaleFactor,
+                        }}
+                        resizeMode="cover"
+                      />
+                    </TouchableHighlight>
+                  )
+                }
+              })}
+            </View>
+          )}
+
+        {!!attachments &&
+          attachments.filter((a) => a.dataType === 'file').length !== 0 && (
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                marginTop: 10 * scaleFactor,
+                justifyContent: 'flex-start',
+              }}
+            >
+              {attachments.map((attachment) => {
+                return <FileDownloader key={attachment.id} file={attachment} />
+              })}
+            </View>
+          )}
 
         {repostedFrom && (
           <View>

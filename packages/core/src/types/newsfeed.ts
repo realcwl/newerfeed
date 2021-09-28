@@ -195,7 +195,8 @@ export interface NewsFeedData {
 
 export interface Attachment {
   id: string
-  dataType: 'img' | 'pdf' | 'other'
+  dataType: 'img' | 'file' | 'other'
+  name?: string
   url: string
 }
 
