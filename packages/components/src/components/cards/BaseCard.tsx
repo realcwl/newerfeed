@@ -26,7 +26,6 @@ import { Spacer } from '../common/Spacer'
 import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
 import { BaseCardProps, renderCardActions, sizes } from './BaseCard.shared'
-import { CardActions } from './partials/CardActions'
 import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
 import { TouchableHighlight } from '../common/TouchableHighlight'
 import { useTheme } from '../context/ThemeContext'
@@ -34,6 +33,9 @@ import { useReduxState } from '../../hooks/use-redux-state'
 import { idToSourceOrSubSourceMapSelector } from '../../redux/selectors'
 import ImageViewer from '../../libs/image-viewer'
 import FileDownloader from '../../libs/file-downloader'
+import { useDispatch } from 'react-redux'
+import { markItemAsRead, markItemAsSaved } from '../../redux/actions'
+import { Link } from '../common/Link'
 
 const NUM_OF_LINES = 3
 
@@ -213,6 +215,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     setTextShown(!textShown)
   }
 
+  const dispatch = useDispatch()
+
   const parseTextWithLinks = (text: string) => {
     let prev = 0
     let match: RegExpExecArray | null = null
@@ -308,7 +312,17 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           >
             {subSource ? subSource.name : ''}
           </ThemedText>
+
           <View style={[sharedStyles.horizontal]}>
+            {!isRead && !isRetweeted && (
+              <ThemedIcon
+                family="octicon"
+                name="dot-fill"
+                color={'primaryBackgroundColor'}
+                size={smallTextSize}
+              />
+            )}
+
             <IntervalRefresh interval={60000} date={timestamp}>
               {() => {
                 const dateText = getDateSmallText(timestamp)
@@ -316,7 +330,18 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
                 return (
                   <>
-                    <Text>{'  '}</Text>
+                    {link ? (
+                      <>
+                        <ThemedIcon
+                          family={'material'}
+                          name={'link'}
+                          color={'foregroundColorMuted65'}
+                        />
+                      </>
+                    ) : (
+                      <Text>{'  '}</Text>
+                    )}
+
                     <ThemedText
                       color="foregroundColorMuted65"
                       numberOfLines={1}
@@ -325,32 +350,39 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                         web: { title: getFullDateText(timestamp) },
                       })}
                     >
-                      {dateText.toLowerCase()}
+                      <Link
+                        analyticsCategory="card_action"
+                        analyticsLabel={'card_link'}
+                        enableUnderlineHover
+                        href={link}
+                        textProps={{
+                          color: 'foregroundColorMuted65',
+                          style: { fontSize: smallTextSize },
+                        }}
+                      >
+                        {dateText.toLowerCase()}
+                      </Link>
                     </ThemedText>
                   </>
                 )
               }}
             </IntervalRefresh>
-            {!!isSaved && !isRetweeted && (
+            {!isRetweeted && (
               <>
                 <Text>{'  '}</Text>
                 <ThemedIcon
                   family="octicon"
-                  name="bookmark"
-                  color="orange"
+                  name={isSaved ? 'bookmark-fill' : 'bookmark'}
+                  color={isSaved ? 'orange' : 'foregroundColorMuted65'}
                   size={smallTextSize}
-                />
-              </>
-            )}
-
-            {!isRead && !isRetweeted && (
-              <>
-                <Text>{'  '}</Text>
-                <ThemedIcon
-                  family="octicon"
-                  name="dot-fill"
-                  color={'primaryBackgroundColor'}
-                  size={smallTextSize}
+                  onPress={() => {
+                    dispatch(
+                      markItemAsSaved({
+                        itemNodeId: nodeIdOrId,
+                        save: !isSaved,
+                      }),
+                    )
+                  }}
                 />
               </>
             )}
@@ -388,6 +420,14 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   // This is to resolve: https://rrcapital.atlassian.net/jira/software/projects/NEWS/boards/4?selectedIssue=NEWS-160
                   numberOfLines={textShown ? 9999 : NUM_OF_LINES}
                   onLayout={checkHasMore}
+                  onPress={() =>
+                    dispatch(
+                      markItemAsRead({
+                        itemNodeIds: [nodeIdOrId],
+                        read: true,
+                      }),
+                    )
+                  }
                 >
                   {parseTextWithLinks(text ?? 'no content')}
                 </ThemedText>
@@ -472,6 +512,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         )}
 
         <Spacer height={sizes.verticalSpaceSize} />
+        {/* 
         {!!renderCardActions && !isRetweeted && (
           <>
             <CardActions
@@ -488,7 +529,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
             <Spacer height={sizes.verticalSpaceSize} />
           </>
-        )}
+        )} */}
       </View>
 
       {/* <CardItemSeparator
