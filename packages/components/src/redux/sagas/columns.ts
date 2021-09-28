@@ -127,7 +127,6 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
           }
         }),
       )
-      console.log('attchments', attachments)
     }
     return {
       id: post.id,

@@ -56,13 +56,11 @@ export const API_BASE_URL = 'https://api.devhubapp.com'
 export const GRAPHQL_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `http://${APP_BASE_URL}/api/graphql`
-    : `http://${APP_BASE_URL}/api/graphql`
-// : 'http://localhost:8080/api/graphql'
+    : 'http://localhost:8080/api/graphql'
 export const GRAPHQL_SUBSCRIPTION_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `ws://${APP_BASE_URL}/api/subscription`
-    : `ws://${APP_BASE_URL}/api/subscription`
-// : 'ws://localhost:8080/api/subscription'
+    : 'ws://localhost:8080/api/subscription'
 
 const LANDING_BASE_URL = 'https://devhubapp.com'
 export const DEVHUB_LINKS = {
