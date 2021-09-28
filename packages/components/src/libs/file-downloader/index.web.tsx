@@ -21,10 +21,10 @@ const FileDownloaderWeb = ({ file }: Prop) => {
             height: 30 * scaleFactor,
           }}
           colors={{
-            backgroundThemeColor: 'backgroundColorLighther3',
-            foregroundThemeColor: 'primaryForegroundColor',
-            backgroundHoverThemeColor: 'backgroundColorLighther4',
-            foregroundHoverThemeColor: 'primaryForegroundColor',
+            backgroundThemeColor: 'backgroundColorLess3',
+            foregroundThemeColor: 'foregroundColor',
+            backgroundHoverThemeColor: 'backgroundColorLess4',
+            foregroundHoverThemeColor: 'foregroundColor',
           }}
           textStyle={{
             textAlign: 'left',

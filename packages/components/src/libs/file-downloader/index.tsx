@@ -19,15 +19,13 @@ const download = async (file: Attachment): Promise<any> => {
   }
 
   //Call downloadFile
-  const response = downloadFile(options)
-  return response.promise.then(async (res) => {
-    if (res && res.statusCode === 200 && res.bytesWritten > 0) {
-      console.log(res)
-    } else {
-      // TODO(fange): res code is 200 but bytesWritten is 0
-      console.log('file download filed', res)
-    }
-  })
+  const res = await downloadFile(options).promise
+  if (res && res.statusCode === 200 && res.bytesWritten > 0) {
+    console.log(res)
+  } else {
+    // TODO(fange): res code is 200 but bytesWritten is 0
+    console.log('file download filed', res)
+  }
 }
 
 const FileDownloader = ({ file }: Prop) => (
