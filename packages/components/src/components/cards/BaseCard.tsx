@@ -330,18 +330,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
                 return (
                   <>
-                    {link ? (
-                      <>
-                        <ThemedIcon
-                          family={'material'}
-                          name={'link'}
-                          color={'foregroundColorMuted65'}
-                        />
-                      </>
-                    ) : (
-                      <Text>{'  '}</Text>
-                    )}
-
+                    <Text>{'  '}</Text>
                     <ThemedText
                       color="foregroundColorMuted65"
                       numberOfLines={1}
