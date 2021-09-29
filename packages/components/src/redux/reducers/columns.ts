@@ -257,8 +257,12 @@ export const columnsReducer: Reducer<State> = (
         const column = draft.byId[columnId]
         if (!column) return
 
-        // if explicit drop is requested, we should clear all the data ids
-        column.itemListIds = dropExistingData ? [] : column.itemListIds
+        // if explicit drop is requested, we drop all data and the cursors.
+        if (dropExistingData) {
+          column.itemListIds = []
+          column.newestItemId = ''
+          column.oldestItemId = ''
+        }
 
         // update cursor
         updateColumnCursor(column, data, dataByNodeId)
