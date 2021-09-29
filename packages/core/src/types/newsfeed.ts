@@ -26,12 +26,15 @@ export interface NewsFeedColumn extends BaseColumn {
   // itemListIds is a list containing all Newsfeed data that are going to be
   // rendered inside this column. Only data ids are stored, the actual data
   // should be retrieved from the data reducer.
+  //
+  // !Note!: If this is updated, you should almost always update oldestItemId
+  // and newestItemId.
   itemListIds: string[]
-
-  // Id of the last item (oldest item) in this column.
+  // Id of the last item (oldest item) in this column. This should always be in
+  // sync with itemListIds, otherwise column's state is broken.
   oldestItemId: string
-
-  // Id of the first item (newest item) in this column.
+  // Id of the first item (newest item) in this column. This should always be in
+  // sync with itemListIds, otherwise column's state is broken.
   newestItemId: string
 
   // Each news column must also have multiple News Sources. Each source is
