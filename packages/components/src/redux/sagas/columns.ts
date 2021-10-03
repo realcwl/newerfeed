@@ -312,10 +312,10 @@ function constructFeedRequest(
 }
 
 function* initialRefreshAllOutdatedColumn() {
-  return refreshAllOutdatedColumn(false)
+  return refreshAllOutdatedColumn({ notifyOnNewPosts: false })
 }
 
-function* refreshAllOutdatedColumn(notifyOnNewPosts: boolean) {
+function* refreshAllOutdatedColumn({ notifyOnNewPosts = false }) {
   const allColumnsWithRefreshTimeAndNotifySetting = yield* select(
     selectors.columnsWithRefreshTimeAndNotifySettingSelector,
   )
@@ -353,7 +353,7 @@ function* columnRefresher() {
     yield delay(10 * 1000)
 
     // Refresh all outdated column
-    yield* refreshAllOutdatedColumn(true)
+    yield* refreshAllOutdatedColumn({ notifyOnNewPosts: true })
   }
 }
 
