@@ -162,6 +162,7 @@ export interface SourceOrSubSource {
 
 export interface ColumnOptions {
   enableAppIconUnreadIndicator?: boolean
+  notifyOnNewPosts?: boolean
 }
 
 export interface NewsFeedData {

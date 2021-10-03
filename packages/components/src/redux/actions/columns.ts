@@ -171,6 +171,7 @@ export function fetchColumnDataRequest(payload: {
   // NEW stands for "refresh", OLD stands for "load more". The initial fetch or
   // the first fetch after column attribute change is denoted as OLD.
   direction: 'NEW' | 'OLD'
+  notifyOnNewPosts?: boolean
 }) {
   return createAction('FETCH_COLUMN_DATA_REQUEST', payload)
 }

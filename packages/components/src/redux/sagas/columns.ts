@@ -19,7 +19,6 @@ import {
   Attachment,
   ColumnCreation,
   constants,
-  guid,
   NewsFeedColumn,
   NewsFeedColumnCreation,
   NewsFeedColumnSource,
@@ -31,6 +30,7 @@ import {
   COLUMN_OUT_OF_SYNC_TIME_IN_MILLI_SECOND,
   EMPTY_ARRAY,
 } from '@devhub/core/src/utils/constants'
+import { notify } from '../../utils/notify'
 
 interface Post {
   id: string
@@ -311,16 +311,23 @@ function constructFeedRequest(
   })
 }
 
-function* refreshAllOutdatedColumn() {
-  const allColumnsWithRefreshTime = yield* select(
-    selectors.columnsWithRefreshTimeSelector,
+function* initialRefreshAllOutdatedColumn() {
+  return refreshAllOutdatedColumn(false)
+}
+
+function* refreshAllOutdatedColumn(notifyOnNewPosts: boolean) {
+  const allColumnsWithRefreshTimeAndNotifySetting = yield* select(
+    selectors.columnsWithRefreshTimeAndNotifySettingSelector,
   )
 
   yield* all(
-    allColumnsWithRefreshTime.map(function* (columnWithRefreshTime) {
-      if (!columnWithRefreshTime) return
+    allColumnsWithRefreshTimeAndNotifySetting.map(function* (
+      columnWithRefreshTimeAndNofitySetting,
+    ) {
+      if (!columnWithRefreshTimeAndNofitySetting) return
       const timeDiff =
-        Date.now() - Date.parse(columnWithRefreshTime.refreshedAt)
+        Date.now() -
+        Date.parse(columnWithRefreshTimeAndNofitySetting.refreshedAt)
 
       if (timeDiff < COLUMN_OUT_OF_SYNC_TIME_IN_MILLI_SECOND) {
         return
@@ -328,7 +335,10 @@ function* refreshAllOutdatedColumn() {
 
       return yield put(
         actions.fetchColumnDataRequest({
-          columnId: columnWithRefreshTime.id,
+          notifyOnNewPosts:
+            notifyOnNewPosts &&
+            columnWithRefreshTimeAndNofitySetting.notifyOnNewPosts,
+          columnId: columnWithRefreshTimeAndNofitySetting.id,
           direction: 'NEW',
         }),
       )
@@ -343,7 +353,7 @@ function* columnRefresher() {
     yield delay(10 * 1000)
 
     // Refresh all outdated column
-    yield* refreshAllOutdatedColumn()
+    yield* refreshAllOutdatedColumn(true)
   }
 }
 
@@ -584,6 +594,13 @@ function* onFetchColumnDataRequest(
 
     const feed = fetchDataResponse.data.data.feeds[0]
 
+    const posts = convertFeedsResponseToPosts(fetchDataResponse.data)
+    if (action.payload.notifyOnNewPosts && action.payload.direction === 'NEW') {
+      for (const post of posts) {
+        notify(post)
+      }
+    }
+
     yield put(
       actions.fetchColumnDataSuccess({
         columnId: column.id,
@@ -612,7 +629,7 @@ function* onFetchColumnDataRequest(
 export function* columnsSagas() {
   yield* all([
     yield* fork(columnRefresher),
-    yield* takeEvery('UPDATE_SEED_STATE', refreshAllOutdatedColumn),
+    yield* takeEvery('UPDATE_SEED_STATE', initialRefreshAllOutdatedColumn),
     yield* takeEvery('ADD_COLUMN', onAddColumn),
     yield* takeEvery('FETCH_COLUMN_DATA_REQUEST', onFetchColumnDataRequest),
     yield* takeEvery('MOVE_COLUMN', onMoveColumn),
