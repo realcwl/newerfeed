@@ -74,6 +74,30 @@ export const ColumnOptions = React.memo(
           }}
         />
 
+        <Checkbox
+          analyticsLabel="column_option_in_app_notify_setting"
+          checked={!!getColumnOption(column, 'notifyOnNewPosts')}
+          containerStyle={
+            sharedColumnOptionsStyles.fullWidthCheckboxContainerWithPadding
+          }
+          defaultValue
+          disabled={false}
+          squareContainerStyle={
+            sharedColumnOptionsStyles.checkboxSquareContainer
+          }
+          enableIndeterminateState={false}
+          label={`Notify on new posts`}
+          onChange={(value) => {
+            dispatch(
+              actions.setColumnOption({
+                columnId,
+                option: 'notifyOnNewPosts',
+                value: !!value,
+              }),
+            )
+          }}
+        />
+
         <Spacer height={contentPadding / 2} />
 
         <View

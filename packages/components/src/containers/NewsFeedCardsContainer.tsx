@@ -62,6 +62,7 @@ export const NewsFeedCardsContainer = React.memo(
             actions.fetchColumnDataRequest({
               columnId,
               direction: 'OLD',
+              notifyOnNewPosts: false,
             }),
           )
         }}

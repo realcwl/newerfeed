@@ -18,7 +18,8 @@ import * as selectors from '../redux/selectors'
 import { SubscriptionClient } from 'subscriptions-transport-ws'
 import { WrapUrlWithToken } from '../utils/api'
 import { constants, SeedState } from '@devhub/core'
-import { setBannerMessage, updateSeedState } from '../redux/actions'
+import { updateSeedState } from '../redux/actions'
+import Notifier from '../libs/notifier'
 
 const styles = StyleSheet.create({
   container: {
@@ -90,6 +91,7 @@ export const MainScreen = React.memo(() => {
         enableSafeArea={false}
       >
         <AppBannerMessage />
+        <Notifier />
 
         <View
           style={[

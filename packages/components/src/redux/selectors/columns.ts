@@ -13,13 +13,20 @@ export const columnSelector = (state: RootState, columnId: string) => {
   return (byId && byId[columnId]) || undefined
 }
 
-export const columnsWithRefreshTimeSelector = (state: RootState) => {
-  const result: { id: string; refreshedAt: string }[] = []
+export const columnsWithRefreshTimeAndNotifySettingSelector = (
+  state: RootState,
+) => {
+  const result: {
+    id: string
+    refreshedAt: string
+    notifyOnNewPosts: boolean
+  }[] = []
   const byId: Record<string, Column> = s(state).byId
   for (const columnId in byId) {
     result.push({
       id: columnId,
       refreshedAt: byId[columnId].refreshedAt,
+      notifyOnNewPosts: byId[columnId].options.notifyOnNewPosts ?? false,
     })
   }
   return result
