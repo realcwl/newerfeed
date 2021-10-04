@@ -446,6 +446,7 @@ function* onAddColumn(
       columnId: updatedId,
       // Initial request for fetching data is always of direction "OLD"
       direction: 'OLD',
+      notifyOnNewPosts: false,
     }),
   )
 }

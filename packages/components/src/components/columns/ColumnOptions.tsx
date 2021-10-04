@@ -75,7 +75,7 @@ export const ColumnOptions = React.memo(
         />
 
         <Checkbox
-          analyticsLabel="column_option_in_app_unread_indicator"
+          analyticsLabel="column_option_in_app_notify_setting"
           checked={!!getColumnOption(column, 'notifyOnNewPosts')}
           containerStyle={
             sharedColumnOptionsStyles.fullWidthCheckboxContainerWithPadding
