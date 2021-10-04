@@ -192,14 +192,18 @@ export const columnsReducer: Reducer<State> = (
     case 'REPLACE_COLUMN_FILTER':
       return immer(state, (draft) => {
         const { columnId, filter } = action.payload
-        draft.byId[columnId].filters = filter
+        if (draft.byId[columnId]) {
+          draft.byId[columnId].filters = filter
+        }
       })
     case 'SET_COLUMN_SAVED_FILTER':
       return immer(state, (draft) => {
         const { columnId, saved } = action.payload
-        draft.byId[columnId].filters = {
-          ...draft.byId[columnId].filters,
-          saved: saved,
+        if (draft.byId[columnId]) {
+          draft.byId[columnId].filters = {
+            ...draft.byId[columnId].filters,
+            saved: saved,
+          }
         }
       })
     case 'SET_COLUMN_OPTION': {
@@ -221,7 +225,9 @@ export const columnsReducer: Reducer<State> = (
     case 'SET_COLUMN_LOADING':
       return immer(state, (draft) => {
         const { columnId } = action.payload
-        draft.byId[columnId].state = 'loading'
+        if (draft.byId[columnId]) {
+          draft.byId[columnId].state = 'loading'
+        }
       })
     case 'UPDATE_COLUMN_ID': {
       return immer(state, (draft) => {
