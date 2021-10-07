@@ -3,7 +3,7 @@ import { REHYDRATE } from 'redux-persist'
 
 import { Reducer } from '../types'
 
-const initialState = {
+export const initialState = {
   loginSuccess: 0,
 }
 

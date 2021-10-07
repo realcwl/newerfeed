@@ -1,8 +1,8 @@
-import { NewsFeedData } from '@devhub/core'
 import _ from 'lodash'
-
-import { Reducer } from '../types'
 import immer from 'immer'
+
+import { NewsFeedData } from '@devhub/core'
+import { Reducer } from '../types'
 
 export interface State {
   // Contains all data IDs, that can be referenced by multiple columns.
@@ -15,7 +15,7 @@ export interface State {
   updatedAt: string | undefined
 }
 
-const initialState: State = {
+export const initialState: State = {
   allIds: [],
   byId: {},
   savedIds: [],
@@ -40,6 +40,19 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
         const entry = draft.byId[itemNodeId]
         entry.isSaved = save
         draft.updatedAt = now
+
+        // update savedIds array
+        if (save && !draft.savedIds.includes(itemNodeId)) {
+          draft.savedIds.push(itemNodeId)
+        } else if (!save && draft.savedIds.includes(itemNodeId)) {
+          const index = draft.savedIds.findIndex((id) => id === itemNodeId)
+          if (index > -1) {
+            draft.savedIds.splice(index, 1)
+          }
+        } else {
+          console.warn(`
+            item ${itemNodeId} was already ${save ? 'saved' : 'unsaved'}`)
+        }
       })
     case 'MARK_ITEM_AS_READ':
       return immer(state, (draft) => {
@@ -50,7 +63,7 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
             // if the item isn't in the data list, it indicates that we might
             // encountered an error and should return directly.
             console.warn(
-              "trying to favorite/unfavorite an item that's not in the data list: ",
+              "trying to read/unread an item that's not in the data list: ",
               itemNodeId,
             )
             return

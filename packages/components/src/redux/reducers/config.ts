@@ -20,7 +20,7 @@ export interface State {
   idToSourceOrSubSourceMap: Record<string, SourceOrSubSource>
 }
 
-const initialState: State = {
+export const initialState: State = {
   theme: constants.DEFAULT_THEME_PAIR,
 
   availableNewsFeedSources: [],
@@ -51,7 +51,7 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
       return immer(state, (draft) => {
         draft.availableNewsFeedSources = action.payload.sources
         draft.idToSourceOrSubSourceMap = {
-          ...draft.idToSourceOrSubSourceMap,
+          ...draft.idToSourceOrSubSourceMap, // map size keeps increasing
           ...action.payload.idToSourceOrSubSourceMap,
         }
       })

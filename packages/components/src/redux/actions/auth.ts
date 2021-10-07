@@ -19,7 +19,7 @@ export function loginSuccess(payload: {
   refreshToken: string
   user: NonNullable<User>
   // lastAuthTime denotes the last timestamp user is authed, if not provided it
-  // will be defaultly set to Data.now()
+  // will be defaultly set to Date.now()
   lastAuthTime?: number
 }) {
   return createAction('LOGIN_SUCCESS', payload)

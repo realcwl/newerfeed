@@ -7,7 +7,7 @@ export interface State {
   modalStack: (ModalPayloadWithIndex | undefined)[]
 }
 
-const initialState: State = {
+export const initialState: State = {
   modalStack: [],
 }
 
