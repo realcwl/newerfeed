@@ -312,7 +312,7 @@ function constructFeedRequest(
 }
 
 function* initialRefreshAllOutdatedColumn() {
-  return refreshAllOutdatedColumn({ notifyOnNewPosts: false })
+  yield* refreshAllOutdatedColumn({ notifyOnNewPosts: false })
 }
 
 function* refreshAllOutdatedColumn({ notifyOnNewPosts = false }) {
