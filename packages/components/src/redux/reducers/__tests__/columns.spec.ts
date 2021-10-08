@@ -329,6 +329,7 @@ describe('columnsReducer', () => {
     const fetchColumnDataRequestAction = fetchColumnDataRequest({
       columnId: newsFeedColumns[0].id,
       direction: 'NEW',
+      notifyOnNewPosts: false,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
       draft.byId[newsFeedColumns[0].id].state = 'loading'
@@ -342,6 +343,7 @@ describe('columnsReducer', () => {
     const fetchColumnDataRequestAction = fetchColumnDataRequest({
       columnId: invalidColumnId,
       direction: 'NEW',
+      notifyOnNewPosts: false,
     })
     expect(
       columnsReducer(getState([0, 1, 2]), fetchColumnDataRequestAction),
