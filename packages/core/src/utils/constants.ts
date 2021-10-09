@@ -51,6 +51,7 @@ export const APPSTORE_ID = '1191864199'
 export const GOOGLEPLAY_ID = 'com.devhubapp'
 
 export const APP_BASE_URL = 'rnr.capital'
+export const API_BASE_URL = 'rnr.capital'
 export const GRAPHQL_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `https://${APP_BASE_URL}/api/graphql`
