@@ -13,7 +13,7 @@ export interface State {
   bannerSignatures: string[]
 }
 
-const initialState: State = {
+export const initialState: State = {
   banners: [],
   bannerSignatures: [],
 }
