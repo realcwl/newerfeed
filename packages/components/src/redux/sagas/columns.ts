@@ -199,6 +199,7 @@ function getUpsertFeedRequest(
                 EncodeDataExpressionFromColumnCreation(columnCreation),
               subSourceIds:
                 ExtractSubSourceIdsFromColumnCreation(columnCreation),
+              visibility: new EnumType('PRIVATE'),
             },
           },
           id: true,
@@ -216,6 +217,7 @@ function getUpsertFeedRequest(
             filterDataExpression:
               EncodeDataExpressionFromColumnCreation(columnCreation),
             subSourceIds: ExtractSubSourceIdsFromColumnCreation(columnCreation),
+            visibility: new EnumType('PRIVATE'),
           },
         },
         id: true,
