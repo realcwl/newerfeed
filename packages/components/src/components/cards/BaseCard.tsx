@@ -1,4 +1,10 @@
-import React, { Fragment, useCallback, useState } from 'react'
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import {
   PixelRatio,
   ScrollView,
@@ -34,10 +40,15 @@ import { idToSourceOrSubSourceMapSelector } from '../../redux/selectors'
 import ImageViewer from '../../libs/image-viewer'
 import FileDownloader from '../../libs/file-downloader'
 import { useDispatch } from 'react-redux'
-import { markItemAsRead, markItemAsSaved } from '../../redux/actions'
+import {
+  capatureView,
+  markItemAsRead,
+  markItemAsSaved,
+} from '../../redux/actions'
 import { Link } from '../common/Link'
 
 const NUM_OF_LINES = 3
+const SIGNAL_RESET_MAX = 100
 
 const styles = StyleSheet.create({
   container: {
@@ -186,6 +197,20 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     overflow: 'hidden',
   },
+
+  mostLeftActionIcon: {
+    alignSelf: 'center',
+    marginLeft: 6 * scaleFactor,
+  },
+
+  actionIcon: {
+    alignSelf: 'center',
+    marginLeft: 4 * scaleFactor,
+  },
+
+  marginTop6: {
+    marginTop: 6 * scaleFactor,
+  },
 })
 
 export const BaseCard = React.memo((props: BaseCardProps) => {
@@ -207,9 +232,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   const timestamp = Date.parse(time)
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
+  const parentShowMoreSignal = props.showMoreSignal
 
   const [textShown, setTextShown] = useState(true)
+  const [showMoreSignal, setshowMoreSignal] = useState<number>(0)
   const [imageToView, setImageToView] = useState<Attachment | null>(null)
+  const ref = useRef<View>(null)
 
   const toggleShowMoreText = () => {
     setTextShown(!textShown)
@@ -277,6 +305,17 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     [hasMore, textShown],
   )
 
+  // 0 initial, adding up to trigger expand
+  useEffect(() => {
+    if (
+      (showMoreSignal !== 0 || parentShowMoreSignal !== 0) &&
+      hasMore &&
+      !textShown
+    ) {
+      setTextShown(true)
+    }
+  }, [showMoreSignal, parentShowMoreSignal])
+
   return (
     <View
       key={`base-card-container-${type}-${nodeIdOrId}-inner`}
@@ -286,6 +325,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           : theme.backgroundColorLess2,
         overflow: 'hidden',
       }}
+      ref={ref}
     >
       <ImageViewer image={imageToView} setImage={setImageToView} />
       <View style={[styles.innerContainer]}>
@@ -358,12 +398,29 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             </IntervalRefresh>
             {!isRetweeted && (
               <>
-                <Text>{'  '}</Text>
+                <ThemedIcon
+                  family="material"
+                  name={'camera-alt'}
+                  color={'foregroundColorMuted65'}
+                  size={smallTextSize}
+                  style={styles.mostLeftActionIcon}
+                  onPress={() => {
+                    setshowMoreSignal((showMoreSignal % SIGNAL_RESET_MAX) + 1)
+                    dispatch(
+                      capatureView({
+                        itemNodeId: nodeIdOrId,
+                        viewRef: ref,
+                        backgroundColor: theme.backgroundColor,
+                      }),
+                    )
+                  }}
+                />
                 <ThemedIcon
                   family="octicon"
                   name={isSaved ? 'bookmark-fill' : 'bookmark'}
                   color={isSaved ? 'orange' : 'foregroundColorMuted65'}
                   size={smallTextSize}
+                  style={styles.actionIcon}
                   onPress={() => {
                     dispatch(
                       markItemAsSaved({
@@ -422,7 +479,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 </ThemedText>
               </View>
               {hasMore && (
-                <View style={sharedStyles.horizontalAndVerticallyAligned}>
+                <View
+                  style={[
+                    sharedStyles.horizontalAndVerticallyAligned,
+                    styles.marginTop6,
+                  ]}
+                >
                   <ThemedText
                     color="primaryBackgroundColor"
                     onPress={toggleShowMoreText}
@@ -500,6 +562,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               {...repostedFrom}
               columnId={columnId}
               isRetweeted={true}
+              showMoreSignal={showMoreSignal}
             />
           </View>
         )}

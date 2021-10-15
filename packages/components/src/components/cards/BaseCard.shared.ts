@@ -79,6 +79,7 @@ export interface BaseCardProps extends AdditionalCardProps {
   isSaved?: boolean
   repostedFrom?: Omit<BaseCardProps, keyof AdditionalCardProps>
   isRetweeted?: boolean
+  showMoreSignal?: number
 }
 
 function _getCardPropsForItem(
