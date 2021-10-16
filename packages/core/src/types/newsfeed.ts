@@ -374,3 +374,9 @@ export interface FeedSeedState {
   id: string
   name: string
 }
+
+export interface Signal {
+  signalType: SignalType
+}
+
+export type SignalType = 'SEED_STATE'

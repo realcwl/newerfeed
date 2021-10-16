@@ -1,7 +1,41 @@
 import { BANNER_AUTO_CLOSE_DURATION } from '@devhub/core/src/utils/constants'
-import { all, delay, put, takeLatest } from 'typed-redux-saga'
-import { closeBannerMessage, setBannerMessage } from '../actions'
+import axios, { AxiosResponse } from 'axios'
+import {
+  all,
+  delay,
+  put,
+  takeLatest,
+  takeEvery,
+  select,
+} from 'typed-redux-saga'
+import {
+  closeBannerMessage,
+  handleSignal,
+  setBannerMessage,
+  updateSeedState,
+} from '../actions'
 import { ExtractActionFromActionCreator } from '../types/base'
+import * as selectors from '../selectors'
+import { WrapUrlWithToken } from '../../utils/api'
+import { constants, SeedState } from '@devhub/core'
+import { jsonToGraphQLQuery } from 'json-to-graphql-query'
+
+// Response returned from the backend for userState.
+interface UserStateResponse {
+  data: {
+    userState: {
+      user: {
+        avatarUrl: string
+        id: string
+        name: string
+        subscribedFeeds: {
+          id: string
+          name: string
+        }[]
+      }
+    }
+  }
+}
 
 function* onSetBannerMessage(
   action: ExtractActionFromActionCreator<typeof setBannerMessage>,
@@ -14,6 +48,73 @@ function* onSetBannerMessage(
   }
 }
 
+// Handle backend signal, this is the *only* handler that handles backend signal
+// sending through the Websocket channel.
+function* onSignal(
+  action: ExtractActionFromActionCreator<typeof handleSignal>,
+) {
+  switch (action.payload.signalType) {
+    case 'SEED_STATE': {
+      yield* fetchSeedState()
+      break
+    }
+    default: {
+      console.error('Unknown signal: ' + String(action.payload.signalType))
+      break
+    }
+  }
+}
+
+function* fetchSeedState() {
+  const appToken = yield* select(selectors.appTokenSelector)
+  const userId = yield* select(selectors.userIdSelector)
+  try {
+    const userStateResponse: AxiosResponse<UserStateResponse> =
+      yield axios.post(WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken), {
+        query: jsonToGraphQLQuery({
+          query: {
+            userState: {
+              __args: {
+                input: {
+                  userId: userId,
+                },
+              },
+              user: {
+                id: true,
+                avatarUrl: true,
+                name: true,
+                subscribedFeeds: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        }),
+      })
+
+    const seedState: SeedState = {
+      userSeedState: userStateResponse.data.data.userState.user,
+      feedSeedState:
+        userStateResponse.data.data.userState.user.subscribedFeeds.map(
+          (feed) => {
+            return {
+              id: feed.id,
+              name: feed.name,
+            }
+          },
+        ),
+    }
+
+    yield put(updateSeedState(seedState))
+  } catch (err) {
+    console.error('fail to get seedState from userState', err)
+  }
+}
+
 export function* appSagas() {
-  yield* all([yield* takeLatest('SET_BANNER_MESSAGE', onSetBannerMessage)])
+  yield* all([
+    yield* takeLatest('SET_BANNER_MESSAGE', onSetBannerMessage),
+    yield* takeEvery('HANDLE_SIGNAL', onSignal),
+  ])
 }
