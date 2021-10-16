@@ -10,6 +10,7 @@ import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { Keyboard, View } from 'react-native'
 import { useDispatch, useStore } from 'react-redux'
 import { DataExpressionEditorContainer } from '../../containers/DataExpressionEditorContainer'
+import { Checkbox } from '../common/Checkbox'
 
 import { useReduxState } from '../../hooks/use-redux-state'
 import { Platform } from '../../libs/platform'
@@ -41,11 +42,15 @@ export interface AddColumnDetailsModalProps {
   // If we're modifying attribute of an existing column, we should pass the
   // columnId of that column.
   columnId?: string
+
+  // If we're adding a new shared feed, we should pass the sources of that feed
+  sharedFeedSources?: NewsFeedColumnSource[]
 }
 
 export const AddColumnDetailsModal = React.memo(
   (props: AddColumnDetailsModalProps) => {
-    const { showBackButton, columnId } = props
+    const { showBackButton, columnId, sharedFeedSources } = props
+    console.log('what shared feed sources', sharedFeedSources)
     const store = useStore()
     const idToSourceOrSubSourceMap = useReduxState(
       selectors.idToSourceOrSubSourceMapSelector,
@@ -65,7 +70,8 @@ export const AddColumnDetailsModal = React.memo(
     // brand new column, or populated with existing column's attribute, when we
     // are modifying attributes of one existing column.
     function getFormInitialValues(
-      columnId: string | undefined,
+      columnId?: string,
+      sharedFeedSources?: NewsFeedColumnSource[],
     ): Record<string, any> {
       const res: Record<string, any> = {
         name: '',
@@ -82,9 +88,16 @@ export const AddColumnDetailsModal = React.memo(
       for (const source of allSources) {
         res[source] = []
       }
+      if (!!sharedFeedSources) {
+        for (const sharedFeedSource of sharedFeedSources) {
+          res[sharedFeedSource.sourceId] = sharedFeedSource.subSourceIds
+        }
+      }
+      // TODO(BONING): add data expression here
 
-      // If no column id is provided, just populate with default value.
-      if (!columnId) return res
+      // If no column id is provided or it is a new shared feed, just populate with default value.
+      if (!columnId || (!!sharedFeedSources && sharedFeedSources.length > 1))
+        return res
 
       // else.. it must be an existing column and thus we need to pre-populate
       // form values with existing data.
@@ -104,11 +117,14 @@ export const AddColumnDetailsModal = React.memo(
         // Make a deepcopy, otherwise every addtion or removal is happening on
         // the real redux object.
         dataExpression: _.cloneDeep(newsFeedColumnAttributes.dataExpression),
+        visibility: newsFeedColumnAttributes.visibility,
       }
     }
 
-    const formInitialValues: Record<string, any> =
-      getFormInitialValues(columnId)
+    const formInitialValues: Record<string, any> = getFormInitialValues(
+      columnId,
+      sharedFeedSources,
+    )
 
     const dialogRef = useRef<DialogProviderState>()
     const dispatch = useDispatch()
@@ -122,6 +138,7 @@ export const AddColumnDetailsModal = React.memo(
         Keyboard.dismiss()
         dispatch(actions.closeAllModals())
 
+        console.log('formik', formValues)
         // Create a empty column.
         const columnCreation: ColumnCreation = {
           title: formValues['name'],
@@ -139,6 +156,7 @@ export const AddColumnDetailsModal = React.memo(
             // show unread by default.
             enableAppIconUnreadIndicator: true,
           },
+          visibility: formValues['visibility'],
         }
         dispatch(actions.addColumn(columnCreation))
 
@@ -223,7 +241,10 @@ export const AddColumnDetailsModal = React.memo(
 
     // Renders Source and Sub sources. For example this could be Weibo with a
     // list of users.
-    function renderSingleSourceOptions(source: NewsFeedColumnSource) {
+    function renderSingleSourceOptions(
+      source: NewsFeedColumnSource,
+      sharedFeedSources?: NewsFeedColumnSource[],
+    ) {
       const isOptionsOpened = openedSource === source.sourceId
 
       return (
@@ -262,17 +283,26 @@ export const AddColumnDetailsModal = React.memo(
 
           <AccordionView isOpen={isOptionsOpened}>
             <Spacer height={contentPadding} />
-            <NewsSubtypesWithFilter source={source} formikProps={formikProps} />
+            <NewsSubtypesWithFilter
+              source={source}
+              formikProps={formikProps}
+              editable={!sharedFeedSources || sharedFeedSources.length === 0}
+            />
           </AccordionView>
         </View>
       )
     }
 
-    function renderSourceAndSubtypesSelectors() {
+    function renderSourceAndSubtypesSelectors(
+      sharedFeedSources?: NewsFeedColumnSource[],
+    ) {
       return (
         <View style={{ paddingHorizontal: contentPadding }}>
           {availableNewsFeedSources.map((formItem, formItemIndex) => {
-            const content = renderSingleSourceOptions(formItem)
+            const content = renderSingleSourceOptions(
+              formItem,
+              sharedFeedSources,
+            )
 
             if (!content) {
               if (__DEV__) {
@@ -408,7 +438,7 @@ export const AddColumnDetailsModal = React.memo(
                 <Spacer height={contentPadding} />
 
                 <View style={sharedStyles.fullWidth}>
-                  {renderSourceAndSubtypesSelectors()}
+                  {renderSourceAndSubtypesSelectors(sharedFeedSources)}
                 </View>
 
                 {renderHeader('Column Icon (Optional)')}
@@ -417,6 +447,24 @@ export const AddColumnDetailsModal = React.memo(
                 {renderHeader('News Expression (Optional)')}
                 <View style={sharedStyles.fullWidth}>
                   {renderDataExpressionEditor()}
+                </View>
+
+                {renderHeader('Visibility')}
+                <View>
+                  <>Set Feed Public</>
+                  <Checkbox
+                    analyticsLabel="column_option_in_feed_sharing_settings"
+                    checked={formikProps.values['visibility'] === 'GLOBAL'}
+                    defaultValue
+                    disabled={false}
+                    enableIndeterminateState={false}
+                    onChange={(value) => {
+                      formikProps.setFieldValue(
+                        'visibility',
+                        value ? 'GLOBAL' : 'PRIVATE',
+                      )
+                    }}
+                  />
                 </View>
 
                 <View style={sharedStyles.paddingHorizontal}>

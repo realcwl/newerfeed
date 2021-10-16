@@ -35,6 +35,9 @@ export const columnsWithRefreshTimeAndNotifySettingSelector = (
 export const columnIdsSelector = (state: RootState) =>
   s(state).allIds || EMPTY_ARRAY
 
+export const sharedFeedsSelector = (state: RootState) =>
+  s(state).sharedIds.map((id) => s(state).byId[id]) || EMPTY_ARRAY
+
 export const columnCountSelector = (state: RootState) =>
   columnIdsSelector(state).length
 

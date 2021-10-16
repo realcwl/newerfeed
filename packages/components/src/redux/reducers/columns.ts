@@ -15,6 +15,9 @@ export interface State {
   // same as the list order.
   allIds: string[]
 
+  // All shared column ids
+  sharedIds: string[]
+
   // byId maps the hex string column id to the Column type, where details of the
   // Column such as column header, type, are defined. Note that this is only a
   // definition of the column, the mapping between column->data are defined in
@@ -24,6 +27,7 @@ export interface State {
 
 const initialState: State = {
   allIds: [],
+  sharedIds: [],
   byId: {},
 }
 
@@ -140,7 +144,9 @@ export const columnsReducer: Reducer<State> = (
         )
 
         // Get all deleted feeds as ids
-        const delIds = draft.allIds.filter((v) => !newAllIds.includes(v))
+        const delIds = draft.allIds.filter(
+          (v) => !newAllIds.includes(v) && !draft.sharedIds.includes(v),
+        )
 
         // Only update when the ids in feed change. It should:
         // 1. substitude the ids
@@ -180,6 +186,7 @@ export const columnsReducer: Reducer<State> = (
             state: 'not_loaded',
             dataExpression: undefined,
             options: { enableAppIconUnreadIndicator: true },
+            visibility: 'PRIVATE',
           }
           const normalized = normalizeColumns([{ ...columnCreation }])
 
@@ -228,6 +235,28 @@ export const columnsReducer: Reducer<State> = (
         if (draft.byId[columnId]) {
           draft.byId[columnId].state = 'loading'
         }
+      })
+    case 'SET_SHARED_FEEDS':
+      return immer(state, (draft) => {
+        draft.sharedIds = action.payload.feeds.map((f) => f.id)
+        action.payload.feeds.forEach((v) => {
+          draft.byId[v.id] = {
+            ...v,
+            sources: v.sources ?? [],
+            title: v.name,
+            type: 'COLUMN_TYPE_NEWS_FEED',
+            icon: {
+              family: 'material',
+              name: 'rss-feed',
+            },
+            itemListIds: [],
+            newestItemId: '',
+            oldestItemId: '',
+            refreshedAt: new Date().toISOString(),
+            state: 'not_loaded',
+            options: { enableAppIconUnreadIndicator: true },
+          }
+        })
       })
     case 'UPDATE_COLUMN_ID': {
       return immer(state, (draft) => {

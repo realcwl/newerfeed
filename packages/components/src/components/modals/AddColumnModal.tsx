@@ -54,11 +54,17 @@ const columnTypes: {
     items: [
       {
         payload: {
-          icon: { family: 'octicon', name: 'bell' },
+          icon: { family: 'octicon', name: 'rss' },
           title: 'News',
         },
       },
     ],
+  },
+  {
+    title: 'Public Feeds',
+    type: 'COLUMN_TYPE_NEWS_FEED',
+    icon: { family: 'octicon', name: 'bell' },
+    items: [],
   },
 ]
 
@@ -131,7 +137,9 @@ function AddColumnModalItem({
           ? () =>
               pushModal({
                 name: 'ADD_COLUMN_DETAILS',
-                params: undefined,
+                params: {
+                  sharedFeedSources: payload.sharedFeedSources,
+                },
               })
           : undefined
       }
@@ -178,6 +186,18 @@ export function AddColumnModal(props: AddColumnModalProps) {
   const { showBackButton } = props
 
   const columnIds = useReduxState(selectors.columnIdsSelector)
+  const visibleFeeds = useReduxState(selectors.sharedFeedsSelector)
+
+  columnTypes[1].items = visibleFeeds.map((feed) => {
+    return {
+      payload: {
+        icon: { family: 'octicon', name: 'rss' },
+        title: feed.title,
+        creator: feed.creator,
+        sharedFeedSources: feed.sources,
+      },
+    }
+  })
 
   const hasReachedColumnLimit = columnIds.length >= constants.COLUMNS_LIMIT
 

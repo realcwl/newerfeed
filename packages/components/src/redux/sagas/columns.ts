@@ -19,6 +19,7 @@ import {
   Attachment,
   ColumnCreation,
   constants,
+  FeedVisibility,
   NewsFeedColumn,
   NewsFeedColumnCreation,
   NewsFeedColumnSource,
@@ -31,6 +32,7 @@ import {
   EMPTY_ARRAY,
 } from '@devhub/core/src/utils/constants'
 import { notify } from '../../utils/notify'
+import { setSharedFeeds } from '../actions'
 
 interface Post {
   id: string
@@ -50,21 +52,38 @@ interface Post {
   originUrl: string
 }
 
+interface FeedResponse {
+  id: string
+  updatedAt: string
+  name: string
+  creator: {
+    id: string
+    name: string
+    email: string
+  }
+  filterDataExpression: string
+  subSources: {
+    id: string
+    source: {
+      id: string
+    }
+  }[]
+  visibility: FeedVisibility
+}
+
+interface FeedWithPostsResponse extends FeedResponse {
+  posts: Post[]
+}
+
 interface FeedsResponse {
   data: {
-    feeds: {
-      id: string
-      updatedAt: string
-      name: string
-      filterDataExpression: string
-      subSources: {
-        id: string
-        source: {
-          id: string
-        }
-      }[]
-      posts: Post[]
-    }[]
+    feeds: FeedWithPostsResponse[]
+  }
+}
+
+interface VisibleFeedResponse {
+  data: {
+    allVisibleFeeds: FeedResponse[]
   }
 }
 
@@ -85,12 +104,12 @@ function shouldDropExistingData(
   )
 }
 
-function convertFeedsResponseToSources(
-  response: FeedsResponse,
+function convertFeedResponseToSources(
+  feedResponse: FeedResponse,
 ): NewsFeedColumnSource[] {
   const sources: NewsFeedColumnSource[] = []
-  if (response.data.feeds.length === 0) return sources
-  for (const subSource of response.data.feeds[0].subSources) {
+  if (feedResponse.subSources.length === 0) return sources
+  for (const subSource of feedResponse.subSources) {
     const source = sources.find((s) => s.sourceId == subSource.source.id)
     if (source) {
       source.subSourceIds.push(subSource.id)
@@ -102,6 +121,14 @@ function convertFeedsResponseToSources(
     })
   }
   return sources
+}
+
+function convertFeedsResponseToSources(
+  response: FeedsResponse,
+): NewsFeedColumnSource[] {
+  const sources: NewsFeedColumnSource[] = []
+  if (response.data.feeds.length === 0) return sources
+  return convertFeedResponseToSources(response.data.feeds[0])
 }
 
 function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
@@ -154,7 +181,7 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
   })
 }
 
-function stringToDataExpressionWrapper(
+export function StringToDataExpressionWrapper(
   jsonString: string,
 ): NewsFeedDataExpressionWrapper {
   const wrapper: NewsFeedDataExpressionWrapper = JSON.parse(jsonString)
@@ -199,7 +226,7 @@ function getUpsertFeedRequest(
                 EncodeDataExpressionFromColumnCreation(columnCreation),
               subSourceIds:
                 ExtractSubSourceIdsFromColumnCreation(columnCreation),
-              visibility: new EnumType('PRIVATE'),
+              visibility: new EnumType(columnCreation.visibility),
             },
           },
           id: true,
@@ -217,7 +244,7 @@ function getUpsertFeedRequest(
             filterDataExpression:
               EncodeDataExpressionFromColumnCreation(columnCreation),
             subSourceIds: ExtractSubSourceIdsFromColumnCreation(columnCreation),
-            visibility: new EnumType('PRIVATE'),
+            visibility: new EnumType(columnCreation.visibility),
           },
         },
         id: true,
@@ -308,6 +335,7 @@ function constructFeedRequest(
           },
         },
         filterDataExpression: true,
+        visibility: true,
       },
     },
   })
@@ -617,7 +645,7 @@ function* onFetchColumnDataRequest(
           action.payload.direction,
         ),
         sources: convertFeedsResponseToSources(fetchDataResponse.data),
-        dataExpression: stringToDataExpressionWrapper(
+        dataExpression: StringToDataExpressionWrapper(
           feed.filterDataExpression,
         ),
         dataByNodeId: dataByNodeId,
@@ -629,6 +657,45 @@ function* onFetchColumnDataRequest(
   }
 }
 
+function* onFetchSharedFeeds() {
+  const appToken = yield* select(selectors.appTokenSelector)
+  const visibleFeeds: AxiosResponse<VisibleFeedResponse> = yield axios.post(
+    WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
+    {
+      query: jsonToGraphQLQuery({
+        query: {
+          allVisibleFeeds: {
+            id: true,
+            name: true,
+            creator: {
+              id: true,
+              name: true,
+            },
+            updatedAt: true,
+            filterDataExpression: true,
+            subSources: {
+              id: true,
+              name: true,
+              source: {
+                id: true,
+              },
+            },
+            visibility: true,
+          },
+        },
+      }),
+    },
+  )
+
+  yield put(
+    setSharedFeeds({
+      feeds: visibleFeeds.data.data.allVisibleFeeds.map((f) => {
+        return { ...f, sources: convertFeedResponseToSources(f) }
+      }),
+    }),
+  )
+}
+
 export function* columnsSagas() {
   yield* all([
     yield* fork(columnRefresher),
@@ -637,6 +704,7 @@ export function* columnsSagas() {
     yield* takeEvery('FETCH_COLUMN_DATA_REQUEST', onFetchColumnDataRequest),
     yield* takeEvery('MOVE_COLUMN', onMoveColumn),
     yield* takeEvery('DELETE_COLUMN', onDeleteColumn),
+    yield* takeLatest('LOGIN_SUCCESS', onFetchSharedFeeds),
     yield* takeLatest(
       ['SET_COLUMN_CLEARED_AT_FILTER', 'CLEAR_ALL_COLUMNS'],
       onClearColumnOrColumns,

@@ -12,6 +12,8 @@ export type Column = NewsFeedColumn
 // Newsfeed column type.
 export type NewsFeedColumnType = 'COLUMN_TYPE_NEWS_FEED'
 
+export type FeedVisibility = 'GLOBAL' | 'PRIVATE'
+
 // Each column extends the BaseColumn, where some common fields are defined.
 export interface NewsFeedColumn extends BaseColumn {
   // Constant defined in another place.
@@ -52,7 +54,16 @@ export interface NewsFeedColumn extends BaseColumn {
   // that is used to quickly filter column data to let user find useful
   // information.
   filters?: ColumnFilter
+
+  creator?: User
+
+  visibility: FeedVisibility
 }
+
+export type PublicNewsFeed = Pick<
+  NewsFeedColumn,
+  'sources' | 'dataExpression' | 'title'
+> & { creator?: User }
 
 export interface NewsFeedColumnSource {
   // Source is a predefined list of information sources, such as "weibo",
@@ -215,7 +226,7 @@ export interface User {
   email: string
 
   // User's avartar. If not provided we'll use a random default icon.
-  avatarUrl: string | null
+  avatarUrl?: string
 }
 
 export type ModalPayload =
@@ -229,7 +240,11 @@ export type ModalPayload =
         // If columnId is provided, it means we're modifying existing column's
         // attribute. In this case, the existing settings should be rendered by
         // default.
-        columnId: string
+        columnId?: string
+
+        // If sources is provided, it means we're adding/modifying a shared feed
+        // In this case, source options are disabled
+        sharedFeedSources?: NewsFeedColumnSource[]
       }
     }
   | {
@@ -336,6 +351,10 @@ export interface AddColumnDetailsPayload {
 
   // Identifies a single icon for the column details.
   icon: GenericIconProp
+
+  creator?: User
+
+  sources?: NewsFeedColumnSource[]
 }
 
 // Identifies a single column creation activity. For not it only extends

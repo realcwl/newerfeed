@@ -516,8 +516,8 @@ export const SidebarOrBottomBarColumnItem = React.memo(
         icon:
           (headerDetails && headerDetails.icon) ||
           ({
-            family: column?.icon.family,
-            name: column?.icon.name,
+            family: column?.icon?.family,
+            name: column?.icon?.name,
           } as IconProp),
       }
     }, [

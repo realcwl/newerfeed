@@ -2,9 +2,11 @@ import {
   ColumnCreation,
   ColumnFilter,
   ColumnOptions,
+  FeedVisibility,
   NewsFeedColumnSource,
   NewsFeedData,
   NewsFeedDataExpressionWrapper,
+  User,
 } from '@devhub/core'
 import { EmitterTypes } from '../../libs/emitter'
 import { createAction } from '../helpers'
@@ -34,6 +36,28 @@ export function moveColumn(
 
 export function addColumn(payload: ColumnCreation) {
   return createAction('ADD_COLUMN', payload)
+}
+
+export function setSharedFeeds(payload: {
+  feeds: {
+    // feed id
+    id: string
+    // feed name
+    name: string
+    // creator
+    creator: User
+    // sources can't be null
+    sources: NewsFeedColumnSource[]
+
+    visibility: FeedVisibility
+
+    // optionally, pass data expression to update the column attributes.
+    dataExpression?: NewsFeedDataExpressionWrapper
+
+    updatedAt: string
+  }[]
+}) {
+  return createAction('SET_SHARED_FEEDS', payload)
 }
 
 export function clearColumnFilters(payload: { columnId: string }) {

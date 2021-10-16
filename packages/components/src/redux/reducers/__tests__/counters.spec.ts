@@ -58,7 +58,6 @@ describe('countReducer', () => {
         id: 'id',
         name: 'name',
         email: 'email@email.com',
-        avatarUrl: null,
       },
     })
     expect(countReducer(stateWithSomeCounts, action).loginSuccess).toBe(
