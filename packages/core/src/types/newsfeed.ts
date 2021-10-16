@@ -60,11 +60,6 @@ export interface NewsFeedColumn extends BaseColumn {
   visibility: FeedVisibility
 }
 
-export type PublicNewsFeed = Pick<
-  NewsFeedColumn,
-  'sources' | 'dataExpression' | 'title'
-> & { creator?: User }
-
 export interface NewsFeedColumnSource {
   // Source is a predefined list of information sources, such as "weibo",
   // "twitter", "caixin".
