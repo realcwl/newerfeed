@@ -8,12 +8,12 @@ describe('appReducer', () => {
     banners: [
       {
         id: 'fail_initial_connection',
-        type: 'BANNER_TYPE_PROMO',
+        type: 'BANNER_TYPE_MESSAGE',
         message: `message`,
         autoClose: true,
       },
     ],
-    bannerSignatures: ['fail_initial_connection#BANNER_TYPE_PROMO'],
+    bannerSignatures: ['fail_initial_connection#BANNER_TYPE_MESSAGE'],
   }
 
   // CLOSE_BANNER_MESSAGE

@@ -235,7 +235,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const parentShowMoreSignal = props.showMoreSignal
 
   const [textShown, setTextShown] = useState(true)
-  const [showMoreSignal, setshowMoreSignal] = useState<number>(0)
+  const [showMoreSignal, setShowMoreSignal] = useState<number>(0)
   const [imageToView, setImageToView] = useState<Attachment | null>(null)
   const ref = useRef<View>(null)
 
@@ -405,7 +405,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   size={smallTextSize}
                   style={styles.mostLeftActionIcon}
                   onPress={() => {
-                    setshowMoreSignal((showMoreSignal % SIGNAL_RESET_MAX) + 1)
+                    setShowMoreSignal((showMoreSignal % SIGNAL_RESET_MAX) + 1)
                     dispatch(
                       capatureView({
                         itemNodeId: nodeIdOrId,

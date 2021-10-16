@@ -1,6 +1,8 @@
 import { toBlob } from 'html-to-image'
 
-const UNSUPPORTED_MSG = '该浏览器不支持剪切板接口，请考虑使用Chrome'
+const UNSUPPORTED_MSG =
+  "This browser does't support view to clipboard, please use Chrome"
+const INVALID_REF_MSG = 'Invalid view reference, please try again or refresh'
 const DEFAULT_BACKGROUND_COLOR = '#FFFFFF'
 const DEFAULT_BLOB_TYPE = 'image/png'
 
@@ -15,7 +17,9 @@ const getImageBlobFromRef = async (
   backgroundColor: string,
 ): Promise<Blob> => {
   const blob = await toBlob(ref.current as HTMLElement, {
-    cacheBust: true,
+    // if cacheBust is true, it will add a random number to the end of image url
+    // to force not using cache
+    cacheBust: false,
     backgroundColor: backgroundColor || DEFAULT_BACKGROUND_COLOR,
   })
   if (blob) {
@@ -42,22 +46,17 @@ export const saveViewToClipboard = async (
               'image/png': getImageBlobFromRef(ref, backgroundColor),
             }),
           ])
-          console.log('Copied')
         } else {
           const blob = await getImageBlobFromRef(ref, backgroundColor)
           await clipboard.write([new ClipboardItem({ [blob.type]: blob })])
-          console.log('Copied')
         }
       } else {
-        console.error(
-          'window.navigator.clipboard is not supported in this browser',
-        )
         throw new Error(UNSUPPORTED_MSG)
       }
     } catch (e) {
       throw new Error(UNSUPPORTED_MSG)
     }
   } else {
-    console.error('invalid ref.current')
+    throw new Error(INVALID_REF_MSG)
   }
 }

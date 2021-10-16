@@ -265,8 +265,11 @@ export type EnhancementCache = Map<
 
 export type AppViewMode = 'single-column' | 'multi-column'
 
-export type BannerType = 'BANNER_TYPE_ERROR' | 'BANNER_TYPE_PROMO'
-export type BannerId = 'fail_initial_connection'
+export type BannerType =
+  | 'BANNER_TYPE_ERROR'
+  | 'BANNER_TYPE_SUCCESS'
+  | 'BANNER_TYPE_MESSAGE'
+export type BannerId = 'fail_initial_connection' | 'clipboard'
 
 export interface BannerMessage {
   // Uniquely identifies a banner

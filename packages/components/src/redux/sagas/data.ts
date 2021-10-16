@@ -3,6 +3,9 @@ import { saveViewToClipboard } from '../../libs/html-to-image'
 import { capatureView, setBannerMessage } from '../actions'
 import { ExtractActionFromActionCreator } from '../types/base'
 
+const DEFAULT_ERROR_MESSAGE = 'Failed to save to clipboard'
+const DEFAULT_SUCCESS_MESSAGE = 'Copied to clipboard'
+
 function* onCaptureItemView(
   action: ExtractActionFromActionCreator<typeof capatureView>,
 ) {
@@ -12,12 +15,24 @@ function* onCaptureItemView(
       action.payload.viewRef,
       action.payload.backgroundColor,
     )
-  } catch (e) {
     yield put(
       setBannerMessage({
-        id: 'fail_initial_connection',
-        type: 'BANNER_TYPE_PROMO',
-        message: '无法加入剪切板',
+        id: 'clipboard',
+        type: 'BANNER_TYPE_SUCCESS',
+        message: DEFAULT_SUCCESS_MESSAGE,
+        autoClose: true,
+      }),
+    )
+  } catch (e) {
+    let message = DEFAULT_ERROR_MESSAGE
+    if (e instanceof Error) {
+      message = e.message
+    }
+    yield put(
+      setBannerMessage({
+        id: 'clipboard',
+        type: 'BANNER_TYPE_ERROR',
+        message: message,
         autoClose: true,
       }),
     )
