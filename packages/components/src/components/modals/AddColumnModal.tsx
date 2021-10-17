@@ -115,7 +115,6 @@ function AddColumnModalItem({
   }, [getStyles])
 
   const column = payload?.columnId ? useColumn(payload.columnId) : null
-  console.log('what column', column)
 
   const isFirstRendeRef = useRef(true)
   useLayoutEffect(() => {
