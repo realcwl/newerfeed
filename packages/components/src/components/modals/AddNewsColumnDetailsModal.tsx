@@ -35,6 +35,7 @@ import {
   ThemedTextInputProps,
 } from '../themed/ThemedTextInput'
 import { NewsSubtypesWithFilter } from './partials/NewsSubtypesWithFilter'
+import { ThemedText } from '../themed/ThemedText'
 
 export interface AddColumnDetailsModalProps {
   showBackButton: boolean
@@ -42,15 +43,11 @@ export interface AddColumnDetailsModalProps {
   // If we're modifying attribute of an existing column, we should pass the
   // columnId of that column.
   columnId?: string
-
-  // If we're adding a new shared feed, we should pass the sources of that feed
-  sharedFeedSources?: NewsFeedColumnSource[]
 }
 
 export const AddColumnDetailsModal = React.memo(
   (props: AddColumnDetailsModalProps) => {
-    const { showBackButton, columnId, sharedFeedSources } = props
-    console.log('what shared feed sources', sharedFeedSources)
+    const { showBackButton, columnId } = props
     const store = useStore()
     const idToSourceOrSubSourceMap = useReduxState(
       selectors.idToSourceOrSubSourceMapSelector,
@@ -66,13 +63,18 @@ export const AddColumnDetailsModal = React.memo(
       columnId ? columnId : '',
     )
 
+    const editable = (formikProps: ReturnType<typeof useFormik>) => {
+      const currentUserId = selectors.currentUserIdSelector(store.getState())
+      return (
+        !formikProps.values['creator'] ||
+        currentUserId === formikProps.values['creator']?.id
+      )
+    }
+
     // Construct form's initial value. It's either empty, when we're adding a
     // brand new column, or populated with existing column's attribute, when we
     // are modifying attributes of one existing column.
-    function getFormInitialValues(
-      columnId?: string,
-      sharedFeedSources?: NewsFeedColumnSource[],
-    ): Record<string, any> {
+    function getFormInitialValues(columnId?: string): Record<string, any> {
       const res: Record<string, any> = {
         name: '',
         // Create a creator expression by default.
@@ -88,16 +90,9 @@ export const AddColumnDetailsModal = React.memo(
       for (const source of allSources) {
         res[source] = []
       }
-      if (!!sharedFeedSources) {
-        for (const sharedFeedSource of sharedFeedSources) {
-          res[sharedFeedSource.sourceId] = sharedFeedSource.subSourceIds
-        }
-      }
-      // TODO(BONING): add data expression here
 
-      // If no column id is provided or it is a new shared feed, just populate with default value.
-      if (!columnId || (!!sharedFeedSources && sharedFeedSources.length > 1))
-        return res
+      // If no column id is provided, just populate with default value.
+      if (!columnId) return res
 
       // else.. it must be an existing column and thus we need to pre-populate
       // form values with existing data.
@@ -112,6 +107,7 @@ export const AddColumnDetailsModal = React.memo(
 
       return {
         ...res,
+        creator: newsFeedColumnAttributes.creator,
         name: newsFeedColumnAttributes.title,
         icon: newsFeedColumnAttributes.icon,
         // Make a deepcopy, otherwise every addtion or removal is happening on
@@ -121,10 +117,8 @@ export const AddColumnDetailsModal = React.memo(
       }
     }
 
-    const formInitialValues: Record<string, any> = getFormInitialValues(
-      columnId,
-      sharedFeedSources,
-    )
+    const formInitialValues: Record<string, any> =
+      getFormInitialValues(columnId)
 
     const dialogRef = useRef<DialogProviderState>()
     const dispatch = useDispatch()
@@ -241,10 +235,7 @@ export const AddColumnDetailsModal = React.memo(
 
     // Renders Source and Sub sources. For example this could be Weibo with a
     // list of users.
-    function renderSingleSourceOptions(
-      source: NewsFeedColumnSource,
-      sharedFeedSources?: NewsFeedColumnSource[],
-    ) {
+    function renderSingleSourceOptions(source: NewsFeedColumnSource) {
       const isOptionsOpened = openedSource === source.sourceId
 
       return (
@@ -286,23 +277,18 @@ export const AddColumnDetailsModal = React.memo(
             <NewsSubtypesWithFilter
               source={source}
               formikProps={formikProps}
-              editable={!sharedFeedSources || sharedFeedSources.length === 0}
+              editable={editable(formikProps)}
             />
           </AccordionView>
         </View>
       )
     }
 
-    function renderSourceAndSubtypesSelectors(
-      sharedFeedSources?: NewsFeedColumnSource[],
-    ) {
+    function renderSourceAndSubtypesSelectors() {
       return (
         <View style={{ paddingHorizontal: contentPadding }}>
           {availableNewsFeedSources.map((formItem, formItemIndex) => {
-            const content = renderSingleSourceOptions(
-              formItem,
-              sharedFeedSources,
-            )
+            const content = renderSingleSourceOptions(formItem)
 
             if (!content) {
               if (__DEV__) {
@@ -332,7 +318,10 @@ export const AddColumnDetailsModal = React.memo(
     function renderDataExpressionEditor() {
       return (
         <View style={{ paddingHorizontal: contentPadding }}>
-          <DataExpressionEditorContainer formikProps={formikProps} />
+          <DataExpressionEditorContainer
+            formikProps={formikProps}
+            editable={editable(formikProps)}
+          />
         </View>
       )
     }
@@ -354,6 +343,8 @@ export const AddColumnDetailsModal = React.memo(
         }
         return !formikProps.values['name']
       }
+
+      const borderColor = editable(formikProps) ? 'green' : 'gray'
 
       return (
         <>
@@ -381,26 +372,28 @@ export const AddColumnDetailsModal = React.memo(
 
           <View style={sharedStyles.paddingHorizontal}>
             <ThemedTextInput
+              editable={editable(formikProps)}
+              selectTextOnFocus={editable(formikProps)}
               textInputKey={`add-column-details-column-name-text-input`}
               borderThemeColor={
                 shouldShowError()
                   ? 'lightRed'
                   : !!formikProps.values['name']
-                  ? 'green'
+                  ? borderColor
                   : undefined
               }
               borderHoverThemeColor={
                 shouldShowError()
                   ? 'lightRed'
                   : !!formikProps.values['name']
-                  ? 'green'
+                  ? borderColor
                   : undefined
               }
               borderFocusThemeColor={
                 shouldShowError()
                   ? 'lightRed'
                   : !!formikProps.values['name']
-                  ? 'green'
+                  ? borderColor
                   : undefined
               }
               {...defaultTextInputProps}
@@ -438,7 +431,7 @@ export const AddColumnDetailsModal = React.memo(
                 <Spacer height={contentPadding} />
 
                 <View style={sharedStyles.fullWidth}>
-                  {renderSourceAndSubtypesSelectors(sharedFeedSources)}
+                  {renderSourceAndSubtypesSelectors()}
                 </View>
 
                 {renderHeader('Column Icon (Optional)')}
@@ -456,7 +449,7 @@ export const AddColumnDetailsModal = React.memo(
                     analyticsLabel="column_option_in_feed_sharing_settings"
                     checked={formikProps.values['visibility'] === 'GLOBAL'}
                     defaultValue
-                    disabled={false}
+                    disabled={!editable(formikProps)}
                     enableIndeterminateState={false}
                     onChange={(value) => {
                       formikProps.setFieldValue(

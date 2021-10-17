@@ -59,7 +59,9 @@ export function renderButtonByTextAndKey(props: renderButtonSettings) {
           onPress()
         }}
         onRemove={
-          onDelete
+          disabled
+            ? undefined
+            : onDelete
             ? () => {
                 vibrateHapticFeedback()
                 onDelete()
@@ -68,6 +70,7 @@ export function renderButtonByTextAndKey(props: renderButtonSettings) {
         }
         size={25 * scaleFactor}
         disabled={disabled}
+        disableDelete={disabled}
       />
     </View>
   )

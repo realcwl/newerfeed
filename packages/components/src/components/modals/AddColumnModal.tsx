@@ -60,12 +60,6 @@ const columnTypes: {
       },
     ],
   },
-  {
-    title: 'Public Feeds',
-    type: 'COLUMN_TYPE_NEWS_FEED',
-    icon: { family: 'octicon', name: 'bell' },
-    items: [],
-  },
 ]
 
 function AddColumnModalItem({
@@ -134,13 +128,15 @@ function AddColumnModalItem({
       disabled={disabled || !payload}
       onPress={
         payload
-          ? () =>
+          ? () => {
+              console.log('what', payload)
               pushModal({
                 name: 'ADD_COLUMN_DETAILS',
                 params: {
-                  sharedFeedSources: payload.sharedFeedSources,
+                  columnId: payload.feedId,
                 },
               })
+            }
           : undefined
       }
       onPressIn={() => {
@@ -186,18 +182,26 @@ export function AddColumnModal(props: AddColumnModalProps) {
   const { showBackButton } = props
 
   const columnIds = useReduxState(selectors.columnIdsSelector)
-  const visibleFeeds = useReduxState(selectors.sharedFeedsSelector)
+  const sharedFeeds = useReduxState(selectors.sharedFeedsSelector)
 
-  columnTypes[1].items = visibleFeeds.map((feed) => {
-    return {
-      payload: {
-        icon: { family: 'octicon', name: 'rss' },
-        title: feed.title,
-        creator: feed.creator,
-        sharedFeedSources: feed.sources,
-      },
-    }
-  })
+  const publicFeedsColumn = {
+    title: 'PUBLIC FEEDS',
+    type: 'COLUMN_TYPE_NEWSFEED' as NewsFeedColumnType,
+    icon: { family: 'octicon', name: 'bell' } as IconProp,
+    items: sharedFeeds.map((feed) => {
+      return {
+        payload: {
+          icon: { family: 'octicon', name: 'rss' } as IconProp,
+          title: feed.title,
+          feedId: feed.id,
+        } as AddColumnDetailsPayload,
+      }
+    }),
+  }
+
+  if (!columnTypes.find((c) => c.title === 'PUBLIC FEEDS')) {
+    columnTypes.push(publicFeedsColumn)
+  }
 
   const hasReachedColumnLimit = columnIds.length >= constants.COLUMNS_LIMIT
 

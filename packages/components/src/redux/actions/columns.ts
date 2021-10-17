@@ -3,6 +3,7 @@ import {
   ColumnFilter,
   ColumnOptions,
   FeedVisibility,
+  NewsFeedColumn,
   NewsFeedColumnSource,
   NewsFeedData,
   NewsFeedDataExpressionWrapper,
@@ -38,25 +39,7 @@ export function addColumn(payload: ColumnCreation) {
   return createAction('ADD_COLUMN', payload)
 }
 
-export function setSharedFeeds(payload: {
-  feeds: {
-    // feed id
-    id: string
-    // feed name
-    name: string
-    // creator
-    creator: User
-    // sources can't be null
-    sources: NewsFeedColumnSource[]
-
-    visibility: FeedVisibility
-
-    // optionally, pass data expression to update the column attributes.
-    dataExpression?: NewsFeedDataExpressionWrapper
-
-    updatedAt: string
-  }[]
-}) {
+export function setSharedFeeds(payload: { feeds: NewsFeedColumn[] }) {
   return createAction('SET_SHARED_FEEDS', payload)
 }
 

@@ -11,6 +11,7 @@ import { isAllOf, isAnyOf, isNotTrue } from '../utils/types'
 
 export interface DataExpressionEditorContainerProps {
   formikProps: ReturnType<typeof useFormik>
+  editable: boolean
 }
 
 // Filter children expression wrappers by id. For AllOf or AnyOf, this basically
@@ -64,7 +65,7 @@ export const DataExpressionEditorContainer = React.memo(
       setFlipper(!flipper)
     }
 
-    const { formikProps } = props
+    const { formikProps, editable } = props
     const dataExpressionWrapper: NewsFeedDataExpressionWrapper =
       formikProps.values['dataExpression']
 
@@ -242,6 +243,7 @@ export const DataExpressionEditorContainer = React.memo(
           setFocusId={setFocusId}
           setExpressionWrapper={setExpressionWrapper}
           deleteExpressionById={deleteExpressionById}
+          editable={editable}
         />
         <Spacer height={contentPadding} />
         <Separator horizontal />

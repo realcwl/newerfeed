@@ -690,7 +690,22 @@ function* onFetchSharedFeeds() {
   yield put(
     setSharedFeeds({
       feeds: visibleFeeds.data.data.allVisibleFeeds.map((f) => {
-        return { ...f, sources: convertFeedResponseToSources(f) }
+        return {
+          ...f,
+          title: f.name,
+          sources: convertFeedResponseToSources(f),
+          type: 'COLUMN_TYPE_NEWS_FEED',
+          icon: {
+            family: 'material',
+            name: 'rss-feed',
+          },
+          itemListIds: [],
+          newestItemId: '',
+          oldestItemId: '',
+          refreshedAt: '',
+          state: 'not_loaded',
+          options: { enableAppIconUnreadIndicator: true },
+        }
       }),
     }),
   )

@@ -24,6 +24,7 @@ export interface DataExpressionEditorProps {
   setFocusId: (id: string) => void
   deleteExpressionById: (id: string | undefined) => boolean
   setExpressionWrapper: (payload: NewsFeedDataExpressionWrapper) => boolean
+  editable: boolean
 }
 
 // Before rendering anything, render a dashline in relative position to denote
@@ -60,6 +61,7 @@ export const DataExpressionEditor = React.memo(
       focusId,
       setFocusId,
       setExpressionWrapper,
+      editable,
     } = props
     if (!dataExpressionWrapper || !dataExpressionWrapper.id) return null
 
@@ -67,6 +69,9 @@ export const DataExpressionEditor = React.memo(
 
     // This is a Creator expression, we should render it as a plus button.
     if (!dataExpressionWrapper.expr) {
+      if (!editable) {
+        return null
+      }
       return (
         <AddNewPredicateButton
           setFocusId={setFocusId}
@@ -131,6 +136,7 @@ export const DataExpressionEditor = React.memo(
               focusId={focusId}
               setFocusId={setFocusId}
               setExpressionWrapper={setExpressionWrapper}
+              editable={editable}
             />
             <Spacer height={contentPadding / 2} />
           </ExpressionEntryIndicator>
@@ -149,6 +155,7 @@ export const DataExpressionEditor = React.memo(
               focusId={focusId}
               setFocusId={setFocusId}
               setExpressionWrapper={setExpressionWrapper}
+              editable={editable}
             />
             <Spacer height={contentPadding / 2} />
           </ExpressionEntryIndicator>
@@ -163,6 +170,7 @@ export const DataExpressionEditor = React.memo(
             focusId={focusId}
             setFocusId={setFocusId}
             setExpressionWrapper={setExpressionWrapper}
+            editable={editable}
           />
           <Spacer height={contentPadding / 2} />
         </ExpressionEntryIndicator>
@@ -173,7 +181,7 @@ export const DataExpressionEditor = React.memo(
         <LiteralPredicateButton
           text={dataExpressionWrapper.expr?.pred.param?.text || ''}
           id={dataExpressionWrapper.id}
-          disabled={false}
+          disabled={!editable}
           color={'gray'}
           onDelete={() => deleteExpressionById(dataExpressionWrapper.id)}
           setExpressionWrapper={setExpressionWrapper}

@@ -243,18 +243,6 @@ export const columnsReducer: Reducer<State> = (
           draft.byId[v.id] = {
             ...v,
             sources: v.sources ?? [],
-            title: v.name,
-            type: 'COLUMN_TYPE_NEWS_FEED',
-            icon: {
-              family: 'material',
-              name: 'rss-feed',
-            },
-            itemListIds: [],
-            newestItemId: '',
-            oldestItemId: '',
-            refreshedAt: new Date().toISOString(),
-            state: 'not_loaded',
-            options: { enableAppIconUnreadIndicator: true },
           }
         })
       })

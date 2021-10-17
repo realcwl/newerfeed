@@ -57,6 +57,7 @@ export interface NewsFeedColumn extends BaseColumn {
 
   creator?: User
 
+  // Whethere this feed is publicly readable or private
   visibility: FeedVisibility
 }
 
@@ -235,11 +236,7 @@ export type ModalPayload =
         // If columnId is provided, it means we're modifying existing column's
         // attribute. In this case, the existing settings should be rendered by
         // default.
-        columnId?: string
-
-        // If sources is provided, it means we're adding/modifying a shared feed
-        // In this case, source options are disabled
-        sharedFeedSources?: NewsFeedColumnSource[]
+        columnId: string
       }
     }
   | {
@@ -347,9 +344,8 @@ export interface AddColumnDetailsPayload {
   // Identifies a single icon for the column details.
   icon: GenericIconProp
 
-  creator?: User
-
-  sources?: NewsFeedColumnSource[]
+  // FeedId of shared feeds
+  feedId?: string
 }
 
 // Identifies a single column creation activity. For not it only extends
