@@ -37,7 +37,7 @@ export const MainScreen = React.memo(() => {
   const dispatch = useDispatch()
   const currentOpenedModal = useReduxState(selectors.currentOpenedModal)
   const appToken = useReduxState(selectors.appTokenSelector)
-  const userId = useReduxState(selectors.userIdSelector)
+  const userId = useReduxState(selectors.currentUserIdSelector)
   const FAB = useFAB()
 
   useEffect(() => {

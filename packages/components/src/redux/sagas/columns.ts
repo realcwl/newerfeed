@@ -411,7 +411,7 @@ function* onAddColumn(
   yield* put(actions.setColumnLoading({ columnId: placeHolderOrColumnId }))
 
   const appToken = yield* select(selectors.appTokenSelector)
-  const userId = yield* select(selectors.userIdSelector)
+  const userId = yield* select(selectors.currentUserIdSelector)
   if (!userId) {
     yield put(actions.authFailure(Error('no user id found')))
     return
@@ -420,6 +420,7 @@ function* onAddColumn(
   let updatedId = ''
   try {
     // 1. Upsert Feed and get new/old feed Id
+    // For subscribe case, we reuse the columnId created by others
     if (subscribeOnly) {
       updatedId = placeHolderOrColumnId
     } else {
@@ -600,7 +601,7 @@ function* onFetchColumnDataRequest(
   action: ExtractActionFromActionCreator<typeof actions.fetchColumnDataRequest>,
 ) {
   const appToken = yield* select(selectors.appTokenSelector)
-  const userId = yield* select(selectors.userIdSelector)
+  const userId = yield* select(selectors.currentUserIdSelector)
   const column = yield* select(
     selectors.columnSelector,
     action.payload.columnId,
@@ -695,7 +696,6 @@ function* fetchSharedFeeds() {
     },
   )
 
-  console.log('I am there', visibleFeeds)
   yield put(
     setSharedFeeds({
       feeds: visibleFeeds.data.data.allVisibleFeeds.map((f: any) => {
