@@ -345,7 +345,7 @@ export interface AddColumnDetailsPayload {
   icon: GenericIconProp
 
   // FeedId of shared feeds
-  feedId?: string
+  columnId?: string
 }
 
 // Identifies a single column creation activity. For not it only extends
@@ -355,6 +355,7 @@ export type GenericColumnCreation<ColumnType extends NewsFeedColumn> = Omit<
   'createdAt' | 'updatedAt' | 'refreshedAt'
 > & {
   isUpdate?: boolean
+  subscribeOnly?: boolean
   createdAt?: string
   updatedAt?: string
 }

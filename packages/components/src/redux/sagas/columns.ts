@@ -343,6 +343,7 @@ function constructFeedRequest(
 
 function* initialRefreshAllOutdatedColumn() {
   yield* refreshAllOutdatedColumn({ notifyOnNewPosts: false })
+  yield* fetchSharedFeeds()
 }
 
 function* refreshAllOutdatedColumn({ notifyOnNewPosts = false }) {
@@ -384,6 +385,8 @@ function* columnRefresher() {
 
     // Refresh all outdated column
     yield* refreshAllOutdatedColumn({ notifyOnNewPosts: true })
+
+    yield* fetchSharedFeeds()
   }
 }
 
@@ -393,6 +396,7 @@ function* onAddColumn(
   const placeHolderOrColumnId = action.payload.id
 
   const isUpdate = !!action.payload.isUpdate
+  const subscribeOnly = !!action.payload.subscribeOnly
 
   if (AppState.currentState === 'active')
     yield* call(InteractionManager.runAfterInteractions)
@@ -416,18 +420,22 @@ function* onAddColumn(
   let updatedId = ''
   try {
     // 1. Upsert Feed and get new/old feed Id
-    const createFeedResponse: AxiosResponse = yield axios.post(
-      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
-      {
-        query: getUpsertFeedRequest(action.payload, userId, isUpdate),
-      },
-    )
+    if (subscribeOnly) {
+      updatedId = placeHolderOrColumnId
+    } else {
+      const createFeedResponse: AxiosResponse = yield axios.post(
+        WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
+        {
+          query: getUpsertFeedRequest(action.payload, userId, isUpdate),
+        },
+      )
 
-    const { id } = createFeedResponse.data.data.upsertFeed
-    updatedId = id
+      const { id } = createFeedResponse.data.data.upsertFeed
+      updatedId = id
+    }
 
     // 2. Subscribe to that feed if this is a feed creation (isUpdate == false)
-    if (!isUpdate) {
+    if (!isUpdate || subscribeOnly) {
       const subscribeFeedResponse: AxiosResponse = yield axios.post(
         WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
         {
@@ -528,7 +536,7 @@ function* onDeleteColumn(
 
   // call backend for feed deletion.
   const appToken = yield* select(selectors.appTokenSelector)
-  const userId = yield* select(selectors.userIdSelector)
+  const userId = yield* select(selectors.currentUserIdSelector)
   try {
     const deleteFeedResponse: AxiosResponse = yield axios.post(
       WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
@@ -657,9 +665,9 @@ function* onFetchColumnDataRequest(
   }
 }
 
-function* onFetchSharedFeeds() {
+function* fetchSharedFeeds() {
   const appToken = yield* select(selectors.appTokenSelector)
-  const visibleFeeds: AxiosResponse<VisibleFeedResponse> = yield axios.post(
+  const visibleFeeds: AxiosResponse = yield axios.post(
     WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
     {
       query: jsonToGraphQLQuery({
@@ -687,9 +695,10 @@ function* onFetchSharedFeeds() {
     },
   )
 
+  console.log('I am there', visibleFeeds)
   yield put(
     setSharedFeeds({
-      feeds: visibleFeeds.data.data.allVisibleFeeds.map((f) => {
+      feeds: visibleFeeds.data.data.allVisibleFeeds.map((f: any) => {
         return {
           ...f,
           title: f.name,
@@ -699,6 +708,8 @@ function* onFetchSharedFeeds() {
             family: 'material',
             name: 'rss-feed',
           },
+          creator: f.creator,
+          dataExpression: StringToDataExpressionWrapper(f.filterDataExpression),
           itemListIds: [],
           newestItemId: '',
           oldestItemId: '',
@@ -719,7 +730,6 @@ export function* columnsSagas() {
     yield* takeEvery('FETCH_COLUMN_DATA_REQUEST', onFetchColumnDataRequest),
     yield* takeEvery('MOVE_COLUMN', onMoveColumn),
     yield* takeEvery('DELETE_COLUMN', onDeleteColumn),
-    yield* takeLatest('LOGIN_SUCCESS', onFetchSharedFeeds),
     yield* takeLatest(
       ['SET_COLUMN_CLEARED_AT_FILTER', 'CLEAR_ALL_COLUMNS'],
       onClearColumnOrColumns,

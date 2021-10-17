@@ -35,7 +35,6 @@ import {
   ThemedTextInputProps,
 } from '../themed/ThemedTextInput'
 import { NewsSubtypesWithFilter } from './partials/NewsSubtypesWithFilter'
-import { ThemedText } from '../themed/ThemedText'
 
 export interface AddColumnDetailsModalProps {
   showBackButton: boolean
@@ -47,6 +46,7 @@ export interface AddColumnDetailsModalProps {
 
 export const AddColumnDetailsModal = React.memo(
   (props: AddColumnDetailsModalProps) => {
+    console.log('what props', props)
     const { showBackButton, columnId } = props
     const store = useStore()
     const idToSourceOrSubSourceMap = useReduxState(
@@ -107,6 +107,7 @@ export const AddColumnDetailsModal = React.memo(
 
       return {
         ...res,
+        columnId,
         creator: newsFeedColumnAttributes.creator,
         name: newsFeedColumnAttributes.title,
         icon: newsFeedColumnAttributes.icon,
@@ -132,7 +133,6 @@ export const AddColumnDetailsModal = React.memo(
         Keyboard.dismiss()
         dispatch(actions.closeAllModals())
 
-        console.log('formik', formValues)
         // Create a empty column.
         const columnCreation: ColumnCreation = {
           title: formValues['name'],
@@ -140,9 +140,11 @@ export const AddColumnDetailsModal = React.memo(
           type: 'COLUMN_TYPE_NEWS_FEED',
           id: columnId ? columnId : guid(),
           isUpdate: !!columnId,
+          subscribeOnly: !editable(formikProps),
           itemListIds: newsFeedColumnAttributes?.itemListIds ?? [],
           newestItemId: '',
           oldestItemId: '',
+          creator: newsFeedColumnAttributes?.creator,
           sources: getColumnSourcesFromFormValues(formValues),
           dataExpression: formValues['dataExpression'],
           state: 'not_loaded',
@@ -150,7 +152,7 @@ export const AddColumnDetailsModal = React.memo(
             // show unread by default.
             enableAppIconUnreadIndicator: true,
           },
-          visibility: formValues['visibility'],
+          visibility: formValues['visibility'] ?? 'PRIVATE',
         }
         dispatch(actions.addColumn(columnCreation))
 
@@ -318,10 +320,7 @@ export const AddColumnDetailsModal = React.memo(
     function renderDataExpressionEditor() {
       return (
         <View style={{ paddingHorizontal: contentPadding }}>
-          <DataExpressionEditorContainer
-            formikProps={formikProps}
-            editable={editable(formikProps)}
-          />
+          <DataExpressionEditorContainer formikProps={formikProps} />
         </View>
       )
     }
@@ -412,6 +411,8 @@ export const AddColumnDetailsModal = React.memo(
       )
     }
 
+    const checkboxSize = 18
+
     return (
       <ModalColumn
         name="ADD_COLUMN_DETAILS"
@@ -443,14 +444,28 @@ export const AddColumnDetailsModal = React.memo(
                 </View>
 
                 {renderHeader('Visibility')}
-                <View>
-                  <>Set Feed Public</>
+                <View
+                  style={[
+                    sharedStyles.flex,
+                    sharedStyles.horizontal,
+                    sharedStyles.paddingHorizontal,
+                  ]}
+                >
+                  <H3 style={{ flex: 5 }}>Set Feed Public</H3>
+                  <Spacer flex={6} />
                   <Checkbox
+                    containerStyle={{
+                      height: checkboxSize * scaleFactor,
+                      width: checkboxSize * scaleFactor,
+                    }}
+                    squareContainerStyle={{
+                      height: checkboxSize * scaleFactor,
+                      width: checkboxSize * scaleFactor,
+                    }}
                     analyticsLabel="column_option_in_feed_sharing_settings"
                     checked={formikProps.values['visibility'] === 'GLOBAL'}
                     defaultValue
                     disabled={!editable(formikProps)}
-                    enableIndeterminateState={false}
                     onChange={(value) => {
                       formikProps.setFieldValue(
                         'visibility',
@@ -459,6 +474,7 @@ export const AddColumnDetailsModal = React.memo(
                     }}
                   />
                 </View>
+                <Spacer height={contentPadding} />
 
                 <View style={sharedStyles.paddingHorizontal}>
                   <Button

@@ -133,7 +133,7 @@ function AddColumnModalItem({
               pushModal({
                 name: 'ADD_COLUMN_DETAILS',
                 params: {
-                  columnId: payload.feedId,
+                  columnId: payload.columnId,
                 },
               })
             }
@@ -183,24 +183,37 @@ export function AddColumnModal(props: AddColumnModalProps) {
 
   const columnIds = useReduxState(selectors.columnIdsSelector)
   const sharedFeeds = useReduxState(selectors.sharedFeedsSelector)
+  console.log('what shared feeds', sharedFeeds)
 
   const publicFeedsColumn = {
     title: 'PUBLIC FEEDS',
     type: 'COLUMN_TYPE_NEWSFEED' as NewsFeedColumnType,
     icon: { family: 'octicon', name: 'bell' } as IconProp,
-    items: sharedFeeds.map((feed) => {
-      return {
+    items: [] as {
+      payload: AddColumnDetailsPayload
+    }[],
+  }
+
+  for (const feed of sharedFeeds) {
+    if (!columnIds.includes(feed.id)) {
+      publicFeedsColumn.items.push({
         payload: {
           icon: { family: 'octicon', name: 'rss' } as IconProp,
           title: feed.title,
-          feedId: feed.id,
+          columnId: feed.id,
         } as AddColumnDetailsPayload,
-      }
-    }),
+      })
+    }
   }
 
-  if (!columnTypes.find((c) => c.title === 'PUBLIC FEEDS')) {
+  console.log('what publicFeedsColumn', publicFeedsColumn)
+
+  console.log('columntypes', columnTypes, sharedFeeds)
+  const i = columnTypes.findIndex((c) => c.title === 'PUBLIC FEEDS')
+  if (i === -1) {
     columnTypes.push(publicFeedsColumn)
+  } else {
+    columnTypes[i] = publicFeedsColumn
   }
 
   const hasReachedColumnLimit = columnIds.length >= constants.COLUMNS_LIMIT

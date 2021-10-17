@@ -6,12 +6,12 @@ import { View } from 'react-native'
 import { Separator } from '../components/common/Separator'
 import { Spacer } from '../components/common/Spacer'
 import { DataExpressionEditor } from '../components/modals/partials/DataExpressionEditor'
+import { useColumnCreatedByCurrentUser } from '../hooks/use-column-created-by-current-user'
 import { contentPadding } from '../styles/variables'
 import { isAllOf, isAnyOf, isNotTrue } from '../utils/types'
 
 export interface DataExpressionEditorContainerProps {
   formikProps: ReturnType<typeof useFormik>
-  editable: boolean
 }
 
 // Filter children expression wrappers by id. For AllOf or AnyOf, this basically
@@ -65,7 +65,7 @@ export const DataExpressionEditorContainer = React.memo(
       setFlipper(!flipper)
     }
 
-    const { formikProps, editable } = props
+    const { formikProps } = props
     const dataExpressionWrapper: NewsFeedDataExpressionWrapper =
       formikProps.values['dataExpression']
 
@@ -243,7 +243,9 @@ export const DataExpressionEditorContainer = React.memo(
           setFocusId={setFocusId}
           setExpressionWrapper={setExpressionWrapper}
           deleteExpressionById={deleteExpressionById}
-          editable={editable}
+          disabled={
+            !useColumnCreatedByCurrentUser(formikProps.values['columnId'])
+          }
         />
         <Spacer height={contentPadding} />
         <Separator horizontal />

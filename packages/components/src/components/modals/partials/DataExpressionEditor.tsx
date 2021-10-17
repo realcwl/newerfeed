@@ -24,7 +24,7 @@ export interface DataExpressionEditorProps {
   setFocusId: (id: string) => void
   deleteExpressionById: (id: string | undefined) => boolean
   setExpressionWrapper: (payload: NewsFeedDataExpressionWrapper) => boolean
-  editable: boolean
+  disabled: boolean
 }
 
 // Before rendering anything, render a dashline in relative position to denote
@@ -61,7 +61,7 @@ export const DataExpressionEditor = React.memo(
       focusId,
       setFocusId,
       setExpressionWrapper,
-      editable,
+      disabled,
     } = props
     if (!dataExpressionWrapper || !dataExpressionWrapper.id) return null
 
@@ -69,7 +69,7 @@ export const DataExpressionEditor = React.memo(
 
     // This is a Creator expression, we should render it as a plus button.
     if (!dataExpressionWrapper.expr) {
-      if (!editable) {
+      if (disabled) {
         return null
       }
       return (
@@ -136,7 +136,7 @@ export const DataExpressionEditor = React.memo(
               focusId={focusId}
               setFocusId={setFocusId}
               setExpressionWrapper={setExpressionWrapper}
-              editable={editable}
+              disabled={disabled}
             />
             <Spacer height={contentPadding / 2} />
           </ExpressionEntryIndicator>
@@ -155,7 +155,7 @@ export const DataExpressionEditor = React.memo(
               focusId={focusId}
               setFocusId={setFocusId}
               setExpressionWrapper={setExpressionWrapper}
-              editable={editable}
+              disabled={disabled}
             />
             <Spacer height={contentPadding / 2} />
           </ExpressionEntryIndicator>
@@ -170,7 +170,7 @@ export const DataExpressionEditor = React.memo(
             focusId={focusId}
             setFocusId={setFocusId}
             setExpressionWrapper={setExpressionWrapper}
-            editable={editable}
+            disabled={disabled}
           />
           <Spacer height={contentPadding / 2} />
         </ExpressionEntryIndicator>
@@ -181,7 +181,7 @@ export const DataExpressionEditor = React.memo(
         <LiteralPredicateButton
           text={dataExpressionWrapper.expr?.pred.param?.text || ''}
           id={dataExpressionWrapper.id}
-          disabled={!editable}
+          disabled={disabled}
           color={'gray'}
           onDelete={() => deleteExpressionById(dataExpressionWrapper.id)}
           setExpressionWrapper={setExpressionWrapper}

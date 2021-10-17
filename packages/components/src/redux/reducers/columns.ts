@@ -105,8 +105,11 @@ export const columnsReducer: Reducer<State> = (
           draft.allIds = draft.allIds.filter(
             (id) => id !== action.payload.columnId,
           )
-
-        if (draft.byId) delete draft.byId[action.payload.columnId]
+        if (
+          draft.byId &&
+          draft.byId[action.payload.columnId].visibility === 'PRIVATE'
+        )
+          delete draft.byId[action.payload.columnId]
       })
     case 'MOVE_COLUMN':
       return immer(state, (draft) => {
@@ -241,8 +244,14 @@ export const columnsReducer: Reducer<State> = (
         draft.sharedIds = action.payload.feeds.map((f) => f.id)
         action.payload.feeds.forEach((v) => {
           draft.byId[v.id] = {
-            ...v,
+            ...draft.byId[v.id],
+            id: v.id,
+            icon: draft.byId[v.id]?.icon ?? v.icon,
+            creator: v.creator,
             sources: v.sources ?? [],
+            dataExpression: v.dataExpression,
+            title: v.title,
+            visibility: v.visibility,
           }
         })
       })

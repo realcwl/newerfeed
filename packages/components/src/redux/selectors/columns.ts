@@ -26,7 +26,7 @@ export const columnsWithRefreshTimeAndNotifySettingSelector = (
     result.push({
       id: columnId,
       refreshedAt: byId[columnId].refreshedAt,
-      notifyOnNewPosts: byId[columnId].options.notifyOnNewPosts ?? false,
+      notifyOnNewPosts: byId[columnId].options?.notifyOnNewPosts ?? false,
     })
   }
   return result
