@@ -64,14 +64,6 @@ export const AddColumnDetailsModal = React.memo(
       columnId ? columnId : '',
     )
 
-    const editable = (formikProps: ReturnType<typeof useFormik>) => {
-      const currentUserId = selectors.currentUserIdSelector(store.getState())
-      return (
-        !formikProps.values['creator'] ||
-        currentUserId === formikProps.values['creator']?.id
-      )
-    }
-
     // Construct form's initial value. It's either empty, when we're adding a
     // brand new column, or populated with existing column's attribute, when we
     // are modifying attributes of one existing column.
@@ -137,12 +129,12 @@ export const AddColumnDetailsModal = React.memo(
 
         // Create a empty column.
         const columnCreation: ColumnCreation = {
+          subscribeOnly,
           title: formValues['name'],
           icon: formValues['icon'],
           type: 'COLUMN_TYPE_NEWS_FEED',
           id: columnId ? columnId : guid(),
           isUpdate: !!columnId,
-          subscribeOnly: !editable(formikProps),
           itemListIds: newsFeedColumnAttributes?.itemListIds ?? [],
           newestItemId: '',
           oldestItemId: '',
@@ -282,7 +274,7 @@ export const AddColumnDetailsModal = React.memo(
             <NewsSubtypesWithFilter
               source={source}
               formikProps={formikProps}
-              editable={editable(formikProps)}
+              editable={!subscribeOnly}
             />
           </AccordionView>
         </View>
@@ -346,7 +338,7 @@ export const AddColumnDetailsModal = React.memo(
         return !formikProps.values['name']
       }
 
-      const borderColor = editable(formikProps) ? 'green' : 'gray'
+      const borderColor = subscribeOnly ? 'gray' : 'green'
 
       return (
         <>
@@ -374,8 +366,8 @@ export const AddColumnDetailsModal = React.memo(
 
           <View style={sharedStyles.paddingHorizontal}>
             <ThemedTextInput
-              editable={editable(formikProps)}
-              selectTextOnFocus={editable(formikProps)}
+              editable={!subscribeOnly}
+              selectTextOnFocus={!subscribeOnly}
               textInputKey={`add-column-details-column-name-text-input`}
               borderThemeColor={
                 shouldShowError()
@@ -478,7 +470,7 @@ export const AddColumnDetailsModal = React.memo(
                     analyticsLabel="column_option_in_feed_sharing_settings"
                     checked={formikProps.values['visibility'] === 'GLOBAL'}
                     defaultValue
-                    disabled={!editable(formikProps)}
+                    disabled={subscribeOnly}
                     onChange={(value) => {
                       formikProps.setFieldValue(
                         'visibility',
