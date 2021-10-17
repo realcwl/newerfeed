@@ -17,9 +17,13 @@ import { useReduxState } from '../hooks/use-redux-state'
 import * as selectors from '../redux/selectors'
 import { SubscriptionClient } from 'subscriptions-transport-ws'
 import { WrapUrlWithToken } from '../utils/api'
-import { constants, SeedState } from '@devhub/core'
-import { updateSeedState } from '../redux/actions'
+import { constants, SeedState, Signal } from '@devhub/core'
 import Notifier from '../libs/notifier'
+import {
+  handleSignal,
+  setBannerMessage,
+  updateSeedState,
+} from '../redux/actions'
 
 const styles = StyleSheet.create({
   container: {
@@ -59,24 +63,17 @@ export const MainScreen = React.memo(() => {
       .request({
         query: `
           subscription {
-            syncDown(userId: "${userId}") {
-              userSeedState {
-                id
-                name
-                avatarUrl
-              }
-              feedSeedState {
-                id
-                name
-              }
+            signal(userId: "${userId}") {
+              signalType
             }
           }
         `,
       })
       .subscribe({
         next: (v: any) => {
-          const seedState: SeedState = v.data?.syncDown
-          dispatch(updateSeedState(seedState))
+          const signal: Signal = v.data?.signal
+          if (!signal) return
+          dispatch(handleSignal(signal))
         },
         error: (e) => console.error(e),
       })

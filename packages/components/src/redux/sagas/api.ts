@@ -63,7 +63,7 @@ async function syncUp(state: RootState) {
   }
 }
 
-const debounceSyncUp = _.debounce(syncUp, 5000, {
+const debounceSyncUp = _.debounce(syncUp, 1000, {
   leading: true,
   maxWait: 30000,
   trailing: true,
