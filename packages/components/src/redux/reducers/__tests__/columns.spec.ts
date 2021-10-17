@@ -54,6 +54,7 @@ describe('columnsReducer', () => {
           unread: false,
         },
         visibility: 'PRIVATE',
+        subscriberCount: 1,
       } as Column),
   )
 
@@ -214,6 +215,7 @@ describe('columnsReducer', () => {
           dataExpression: undefined,
           options: { enableAppIconUnreadIndicator: true },
           visibility: 'PRIVATE',
+          subscriberCount: 1,
         },
       ]).byId[id]
 

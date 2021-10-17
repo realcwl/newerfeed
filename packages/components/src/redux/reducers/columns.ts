@@ -190,6 +190,7 @@ export const columnsReducer: Reducer<State> = (
             dataExpression: undefined,
             options: { enableAppIconUnreadIndicator: true },
             visibility: 'PRIVATE',
+            subscriberCount: 1,
           }
           const normalized = normalizeColumns([{ ...columnCreation }])
 
@@ -252,6 +253,7 @@ export const columnsReducer: Reducer<State> = (
             dataExpression: v.dataExpression,
             title: v.title,
             visibility: v.visibility,
+            subscriberCount: v.subscriberCount,
           }
         })
       })

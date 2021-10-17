@@ -4,6 +4,7 @@ import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native'
 import { useDispatch } from 'react-redux'
 
 import { useColumn } from '../../hooks/use-column'
+import { useColumnCreatedByCurrentUser } from '../../hooks/use-column-created-by-current-user'
 import { useDesktopOptions } from '../../hooks/use-desktop-options'
 import { useReduxState } from '../../hooks/use-redux-state'
 import { Browser } from '../../libs/browser'
@@ -85,6 +86,7 @@ export function ColumnHeader(props: ColumnHeaderProps) {
   const dispatch = useDispatch()
   const bannerMessage = useReduxState(selectors.bannerMessageSelector)
   const { column } = useColumn(columnId || '')
+  const subscribeOnly = !useColumnCreatedByCurrentUser(columnId ?? '')
   const { enablePushNotifications: enableDesktopPushNotifications } =
     useDesktopOptions()
 
@@ -158,7 +160,9 @@ export function ColumnHeader(props: ColumnHeaderProps) {
                     numberOfLines={1}
                     style={styles.title}
                   >
-                    {title}
+                    {subscribeOnly
+                      ? `${title}(${column?.creator?.name})`
+                      : title}
                   </ThemedText>
 
                   <Spacer width={contentPadding / 2} />

@@ -39,7 +39,7 @@ export function addColumn(payload: ColumnCreation) {
   return createAction('ADD_COLUMN', payload)
 }
 
-export function setSharedFeeds(payload: { feeds: NewsFeedColumn[] }) {
+export function setSharedColumns(payload: { feeds: NewsFeedColumn[] }) {
   return createAction('SET_SHARED_COLUMNS', payload)
 }
 

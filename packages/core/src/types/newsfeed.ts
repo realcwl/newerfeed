@@ -12,6 +12,8 @@ export type Column = NewsFeedColumn
 // Newsfeed column type.
 export type NewsFeedColumnType = 'COLUMN_TYPE_NEWS_FEED'
 
+// Visiblity of a feed, 'GLOBAL' means visible to all users across the website.
+// PRIVATE by default.
 export type FeedVisibility = 'GLOBAL' | 'PRIVATE'
 
 // Each column extends the BaseColumn, where some common fields are defined.
@@ -55,10 +57,14 @@ export interface NewsFeedColumn extends BaseColumn {
   // information.
   filters?: ColumnFilter
 
+  // if creator != self, this is a feed shared by others and thus not editable
   creator?: User
 
   // Whethere this feed is publicly readable or private
   visibility: FeedVisibility
+
+  // subscriberCount is the total subscribers to this feed (it is 1 if not shared b/c the current user is the only subscriber)
+  subscriberCount: number
 }
 
 export interface NewsFeedColumnSource {

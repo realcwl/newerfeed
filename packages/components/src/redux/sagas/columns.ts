@@ -32,7 +32,7 @@ import {
   EMPTY_ARRAY,
 } from '@devhub/core/src/utils/constants'
 import { notify } from '../../utils/notify'
-import { setSharedFeeds } from '../actions'
+import { setSharedColumns } from '../actions'
 
 interface Post {
   id: string
@@ -71,6 +71,10 @@ interface FeedResponse {
   visibility: FeedVisibility
 }
 
+interface FeedResponseWithSubscriberCount extends FeedResponse {
+  subscriberCount: number
+}
+
 interface FeedWithPostsResponse extends FeedResponse {
   posts: Post[]
 }
@@ -83,7 +87,7 @@ interface FeedsResponse {
 
 interface VisibleFeedResponse {
   data: {
-    allVisibleFeeds: FeedResponse[]
+    allVisibleFeeds: FeedResponseWithSubscriberCount[]
   }
 }
 
@@ -690,6 +694,7 @@ function* fetchSharedFeeds() {
               },
             },
             visibility: true,
+            subscriberCount: true,
           },
         },
       }),
@@ -697,7 +702,7 @@ function* fetchSharedFeeds() {
   )
 
   yield put(
-    setSharedFeeds({
+    setSharedColumns({
       feeds: visibleFeeds.data.data.allVisibleFeeds.map((f: any) => {
         return {
           ...f,
@@ -716,6 +721,7 @@ function* fetchSharedFeeds() {
           refreshedAt: '',
           state: 'not_loaded',
           options: { enableAppIconUnreadIndicator: true },
+          subscriberCount: f.subscriberCount,
         }
       }),
     }),

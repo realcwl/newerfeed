@@ -129,7 +129,6 @@ function AddColumnModalItem({
       onPress={
         payload
           ? () => {
-              console.log('what', payload)
               pushModal({
                 name: 'ADD_COLUMN_DETAILS',
                 params: {
@@ -153,6 +152,7 @@ function AddColumnModalItem({
       }}
       style={[sharedStyles.flex, springAnimatedStyles]}
     >
+      {/* {!payload || useColumnCreatedByCurrentUser(payload.columnId ?? '') ? ( */}
       <View
         style={[
           sharedStyles.flex,
@@ -174,6 +174,7 @@ function AddColumnModalItem({
 
         <ThemedText color="foregroundColor">{title}</ThemedText>
       </View>
+      {/* ) */}
     </SpringAnimatedTouchableOpacity>
   )
 }
@@ -183,7 +184,6 @@ export function AddColumnModal(props: AddColumnModalProps) {
 
   const columnIds = useReduxState(selectors.columnIdsSelector)
   const sharedFeeds = useReduxState(selectors.sharedFeedsSelector)
-  console.log('what shared feeds', sharedFeeds)
 
   const publicFeedsColumn = {
     title: 'PUBLIC FEEDS',
@@ -206,9 +206,6 @@ export function AddColumnModal(props: AddColumnModalProps) {
     }
   }
 
-  console.log('what publicFeedsColumn', publicFeedsColumn)
-
-  console.log('columntypes', columnTypes, sharedFeeds)
   const i = columnTypes.findIndex((c) => c.title === 'PUBLIC FEEDS')
   if (i === -1) {
     columnTypes.push(publicFeedsColumn)

@@ -35,6 +35,7 @@ import {
   ThemedTextInputProps,
 } from '../themed/ThemedTextInput'
 import { NewsSubtypesWithFilter } from './partials/NewsSubtypesWithFilter'
+import { useColumnCreatedByCurrentUser } from '../../hooks/use-column-created-by-current-user'
 
 export interface AddColumnDetailsModalProps {
   showBackButton: boolean
@@ -46,12 +47,12 @@ export interface AddColumnDetailsModalProps {
 
 export const AddColumnDetailsModal = React.memo(
   (props: AddColumnDetailsModalProps) => {
-    console.log('what props', props)
     const { showBackButton, columnId } = props
     const store = useStore()
     const idToSourceOrSubSourceMap = useReduxState(
       selectors.idToSourceOrSubSourceMapSelector,
     )
+    const subscribeOnly = !useColumnCreatedByCurrentUser(columnId ?? '')
     const availableNewsFeedSources = useReduxState(
       selectors.availableNewsFeedSourcesSelector,
     )
@@ -115,6 +116,7 @@ export const AddColumnDetailsModal = React.memo(
         // the real redux object.
         dataExpression: _.cloneDeep(newsFeedColumnAttributes.dataExpression),
         visibility: newsFeedColumnAttributes.visibility,
+        subscriberCount: newsFeedColumnAttributes.subscriberCount,
       }
     }
 
@@ -153,6 +155,7 @@ export const AddColumnDetailsModal = React.memo(
             enableAppIconUnreadIndicator: true,
           },
           visibility: formValues['visibility'] ?? 'PRIVATE',
+          subscriberCount: formValues['subscriberCount'] ?? 1,
         }
         dispatch(actions.addColumn(columnCreation))
 
@@ -402,7 +405,11 @@ export const AddColumnDetailsModal = React.memo(
               onChangeText={(value) => {
                 formikProps.setFieldValue('name', value)
               }}
-              value={formikProps.values['name']}
+              value={
+                subscribeOnly
+                  ? `${formikProps.values['name']}(${formikProps.values['creator'].name})`
+                  : formikProps.values['name']
+              }
             />
           </View>
 
@@ -417,7 +424,13 @@ export const AddColumnDetailsModal = React.memo(
       <ModalColumn
         name="ADD_COLUMN_DETAILS"
         showBackButton={showBackButton}
-        title={columnId ? 'Edit News Column Attribute' : 'Add News Column'}
+        title={
+          subscribeOnly
+            ? 'Subscribe to Feed'
+            : columnId
+            ? 'Edit News Column Attribute'
+            : 'Add News Column'
+        }
       >
         <DialogConsumer>
           {(Dialog) => {
@@ -482,7 +495,11 @@ export const AddColumnDetailsModal = React.memo(
                     disabled={!formikProps.isValid || formikProps.isSubmitting}
                     onPress={formikProps.submitForm}
                   >
-                    {columnId ? 'Save Column Attribute' : 'Add Column'}
+                    {subscribeOnly
+                      ? 'Subscribe to Feed'
+                      : columnId
+                      ? 'Save Column Attribute'
+                      : 'Add Column'}
                   </Button>
                 </View>
 
