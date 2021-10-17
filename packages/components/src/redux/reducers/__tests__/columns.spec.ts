@@ -53,12 +53,15 @@ describe('columnsReducer', () => {
           saved: false,
           unread: false,
         },
+        visibility: 'PRIVATE',
+        subscriberCount: 1,
       } as Column),
   )
 
   const defaultState = {
     allIds: [],
     byId: {},
+    sharedIds: [],
   } as State
 
   const getState = (items: number[]): State => {
@@ -211,6 +214,8 @@ describe('columnsReducer', () => {
           state: 'not_loaded',
           dataExpression: undefined,
           options: { enableAppIconUnreadIndicator: true },
+          visibility: 'PRIVATE',
+          subscriberCount: 1,
         },
       ]).byId[id]
 

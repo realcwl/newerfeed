@@ -15,6 +15,9 @@ export interface State {
   // same as the list order.
   allIds: string[]
 
+  // All shared column ids
+  sharedIds: string[]
+
   // byId maps the hex string column id to the Column type, where details of the
   // Column such as column header, type, are defined. Note that this is only a
   // definition of the column, the mapping between column->data are defined in
@@ -24,6 +27,7 @@ export interface State {
 
 const initialState: State = {
   allIds: [],
+  sharedIds: [],
   byId: {},
 }
 
@@ -101,8 +105,11 @@ export const columnsReducer: Reducer<State> = (
           draft.allIds = draft.allIds.filter(
             (id) => id !== action.payload.columnId,
           )
-
-        if (draft.byId) delete draft.byId[action.payload.columnId]
+        if (
+          draft.byId &&
+          draft.byId[action.payload.columnId].visibility === 'PRIVATE'
+        )
+          delete draft.byId[action.payload.columnId]
       })
     case 'MOVE_COLUMN':
       return immer(state, (draft) => {
@@ -140,7 +147,9 @@ export const columnsReducer: Reducer<State> = (
         )
 
         // Get all deleted feeds as ids
-        const delIds = draft.allIds.filter((v) => !newAllIds.includes(v))
+        const delIds = draft.allIds.filter(
+          (v) => !newAllIds.includes(v) && !draft.sharedIds.includes(v),
+        )
 
         // Only update when the ids in feed change. It should:
         // 1. substitude the ids
@@ -180,6 +189,8 @@ export const columnsReducer: Reducer<State> = (
             state: 'not_loaded',
             dataExpression: undefined,
             options: { enableAppIconUnreadIndicator: true },
+            visibility: 'PRIVATE',
+            subscriberCount: 1,
           }
           const normalized = normalizeColumns([{ ...columnCreation }])
 
@@ -228,6 +239,23 @@ export const columnsReducer: Reducer<State> = (
         if (draft.byId[columnId]) {
           draft.byId[columnId].state = 'loading'
         }
+      })
+    case 'SET_SHARED_COLUMNS':
+      return immer(state, (draft) => {
+        draft.sharedIds = action.payload.feeds.map((f) => f.id)
+        action.payload.feeds.forEach((v) => {
+          draft.byId[v.id] = {
+            ...draft.byId[v.id],
+            id: v.id,
+            icon: draft.byId[v.id]?.icon ?? v.icon,
+            creator: v.creator,
+            sources: v.sources ?? [],
+            dataExpression: v.dataExpression,
+            title: v.title,
+            visibility: v.visibility,
+            subscriberCount: v.subscriberCount,
+          }
+        })
       })
     case 'UPDATE_COLUMN_ID': {
       return immer(state, (draft) => {

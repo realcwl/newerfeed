@@ -12,6 +12,10 @@ export type Column = NewsFeedColumn
 // Newsfeed column type.
 export type NewsFeedColumnType = 'COLUMN_TYPE_NEWS_FEED'
 
+// Visiblity of a feed, 'GLOBAL' means visible to all users across the website.
+// PRIVATE by default.
+export type FeedVisibility = 'GLOBAL' | 'PRIVATE'
+
 // Each column extends the BaseColumn, where some common fields are defined.
 export interface NewsFeedColumn extends BaseColumn {
   // Constant defined in another place.
@@ -52,6 +56,15 @@ export interface NewsFeedColumn extends BaseColumn {
   // that is used to quickly filter column data to let user find useful
   // information.
   filters?: ColumnFilter
+
+  // if creator != self, this is a feed shared by others and thus not editable
+  creator?: User
+
+  // Whethere this feed is publicly readable or private
+  visibility: FeedVisibility
+
+  // subscriberCount is the total subscribers to this feed (it is 1 if not shared b/c the current user is the only subscriber)
+  subscriberCount: number
 }
 
 export interface NewsFeedColumnSource {
@@ -215,7 +228,7 @@ export interface User {
   email: string
 
   // User's avartar. If not provided we'll use a random default icon.
-  avatarUrl: string | null
+  avatarUrl?: string
 }
 
 export type ModalPayload =
@@ -339,6 +352,9 @@ export interface AddColumnDetailsPayload {
 
   // Identifies a single icon for the column details.
   icon: GenericIconProp
+
+  // FeedId of shared feeds
+  columnId?: string
 }
 
 // Identifies a single column creation activity. For not it only extends
@@ -348,6 +364,7 @@ export type GenericColumnCreation<ColumnType extends NewsFeedColumn> = Omit<
   'createdAt' | 'updatedAt' | 'refreshedAt'
 > & {
   isUpdate?: boolean
+  subscribeOnly?: boolean
   createdAt?: string
   updatedAt?: string
 }

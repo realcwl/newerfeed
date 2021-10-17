@@ -19,6 +19,7 @@ import {
   Attachment,
   ColumnCreation,
   constants,
+  FeedVisibility,
   NewsFeedColumn,
   NewsFeedColumnCreation,
   NewsFeedColumnSource,
@@ -31,6 +32,7 @@ import {
   EMPTY_ARRAY,
 } from '@devhub/core/src/utils/constants'
 import { notify } from '../../utils/notify'
+import { setSharedColumns } from '../actions'
 
 interface Post {
   id: string
@@ -50,21 +52,42 @@ interface Post {
   originUrl: string
 }
 
+interface FeedResponse {
+  id: string
+  updatedAt: string
+  name: string
+  creator: {
+    id: string
+    name: string
+    email: string
+  }
+  filterDataExpression: string
+  subSources: {
+    id: string
+    source: {
+      id: string
+    }
+  }[]
+  visibility: FeedVisibility
+}
+
+interface FeedResponseWithSubscriberCount extends FeedResponse {
+  subscriberCount: number
+}
+
+interface FeedWithPostsResponse extends FeedResponse {
+  posts: Post[]
+}
+
 interface FeedsResponse {
   data: {
-    feeds: {
-      id: string
-      updatedAt: string
-      name: string
-      filterDataExpression: string
-      subSources: {
-        id: string
-        source: {
-          id: string
-        }
-      }[]
-      posts: Post[]
-    }[]
+    feeds: FeedWithPostsResponse[]
+  }
+}
+
+interface VisibleFeedResponse {
+  data: {
+    allVisibleFeeds: FeedResponseWithSubscriberCount[]
   }
 }
 
@@ -85,12 +108,12 @@ function shouldDropExistingData(
   )
 }
 
-function convertFeedsResponseToSources(
-  response: FeedsResponse,
+function convertFeedResponseToSources(
+  feedResponse: FeedResponse,
 ): NewsFeedColumnSource[] {
   const sources: NewsFeedColumnSource[] = []
-  if (response.data.feeds.length === 0) return sources
-  for (const subSource of response.data.feeds[0].subSources) {
+  if (feedResponse.subSources.length === 0) return sources
+  for (const subSource of feedResponse.subSources) {
     const source = sources.find((s) => s.sourceId == subSource.source.id)
     if (source) {
       source.subSourceIds.push(subSource.id)
@@ -102,6 +125,14 @@ function convertFeedsResponseToSources(
     })
   }
   return sources
+}
+
+function convertFeedsResponseToSources(
+  response: FeedsResponse,
+): NewsFeedColumnSource[] {
+  const sources: NewsFeedColumnSource[] = []
+  if (response.data.feeds.length === 0) return sources
+  return convertFeedResponseToSources(response.data.feeds[0])
 }
 
 function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
@@ -154,7 +185,7 @@ function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
   })
 }
 
-function stringToDataExpressionWrapper(
+export function StringToDataExpressionWrapper(
   jsonString: string,
 ): NewsFeedDataExpressionWrapper {
   const wrapper: NewsFeedDataExpressionWrapper = JSON.parse(jsonString)
@@ -199,7 +230,7 @@ function getUpsertFeedRequest(
                 EncodeDataExpressionFromColumnCreation(columnCreation),
               subSourceIds:
                 ExtractSubSourceIdsFromColumnCreation(columnCreation),
-              visibility: new EnumType('PRIVATE'),
+              visibility: new EnumType(columnCreation.visibility),
             },
           },
           id: true,
@@ -217,7 +248,7 @@ function getUpsertFeedRequest(
             filterDataExpression:
               EncodeDataExpressionFromColumnCreation(columnCreation),
             subSourceIds: ExtractSubSourceIdsFromColumnCreation(columnCreation),
-            visibility: new EnumType('PRIVATE'),
+            visibility: new EnumType(columnCreation.visibility),
           },
         },
         id: true,
@@ -308,6 +339,7 @@ function constructFeedRequest(
           },
         },
         filterDataExpression: true,
+        visibility: true,
       },
     },
   })
@@ -315,6 +347,7 @@ function constructFeedRequest(
 
 function* initialRefreshAllOutdatedColumn() {
   yield* refreshAllOutdatedColumn({ notifyOnNewPosts: false })
+  yield* fetchSharedFeeds()
 }
 
 function* refreshAllOutdatedColumn({ notifyOnNewPosts = false }) {
@@ -356,6 +389,8 @@ function* columnRefresher() {
 
     // Refresh all outdated column
     yield* refreshAllOutdatedColumn({ notifyOnNewPosts: true })
+
+    yield* fetchSharedFeeds()
   }
 }
 
@@ -365,6 +400,7 @@ function* onAddColumn(
   const placeHolderOrColumnId = action.payload.id
 
   const isUpdate = !!action.payload.isUpdate
+  const subscribeOnly = !!action.payload.subscribeOnly
 
   if (AppState.currentState === 'active')
     yield* call(InteractionManager.runAfterInteractions)
@@ -379,7 +415,7 @@ function* onAddColumn(
   yield* put(actions.setColumnLoading({ columnId: placeHolderOrColumnId }))
 
   const appToken = yield* select(selectors.appTokenSelector)
-  const userId = yield* select(selectors.userIdSelector)
+  const userId = yield* select(selectors.currentUserIdSelector)
   if (!userId) {
     yield put(actions.authFailure(Error('no user id found')))
     return
@@ -388,18 +424,23 @@ function* onAddColumn(
   let updatedId = ''
   try {
     // 1. Upsert Feed and get new/old feed Id
-    const createFeedResponse: AxiosResponse = yield axios.post(
-      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
-      {
-        query: getUpsertFeedRequest(action.payload, userId, isUpdate),
-      },
-    )
+    // For subscribe case, we reuse the columnId created by others
+    if (subscribeOnly) {
+      updatedId = placeHolderOrColumnId
+    } else {
+      const createFeedResponse: AxiosResponse = yield axios.post(
+        WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
+        {
+          query: getUpsertFeedRequest(action.payload, userId, isUpdate),
+        },
+      )
 
-    const { id } = createFeedResponse.data.data.upsertFeed
-    updatedId = id
+      const { id } = createFeedResponse.data.data.upsertFeed
+      updatedId = id
+    }
 
     // 2. Subscribe to that feed if this is a feed creation (isUpdate == false)
-    if (!isUpdate) {
+    if (!isUpdate || subscribeOnly) {
       const subscribeFeedResponse: AxiosResponse = yield axios.post(
         WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
         {
@@ -500,7 +541,7 @@ function* onDeleteColumn(
 
   // call backend for feed deletion.
   const appToken = yield* select(selectors.appTokenSelector)
-  const userId = yield* select(selectors.userIdSelector)
+  const userId = yield* select(selectors.currentUserIdSelector)
   try {
     const deleteFeedResponse: AxiosResponse = yield axios.post(
       WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
@@ -564,7 +605,7 @@ function* onFetchColumnDataRequest(
   action: ExtractActionFromActionCreator<typeof actions.fetchColumnDataRequest>,
 ) {
   const appToken = yield* select(selectors.appTokenSelector)
-  const userId = yield* select(selectors.userIdSelector)
+  const userId = yield* select(selectors.currentUserIdSelector)
   const column = yield* select(
     selectors.columnSelector,
     action.payload.columnId,
@@ -617,7 +658,7 @@ function* onFetchColumnDataRequest(
           action.payload.direction,
         ),
         sources: convertFeedsResponseToSources(fetchDataResponse.data),
-        dataExpression: stringToDataExpressionWrapper(
+        dataExpression: StringToDataExpressionWrapper(
           feed.filterDataExpression,
         ),
         dataByNodeId: dataByNodeId,
@@ -627,6 +668,64 @@ function* onFetchColumnDataRequest(
     yield put(actions.fetchColumnDataFailure({ columnId: column.id }))
     console.error(err)
   }
+}
+
+function* fetchSharedFeeds() {
+  const appToken = yield* select(selectors.appTokenSelector)
+  const visibleFeeds: AxiosResponse = yield axios.post(
+    WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
+    {
+      query: jsonToGraphQLQuery({
+        query: {
+          allVisibleFeeds: {
+            id: true,
+            name: true,
+            creator: {
+              id: true,
+              name: true,
+            },
+            updatedAt: true,
+            filterDataExpression: true,
+            subSources: {
+              id: true,
+              name: true,
+              source: {
+                id: true,
+              },
+            },
+            visibility: true,
+            subscriberCount: true,
+          },
+        },
+      }),
+    },
+  )
+
+  yield put(
+    setSharedColumns({
+      feeds: visibleFeeds.data.data.allVisibleFeeds.map((f: any) => {
+        return {
+          ...f,
+          title: f.name,
+          sources: convertFeedResponseToSources(f),
+          type: 'COLUMN_TYPE_NEWS_FEED',
+          icon: {
+            family: 'material',
+            name: 'rss-feed',
+          },
+          creator: f.creator,
+          dataExpression: StringToDataExpressionWrapper(f.filterDataExpression),
+          itemListIds: [],
+          newestItemId: '',
+          oldestItemId: '',
+          refreshedAt: '',
+          state: 'not_loaded',
+          options: { enableAppIconUnreadIndicator: true },
+          subscriberCount: f.subscriberCount,
+        }
+      }),
+    }),
+  )
 }
 
 export function* columnsSagas() {

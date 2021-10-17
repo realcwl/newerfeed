@@ -28,7 +28,7 @@ export interface renderButtonSettings {
 }
 
 export function renderButtonByTextAndKey(props: renderButtonSettings) {
-  const { text, color, disabled, onDelete, onPress } = props
+  const { text, color, disabled, onDelete, onPress, disableDelete } = props
 
   const theme = getTheme()
 
@@ -59,7 +59,9 @@ export function renderButtonByTextAndKey(props: renderButtonSettings) {
           onPress()
         }}
         onRemove={
-          onDelete
+          disableDelete
+            ? undefined
+            : onDelete
             ? () => {
                 vibrateHapticFeedback()
                 onDelete()
@@ -68,6 +70,7 @@ export function renderButtonByTextAndKey(props: renderButtonSettings) {
         }
         size={25 * scaleFactor}
         disabled={disabled}
+        disableDelete={disabled}
       />
     </View>
   )
@@ -176,6 +179,7 @@ export const LogicalExpressionButtons = React.memo(
               setFocusId('')
             },
             disabled: false,
+            disableDelete: false,
           })}
         </View>
         <Spacer width={contentPadding / 2} />
@@ -198,6 +202,7 @@ export const LogicalExpressionButtons = React.memo(
               setFocusId('')
             },
             disabled: false,
+            disableDelete: false,
           })}
         </View>
         <Spacer width={contentPadding / 2} />
@@ -206,6 +211,7 @@ export const LogicalExpressionButtons = React.memo(
             text: 'N',
             color: 'lightRed',
             disabled: false,
+            disableDelete: false,
             onPress: () => {
               // add a creator expression.
               setExpressionWrapper({

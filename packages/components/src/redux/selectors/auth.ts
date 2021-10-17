@@ -19,8 +19,6 @@ export const refreshTokenSelector = (state: RootState) => s(state).refreshToken
 
 export const lastAuthTimeSelector = (state: RootState) => s(state).lastAuthTime
 
-export const userIdSelector = (state: RootState) => s(state).user?.id
-
 export const currentUserSelector = (state: RootState) => {
   const user = s(state).user
   if (!isLoggedSelector(state)) return undefined
@@ -28,5 +26,5 @@ export const currentUserSelector = (state: RootState) => {
 }
 
 export const currentUserIdSelector = (state: RootState) => {
-  return state.auth.user?.id
+  return s(state).user?.id
 }

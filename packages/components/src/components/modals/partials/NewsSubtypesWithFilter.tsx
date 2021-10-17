@@ -24,11 +24,12 @@ const MAX_ITEM_WITHOUT_FILTER = 9
 export interface NewsSubtypesWithFilterProps {
   source: NewsFeedColumnSource
   formikProps: ReturnType<typeof useFormik>
+  editable: boolean
 }
 
 export const NewsSubtypesWithFilter = React.memo(
   (props: NewsSubtypesWithFilterProps) => {
-    const { source, formikProps } = props
+    const { source, formikProps, editable } = props
     const idToSourceOrSubSourceMap = useReduxState(
       selectors.idToSourceOrSubSourceMapSelector,
     )
@@ -102,6 +103,7 @@ export const NewsSubtypesWithFilter = React.memo(
         ) ? (
           <View key={`add-news-column-details-source-subtype-${subtype}`}>
             <Checkbox
+              disabled={!editable}
               checked={selectedSubtype.includes(subtype)}
               containerStyle={
                 sharedColumnOptionsStyles.fullWidthCheckboxContainer

@@ -10,6 +10,7 @@ import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { Keyboard, View } from 'react-native'
 import { useDispatch, useStore } from 'react-redux'
 import { DataExpressionEditorContainer } from '../../containers/DataExpressionEditorContainer'
+import { Checkbox } from '../common/Checkbox'
 
 import { useReduxState } from '../../hooks/use-redux-state'
 import { Platform } from '../../libs/platform'
@@ -34,6 +35,7 @@ import {
   ThemedTextInputProps,
 } from '../themed/ThemedTextInput'
 import { NewsSubtypesWithFilter } from './partials/NewsSubtypesWithFilter'
+import { useColumnCreatedByCurrentUser } from '../../hooks/use-column-created-by-current-user'
 
 export interface AddColumnDetailsModalProps {
   showBackButton: boolean
@@ -50,6 +52,7 @@ export const AddColumnDetailsModal = React.memo(
     const idToSourceOrSubSourceMap = useReduxState(
       selectors.idToSourceOrSubSourceMapSelector,
     )
+    const subscribeOnly = !useColumnCreatedByCurrentUser(columnId ?? '')
     const availableNewsFeedSources = useReduxState(
       selectors.availableNewsFeedSourcesSelector,
     )
@@ -64,9 +67,7 @@ export const AddColumnDetailsModal = React.memo(
     // Construct form's initial value. It's either empty, when we're adding a
     // brand new column, or populated with existing column's attribute, when we
     // are modifying attributes of one existing column.
-    function getFormInitialValues(
-      columnId: string | undefined,
-    ): Record<string, any> {
+    function getFormInitialValues(columnId?: string): Record<string, any> {
       const res: Record<string, any> = {
         name: '',
         // Create a creator expression by default.
@@ -99,11 +100,15 @@ export const AddColumnDetailsModal = React.memo(
 
       return {
         ...res,
+        columnId,
+        creator: newsFeedColumnAttributes.creator,
         name: newsFeedColumnAttributes.title,
         icon: newsFeedColumnAttributes.icon,
         // Make a deepcopy, otherwise every addtion or removal is happening on
         // the real redux object.
         dataExpression: _.cloneDeep(newsFeedColumnAttributes.dataExpression),
+        visibility: newsFeedColumnAttributes.visibility,
+        subscriberCount: newsFeedColumnAttributes.subscriberCount,
       }
     }
 
@@ -124,6 +129,7 @@ export const AddColumnDetailsModal = React.memo(
 
         // Create a empty column.
         const columnCreation: ColumnCreation = {
+          subscribeOnly,
           title: formValues['name'],
           icon: formValues['icon'],
           type: 'COLUMN_TYPE_NEWS_FEED',
@@ -132,6 +138,7 @@ export const AddColumnDetailsModal = React.memo(
           itemListIds: newsFeedColumnAttributes?.itemListIds ?? [],
           newestItemId: '',
           oldestItemId: '',
+          creator: newsFeedColumnAttributes?.creator,
           sources: getColumnSourcesFromFormValues(formValues),
           dataExpression: formValues['dataExpression'],
           state: 'not_loaded',
@@ -139,6 +146,8 @@ export const AddColumnDetailsModal = React.memo(
             // show unread by default.
             enableAppIconUnreadIndicator: true,
           },
+          visibility: formValues['visibility'] ?? 'PRIVATE',
+          subscriberCount: formValues['subscriberCount'] ?? 1,
         }
         dispatch(actions.addColumn(columnCreation))
 
@@ -262,7 +271,11 @@ export const AddColumnDetailsModal = React.memo(
 
           <AccordionView isOpen={isOptionsOpened}>
             <Spacer height={contentPadding} />
-            <NewsSubtypesWithFilter source={source} formikProps={formikProps} />
+            <NewsSubtypesWithFilter
+              source={source}
+              formikProps={formikProps}
+              editable={!subscribeOnly}
+            />
           </AccordionView>
         </View>
       )
@@ -325,6 +338,8 @@ export const AddColumnDetailsModal = React.memo(
         return !formikProps.values['name']
       }
 
+      const borderColor = subscribeOnly ? 'gray' : 'green'
+
       return (
         <>
           <SubHeader icon={undefined} title={'Column Name'}>
@@ -351,26 +366,28 @@ export const AddColumnDetailsModal = React.memo(
 
           <View style={sharedStyles.paddingHorizontal}>
             <ThemedTextInput
+              editable={!subscribeOnly}
+              selectTextOnFocus={!subscribeOnly}
               textInputKey={`add-column-details-column-name-text-input`}
               borderThemeColor={
                 shouldShowError()
                   ? 'lightRed'
                   : !!formikProps.values['name']
-                  ? 'green'
+                  ? borderColor
                   : undefined
               }
               borderHoverThemeColor={
                 shouldShowError()
                   ? 'lightRed'
                   : !!formikProps.values['name']
-                  ? 'green'
+                  ? borderColor
                   : undefined
               }
               borderFocusThemeColor={
                 shouldShowError()
                   ? 'lightRed'
                   : !!formikProps.values['name']
-                  ? 'green'
+                  ? borderColor
                   : undefined
               }
               {...defaultTextInputProps}
@@ -380,7 +397,11 @@ export const AddColumnDetailsModal = React.memo(
               onChangeText={(value) => {
                 formikProps.setFieldValue('name', value)
               }}
-              value={formikProps.values['name']}
+              value={
+                subscribeOnly
+                  ? `${formikProps.values['name']}(${formikProps.values['creator'].name})`
+                  : formikProps.values['name']
+              }
             />
           </View>
 
@@ -389,11 +410,19 @@ export const AddColumnDetailsModal = React.memo(
       )
     }
 
+    const checkboxSize = 18
+
     return (
       <ModalColumn
         name="ADD_COLUMN_DETAILS"
         showBackButton={showBackButton}
-        title={columnId ? 'Edit News Column Attribute' : 'Add News Column'}
+        title={
+          subscribeOnly
+            ? 'Subscribe to Feed'
+            : columnId
+            ? 'Edit News Column Attribute'
+            : 'Add News Column'
+        }
       >
         <DialogConsumer>
           {(Dialog) => {
@@ -419,13 +448,50 @@ export const AddColumnDetailsModal = React.memo(
                   {renderDataExpressionEditor()}
                 </View>
 
+                {renderHeader('Visibility')}
+                <View
+                  style={[
+                    sharedStyles.flex,
+                    sharedStyles.horizontal,
+                    sharedStyles.paddingHorizontal,
+                  ]}
+                >
+                  <H3 style={{ flex: 5 }}>Set Feed Public</H3>
+                  <Spacer flex={6} />
+                  <Checkbox
+                    containerStyle={{
+                      height: checkboxSize * scaleFactor,
+                      width: checkboxSize * scaleFactor,
+                    }}
+                    squareContainerStyle={{
+                      height: checkboxSize * scaleFactor,
+                      width: checkboxSize * scaleFactor,
+                    }}
+                    analyticsLabel="column_option_in_feed_sharing_settings"
+                    checked={formikProps.values['visibility'] === 'GLOBAL'}
+                    defaultValue
+                    disabled={subscribeOnly}
+                    onChange={(value) => {
+                      formikProps.setFieldValue(
+                        'visibility',
+                        value ? 'GLOBAL' : 'PRIVATE',
+                      )
+                    }}
+                  />
+                </View>
+                <Spacer height={contentPadding} />
+
                 <View style={sharedStyles.paddingHorizontal}>
                   <Button
                     analyticsLabel="add_or_set_column"
                     disabled={!formikProps.isValid || formikProps.isSubmitting}
                     onPress={formikProps.submitForm}
                   >
-                    {columnId ? 'Save Column Attribute' : 'Add Column'}
+                    {subscribeOnly
+                      ? 'Subscribe to Feed'
+                      : columnId
+                      ? 'Save Column Attribute'
+                      : 'Add Column'}
                   </Button>
                 </View>
 

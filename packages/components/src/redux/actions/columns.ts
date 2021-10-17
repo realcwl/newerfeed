@@ -2,9 +2,12 @@ import {
   ColumnCreation,
   ColumnFilter,
   ColumnOptions,
+  FeedVisibility,
+  NewsFeedColumn,
   NewsFeedColumnSource,
   NewsFeedData,
   NewsFeedDataExpressionWrapper,
+  User,
 } from '@devhub/core'
 import { EmitterTypes } from '../../libs/emitter'
 import { createAction } from '../helpers'
@@ -34,6 +37,10 @@ export function moveColumn(
 
 export function addColumn(payload: ColumnCreation) {
   return createAction('ADD_COLUMN', payload)
+}
+
+export function setSharedColumns(payload: { feeds: NewsFeedColumn[] }) {
+  return createAction('SET_SHARED_COLUMNS', payload)
 }
 
 export function clearColumnFilters(payload: { columnId: string }) {

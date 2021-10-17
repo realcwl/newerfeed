@@ -6,6 +6,7 @@ import { View } from 'react-native'
 import { Separator } from '../components/common/Separator'
 import { Spacer } from '../components/common/Spacer'
 import { DataExpressionEditor } from '../components/modals/partials/DataExpressionEditor'
+import { useColumnCreatedByCurrentUser } from '../hooks/use-column-created-by-current-user'
 import { contentPadding } from '../styles/variables'
 import { isAllOf, isAnyOf, isNotTrue } from '../utils/types'
 
@@ -242,6 +243,12 @@ export const DataExpressionEditorContainer = React.memo(
           setFocusId={setFocusId}
           setExpressionWrapper={setExpressionWrapper}
           deleteExpressionById={deleteExpressionById}
+          disabled={
+            !useColumnCreatedByCurrentUser(formikProps.values['columnId'])
+          }
+          disableDelete={
+            !useColumnCreatedByCurrentUser(formikProps.values['columnId'])
+          }
         />
         <Spacer height={contentPadding} />
         <Separator horizontal />
