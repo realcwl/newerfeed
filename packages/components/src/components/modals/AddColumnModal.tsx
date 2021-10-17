@@ -2,6 +2,7 @@ import {
   NewsFeedColumnType,
   constants,
   AddColumnDetailsPayload,
+  getDateSmallText,
 } from '@devhub/core'
 import { rgba } from 'polished'
 import React, { useCallback, useLayoutEffect, useRef } from 'react'
@@ -32,6 +33,8 @@ import { SubHeader } from '../common/SubHeader'
 import { useTheme } from '../context/ThemeContext'
 import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
+import { useColumnCreatedByCurrentUser } from '../../hooks/use-column-created-by-current-user'
+import { useColumn } from '../../hooks/use-column'
 
 export interface AddColumnModalProps {
   showBackButton: boolean
@@ -111,6 +114,9 @@ function AddColumnModalItem({
     setSpringAnimatedStyles(getStyles())
   }, [getStyles])
 
+  const column = payload?.columnId ? useColumn(payload.columnId) : null
+  console.log('what column', column)
+
   const isFirstRendeRef = useRef(true)
   useLayoutEffect(() => {
     if (isFirstRendeRef.current) {
@@ -152,29 +158,74 @@ function AddColumnModalItem({
       }}
       style={[sharedStyles.flex, springAnimatedStyles]}
     >
-      {/* {!payload || useColumnCreatedByCurrentUser(payload.columnId ?? '') ? ( */}
-      <View
-        style={[
-          sharedStyles.flex,
-          sharedStyles.horizontal,
-          sharedStyles.alignItemsCenter,
-          {
-            padding: contentPadding,
-          },
-        ]}
-      >
-        <ThemedIcon
-          {...icon}
-          color="foregroundColor"
-          size={18 * scaleFactor}
-          style={{ width: 20 * scaleFactor }}
-        />
+      {!payload || useColumnCreatedByCurrentUser(payload.columnId ?? '') ? (
+        <View
+          style={[
+            sharedStyles.flex,
+            sharedStyles.horizontal,
+            sharedStyles.alignItemsCenter,
+            {
+              padding: contentPadding,
+            },
+          ]}
+        >
+          <ThemedIcon
+            {...icon}
+            color="foregroundColor"
+            size={18 * scaleFactor}
+            style={{ width: 20 * scaleFactor }}
+          />
 
-        <Spacer width={contentPadding / 2} />
+          <Spacer width={contentPadding / 2} />
 
-        <ThemedText color="foregroundColor">{title}</ThemedText>
-      </View>
-      {/* ) */}
+          <ThemedText color="foregroundColor">{title}</ThemedText>
+        </View>
+      ) : (
+        <View>
+          <Spacer height={contentPadding / 2} />
+          <View
+            style={[
+              sharedStyles.flex,
+              sharedStyles.horizontal,
+              sharedStyles.alignItemsCenter,
+              sharedStyles.paddingHorizontal,
+              sharedStyles.paddingVerticalHalf,
+            ]}
+          >
+            <ThemedText color="foregroundColor">{title}</ThemedText>
+            <Spacer flex={1} />
+            <ThemedText color="foregroundColor">
+              {column?.column?.creator?.name}
+            </ThemedText>
+          </View>
+          <View
+            style={[
+              sharedStyles.flex,
+              sharedStyles.horizontal,
+              sharedStyles.alignItemsCenter,
+              sharedStyles.paddingHorizontal,
+              sharedStyles.paddingVerticalHalf,
+            ]}
+          >
+            <ThemedIcon
+              family="material"
+              name="group"
+              color="foregroundColor"
+              size={18 * scaleFactor}
+            />
+            <Spacer width={contentPadding / 4} />
+            <ThemedText color="foregroundColor">
+              {column?.column?.subscriberCount}
+            </ThemedText>
+            <Spacer flex={1} />
+            <ThemedText color="foregroundColorMuted65">
+              updated {getDateSmallText(column?.column?.updatedAt)} ago
+            </ThemedText>
+          </View>
+          <Spacer height={contentPadding / 2} />
+          <Separator leftOffset={contentPadding} horizontal />
+        </View>
+      )}
     </SpringAnimatedTouchableOpacity>
   )
 }
