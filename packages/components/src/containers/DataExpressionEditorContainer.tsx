@@ -246,6 +246,9 @@ export const DataExpressionEditorContainer = React.memo(
           disabled={
             !useColumnCreatedByCurrentUser(formikProps.values['columnId'])
           }
+          disableDelete={
+            !useColumnCreatedByCurrentUser(formikProps.values['columnId'])
+          }
         />
         <Spacer height={contentPadding} />
         <Separator horizontal />

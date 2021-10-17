@@ -239,7 +239,7 @@ export const columnsReducer: Reducer<State> = (
           draft.byId[columnId].state = 'loading'
         }
       })
-    case 'SET_SHARED_FEEDS':
+    case 'SET_SHARED_COLUMNS':
       return immer(state, (draft) => {
         draft.sharedIds = action.payload.feeds.map((f) => f.id)
         action.payload.feeds.forEach((v) => {

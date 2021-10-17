@@ -40,7 +40,7 @@ export function addColumn(payload: ColumnCreation) {
 }
 
 export function setSharedFeeds(payload: { feeds: NewsFeedColumn[] }) {
-  return createAction('SET_SHARED_FEEDS', payload)
+  return createAction('SET_SHARED_COLUMNS', payload)
 }
 
 export function clearColumnFilters(payload: { columnId: string }) {

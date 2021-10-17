@@ -25,6 +25,7 @@ export interface DataExpressionEditorProps {
   deleteExpressionById: (id: string | undefined) => boolean
   setExpressionWrapper: (payload: NewsFeedDataExpressionWrapper) => boolean
   disabled: boolean
+  disableDelete: boolean
 }
 
 // Before rendering anything, render a dashline in relative position to denote
@@ -95,6 +96,7 @@ export const DataExpressionEditor = React.memo(
           text: 'AND',
           color: 'orange',
           disabled: true,
+          disableDelete: disabled,
           onDelete: () => deleteExpressionById(exprWrapper.id),
         })
       } else if (isAnyOf(exprWrapper.expr)) {
@@ -103,6 +105,7 @@ export const DataExpressionEditor = React.memo(
           text: 'OR',
           color: 'white',
           disabled: true,
+          disableDelete: disabled,
           onDelete: () => deleteExpressionById(exprWrapper.id),
         })
       } else if (isNotTrue(exprWrapper.expr)) {
@@ -111,6 +114,7 @@ export const DataExpressionEditor = React.memo(
           text: 'NOT',
           color: 'lightRed',
           disabled: true,
+          disableDelete: disabled,
           onDelete: () => deleteExpressionById(exprWrapper.id),
         })
       }
@@ -137,6 +141,7 @@ export const DataExpressionEditor = React.memo(
               setFocusId={setFocusId}
               setExpressionWrapper={setExpressionWrapper}
               disabled={disabled}
+              disableDelete={disabled}
             />
             <Spacer height={contentPadding / 2} />
           </ExpressionEntryIndicator>
@@ -156,6 +161,7 @@ export const DataExpressionEditor = React.memo(
               setFocusId={setFocusId}
               setExpressionWrapper={setExpressionWrapper}
               disabled={disabled}
+              disableDelete={disabled}
             />
             <Spacer height={contentPadding / 2} />
           </ExpressionEntryIndicator>
@@ -171,6 +177,7 @@ export const DataExpressionEditor = React.memo(
             setFocusId={setFocusId}
             setExpressionWrapper={setExpressionWrapper}
             disabled={disabled}
+            disableDelete={disabled}
           />
           <Spacer height={contentPadding / 2} />
         </ExpressionEntryIndicator>
@@ -182,6 +189,7 @@ export const DataExpressionEditor = React.memo(
           text={dataExpressionWrapper.expr?.pred.param?.text || ''}
           id={dataExpressionWrapper.id}
           disabled={disabled}
+          disableDelete={disabled}
           color={'gray'}
           onDelete={() => deleteExpressionById(dataExpressionWrapper.id)}
           setExpressionWrapper={setExpressionWrapper}
