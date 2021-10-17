@@ -17,3 +17,23 @@ export function markItemAsRead(payload: {
 }) {
   return createAction('MARK_ITEM_AS_READ', payload)
 }
+
+export function capatureView(payload: {
+  // Indicate the item under action.
+  itemNodeId: string
+  // reference to the view
+  viewRef: any
+  // background color
+  backgroundColor: string
+}) {
+  return createAction('CAPTURE_VIEW', payload)
+}
+
+export function itemViewSavedToClipboard(payload: {
+  // Indicate the item under action.
+  itemNodeId: string
+  // reference to the view
+  viewRef: any
+}) {
+  return createAction('VIEW_SAVED_TO_CLIPBOARD', payload)
+}
