@@ -703,7 +703,7 @@ function* fetchSharedFeeds() {
 
   yield put(
     setSharedColumns({
-      feeds: visibleFeeds.data.data.allVisibleFeeds.map((f: any) => {
+      feeds: visibleFeeds.data.data.allVisibleFeeds?.map((f: any) => {
         return {
           ...f,
           title: f.name,
