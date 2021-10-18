@@ -27,7 +27,7 @@ export function AppBannerMessage() {
   const getBannerBackgroundColor = (type: BannerType): string => {
     switch (type) {
       case 'BANNER_TYPE_SUCCESS':
-        return darken(0.3, theme.green)
+        return darken(0.1, theme.green)
       case 'BANNER_TYPE_ERROR':
         return theme.red
       case 'BANNER_TYPE_MESSAGE':

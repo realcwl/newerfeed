@@ -28,10 +28,6 @@ const getImageBlobFromRef = async (
   return new Blob()
 }
 
-const getTypeFromBlob = (blob: Blob | null): string => {
-  return (blob && blob.type) || DEFAULT_BLOB_TYPE
-}
-
 export const saveViewToClipboard = async (
   ref: any,
   backgroundColor: string,
@@ -43,7 +39,7 @@ export const saveViewToClipboard = async (
         if (isSafari()) {
           await clipboard.write([
             new ClipboardItem({
-              'image/png': getImageBlobFromRef(ref, backgroundColor),
+              [DEFAULT_BLOB_TYPE]: getImageBlobFromRef(ref, backgroundColor),
             }),
           ])
         } else {

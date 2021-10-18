@@ -67,7 +67,7 @@ function* onSignal(
 
 function* fetchSeedState() {
   const appToken = yield* select(selectors.appTokenSelector)
-  const userId = yield* select(selectors.userIdSelector)
+  const userId = yield* select(selectors.currentUserIdSelector)
   try {
     const userStateResponse: AxiosResponse<UserStateResponse> =
       yield axios.post(WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken), {

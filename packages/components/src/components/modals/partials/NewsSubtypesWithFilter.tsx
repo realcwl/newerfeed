@@ -1,10 +1,13 @@
+import React, { useState } from 'react'
+import { View } from 'react-native'
+import { useFormik } from 'formik'
+
 import {
   mapSourceIdToName,
   NewsFeedColumnSource,
   ThemeColors,
 } from '@devhub/core'
-import React, { useState } from 'react'
-import { View } from 'react-native'
+
 import { useReduxState } from '../../../hooks/use-redux-state'
 import { contentPadding } from '../../../styles/variables'
 import { columnHeaderItemContentSize } from '../../columns/ColumnHeader'
@@ -16,7 +19,10 @@ import {
   ThemedTextInput,
   ThemedTextInputProps,
 } from '../../themed/ThemedTextInput'
-import { useFormik } from 'formik'
+import { ThemedText } from '../../themed/ThemedText'
+import { Separator } from '../../common/Separator'
+import { SELECT_ALL } from '../../../resources/strings'
+import { useColumnCreatedByCurrentUser } from '../../../hooks/use-column-created-by-current-user'
 
 // We shoud a search bar if there are more than 9 subtypes to be selected.
 const MAX_ITEM_WITHOUT_FILTER = 9
@@ -95,49 +101,136 @@ export const NewsSubtypesWithFilter = React.memo(
       source: NewsFeedColumnSource,
       filter: string,
     ) {
-      return source.subSourceIds.map((subtype) => {
-        const selectedSubtype = formikProps.values[source.sourceId]
-        // Filter by the actual name, instead of by id.
-        return mapSourceIdToName(subtype, idToSourceOrSubSourceMap).includes(
-          filter,
-        ) ? (
-          <View key={`add-news-column-details-source-subtype-${subtype}`}>
-            <Checkbox
-              disabled={!editable}
-              checked={selectedSubtype.includes(subtype)}
-              containerStyle={
-                sharedColumnOptionsStyles.fullWidthCheckboxContainer
-              }
-              defaultValue={false}
-              label={mapSourceIdToName(subtype, idToSourceOrSubSourceMap)}
-              onChange={(checked) => {
-                if (selectedSubtype.includes(subtype)) {
-                  const newlySelectedSubtypes = selectedSubtype.filter(
-                    (name: string) => name !== subtype,
-                  )
-                  // formik 2.1.1 is required here, otherwise setting this field
-                  // to empty array will mark this field as undefined.
-                  // See the below issue for more context:
-                  // https://github.com/formium/formik/issues/2130
-                  formikProps.setFieldValue(
-                    source.sourceId,
-                    newlySelectedSubtypes,
-                  )
-                } else {
-                  formikProps.setFieldValue(source.sourceId, [
-                    ...selectedSubtype,
-                    subtype,
-                  ])
+      const selectedSubtypes: string[] = formikProps.values[source.sourceId]
+      let selectedFilteredSubSourcesCount = 0
+      const filteredSubSources: string[] = source.subSourceIds.filter(
+        (subType: string) => {
+          const show = mapSourceIdToName(
+            subType,
+            idToSourceOrSubSourceMap,
+          ).includes(filter)
+          if (show && selectedSubtypes.includes(subType)) {
+            selectedFilteredSubSourcesCount++
+          }
+          return show
+        },
+      )
+      const allSelected =
+        selectedFilteredSubSourcesCount === filteredSubSources.length
+
+      // Select all button to select/unselect current all filtered subSources
+      const renderSelectAll = () => {
+        if (filteredSubSources.length > 1 && editable) {
+          const selectAllText = (
+            <ThemedText
+              color="foregroundColorMuted65"
+              numberOfLines={1}
+              style={{ fontWeight: 'bold' }}
+            >
+              {SELECT_ALL}
+            </ThemedText>
+          )
+
+          return (
+            <View style={{ marginRight: 24 }}>
+              <Checkbox
+                checked={allSelected}
+                containerStyle={
+                  sharedColumnOptionsStyles.fullWidthCheckboxContainer
                 }
-                // formikProps.setFieldTouched(source.source)
-              }}
-              squareContainerStyle={
-                sharedColumnOptionsStyles.checkboxSquareContainer
-              }
-            />
-          </View>
-        ) : null
-      })
+                defaultValue={false}
+                label={selectAllText}
+                onChange={(checked) => {
+                  if (checked) {
+                    let newSelectedSubSources
+
+                    if (filter == null || filter === '') {
+                      newSelectedSubSources = source.subSourceIds
+                    } else {
+                      newSelectedSubSources = selectedSubtypes
+                      filteredSubSources.forEach((source) => {
+                        if (
+                          selectedSubtypes.findIndex(
+                            (subType) => subType === source,
+                          ) < 0
+                        ) {
+                          newSelectedSubSources.push(source)
+                        }
+                      })
+                    }
+
+                    formikProps.setFieldValue(
+                      source.sourceId,
+                      newSelectedSubSources,
+                    )
+                  } else {
+                    formikProps.setFieldValue(
+                      source.sourceId,
+                      selectedSubtypes.filter(
+                        (subType: string) =>
+                          !filteredSubSources.includes(subType),
+                      ),
+                    )
+                  }
+                }}
+                squareContainerStyle={
+                  sharedColumnOptionsStyles.checkboxSquareContainer
+                }
+              />
+              <Separator horizontal />
+            </View>
+          )
+        }
+        return null
+      }
+      const filteredSubsourceRows = filteredSubSources.map(
+        (subtype: string) => {
+          // Filter by the actual name, instead of by id.
+          return (
+            <View key={`add-news-column-details-source-subtype-${subtype}`}>
+              <Checkbox
+                checked={selectedSubtypes.includes(subtype)}
+                containerStyle={
+                  sharedColumnOptionsStyles.fullWidthCheckboxContainer
+                }
+                disabled={!editable}
+                defaultValue={false}
+                label={mapSourceIdToName(subtype, idToSourceOrSubSourceMap)}
+                onChange={(checked) => {
+                  if (selectedSubtypes.includes(subtype)) {
+                    const newlySelectedSubtypes = selectedSubtypes.filter(
+                      (name: string) => name !== subtype,
+                    )
+                    // formik 2.1.1 is required here, otherwise setting this field
+                    // to empty array will mark this field as undefined.
+                    // See the below issue for more context:
+                    // https://github.com/formium/formik/issues/2130
+                    formikProps.setFieldValue(
+                      source.sourceId,
+                      newlySelectedSubtypes,
+                    )
+                  } else {
+                    formikProps.setFieldValue(source.sourceId, [
+                      ...selectedSubtypes,
+                      subtype,
+                    ])
+                  }
+                  // formikProps.setFieldTouched(source.source)
+                }}
+                squareContainerStyle={
+                  sharedColumnOptionsStyles.checkboxSquareContainer
+                }
+              />
+            </View>
+          )
+        },
+      )
+      return (
+        <>
+          {renderSelectAll()}
+          {filteredSubsourceRows}
+        </>
+      )
     }
 
     return (
