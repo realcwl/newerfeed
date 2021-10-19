@@ -111,11 +111,9 @@ export const authReducer: Reducer<State> = (state = initialState, action) => {
     case 'UPDATE_SEED_STATE': {
       return immer(state, (draft) => {
         const userSeedState = action.payload.userSeedState
-        const user: User = {
-          email: draft.user?.email || '',
-          ...userSeedState,
-        }
-        draft.user = user
+        if (!draft.user) return
+        draft.user.name = userSeedState.name
+        draft.user.avatarUrl = userSeedState.avatarUrl
       })
     }
 

@@ -19,11 +19,7 @@ import { SubscriptionClient } from 'subscriptions-transport-ws'
 import { WrapUrlWithToken } from '../utils/api'
 import { constants, SeedState, Signal } from '@devhub/core'
 import Notifier from '../libs/notifier'
-import {
-  handleSignal,
-  setBannerMessage,
-  updateSeedState,
-} from '../redux/actions'
+import { handleSignal } from '../redux/actions'
 
 const styles = StyleSheet.create({
   container: {
