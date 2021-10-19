@@ -602,7 +602,12 @@ function* onFetchColumnDataRequest(
     selectors.columnSelector,
     action.payload.columnId,
   )
-  if (!appToken || !column || !userId) return
+  if (!appToken || !column || !userId) {
+    yield put(
+      actions.fetchColumnDataFailure({ columnId: action.payload.columnId }),
+    )
+    return
+  }
   const dataByNodeId = yield* select(selectors.dataByNodeIdOrId)
 
   const { updatedAt } = column
