@@ -112,8 +112,9 @@ export const authReducer: Reducer<State> = (state = initialState, action) => {
       return immer(state, (draft) => {
         const userSeedState = action.payload.userSeedState
         if (!draft.user) return
-        draft.user.name = userSeedState.name
-        draft.user.avatarUrl = userSeedState.avatarUrl
+        if (!!userSeedState.name) draft.user.name = userSeedState.name
+        if (!!userSeedState.avatarUrl)
+          draft.user.avatarUrl = userSeedState.avatarUrl
       })
     }
 
