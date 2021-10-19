@@ -22,13 +22,16 @@ export const columnsWithRefreshTimeAndNotifySettingSelector = (
     notifyOnNewPosts: boolean
   }[] = []
   const byId: Record<string, Column> = s(state).byId
-  for (const columnId in byId) {
+  const allIds: string[] = s(state).allIds
+
+  for (const columnId of allIds) {
     result.push({
       id: columnId,
       refreshedAt: byId[columnId].refreshedAt,
       notifyOnNewPosts: byId[columnId].options?.notifyOnNewPosts ?? false,
     })
   }
+
   return result
 }
 

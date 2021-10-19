@@ -85,12 +85,6 @@ interface FeedsResponse {
   }
 }
 
-interface VisibleFeedResponse {
-  data: {
-    allVisibleFeeds: FeedResponseWithSubscriberCount[]
-  }
-}
-
 // clean data when:
 // 1. mismatch updatedAt
 // 2. post.length == limit
@@ -389,8 +383,6 @@ function* columnRefresher() {
 
     // Refresh all outdated column
     yield* refreshAllOutdatedColumn({ notifyOnNewPosts: true })
-
-    yield* fetchSharedFeeds()
   }
 }
 
