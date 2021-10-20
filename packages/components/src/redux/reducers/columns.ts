@@ -254,6 +254,7 @@ export const columnsReducer: Reducer<State> = (
             dataExpression: v.dataExpression,
             title: v.title,
             visibility: v.visibility,
+            updatedAt: v.updatedAt,
             subscriberCount: v.subscriberCount,
           }
         })

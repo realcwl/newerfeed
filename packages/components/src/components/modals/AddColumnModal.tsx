@@ -218,7 +218,10 @@ function AddColumnModalItem({
             </ThemedText>
             <Spacer flex={1} />
             <ThemedText color="foregroundColorMuted65">
-              updated {getDateSmallText(column?.column?.updatedAt)} ago
+              updated{' '}
+              {getDateSmallText(column?.column?.updatedAt, {
+                pastSuffix: 'ago',
+              })}
             </ThemedText>
           </View>
           <Spacer height={contentPadding / 2} />
