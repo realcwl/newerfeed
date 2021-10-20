@@ -669,60 +669,67 @@ function* onFetchColumnDataRequest(
 
 function* fetchSharedFeeds() {
   const appToken = yield* select(selectors.appTokenSelector)
-  const visibleFeeds: AxiosResponse = yield axios.post(
-    WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
-    {
-      query: jsonToGraphQLQuery({
-        query: {
-          allVisibleFeeds: {
-            id: true,
-            name: true,
-            creator: {
-              id: true,
-              name: true,
-            },
-            updatedAt: true,
-            filterDataExpression: true,
-            subSources: {
-              id: true,
-              name: true,
-              source: {
-                id: true,
-              },
-            },
-            visibility: true,
-            subscriberCount: true,
-          },
-        },
-      }),
-    },
-  )
 
-  yield put(
-    setSharedColumns({
-      feeds: visibleFeeds.data.data.allVisibleFeeds?.map((f: any) => {
-        return {
-          ...f,
-          title: f.name,
-          sources: convertFeedResponseToSources(f),
-          type: 'COLUMN_TYPE_NEWS_FEED',
-          icon: {
-            family: 'material',
-            name: 'rss-feed',
+  try {
+    const visibleFeeds: AxiosResponse = yield axios.post(
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
+      {
+        query: jsonToGraphQLQuery({
+          query: {
+            allVisibleFeeds: {
+              id: true,
+              name: true,
+              creator: {
+                id: true,
+                name: true,
+              },
+              updatedAt: true,
+              filterDataExpression: true,
+              subSources: {
+                id: true,
+                name: true,
+                source: {
+                  id: true,
+                },
+              },
+              visibility: true,
+              subscriberCount: true,
+            },
           },
-          creator: f.creator,
-          dataExpression: StringToDataExpressionWrapper(f.filterDataExpression),
-          itemListIds: [],
-          newestItemId: '',
-          oldestItemId: '',
-          refreshedAt: '',
-          state: 'not_loaded',
-          options: { enableAppIconUnreadIndicator: true },
-          subscriberCount: f.subscriberCount,
-        }
+        }),
+      },
+    )
+
+    yield put(
+      setSharedColumns({
+        feeds: visibleFeeds.data.data.allVisibleFeeds?.map((f: any) => {
+          return {
+            ...f,
+            title: f.name,
+            sources: convertFeedResponseToSources(f),
+            type: 'COLUMN_TYPE_NEWS_FEED',
+            icon: {
+              family: 'material',
+              name: 'rss-feed',
+            },
+            creator: f.creator,
+            dataExpression: StringToDataExpressionWrapper(
+              f.filterDataExpression,
+            ),
+            itemListIds: [],
+            newestItemId: '',
+            oldestItemId: '',
+            refreshedAt: '',
+            state: 'not_loaded',
+            options: { enableAppIconUnreadIndicator: true },
+            subscriberCount: f.subscriberCount,
+          }
+        }),
       }),
-    }),
-  )
+    )
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 export function* columnsSagas() {
