@@ -73,6 +73,11 @@ export const MainScreen = React.memo(() => {
         },
         error: (e) => console.error(e),
       })
+
+    // Clean up the previous websocket connection on token refresh.
+    return function cleanup() {
+      client.close(/*isForces=*/ false, /*closedByUser=*/ true)
+    }
   }, [appToken])
 
   return (
