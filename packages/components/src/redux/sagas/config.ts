@@ -78,38 +78,41 @@ function* onThemeChange() {
 function* fetchAvailableSourcesAndIdMap() {
   const appToken = yield* select(selectors.appTokenSelector)
 
-  const sourcesResponse: AxiosResponse<SourcesResponse> = yield axios.post(
-    WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
-    {
-      query: jsonToGraphQLQuery({
-        query: {
-          sources: {
-            __args: {
-              input: {
-                subSourceFromSharedPost: false,
+  try {
+    const sourcesResponse: AxiosResponse<SourcesResponse> = yield axios.post(
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken),
+      {
+        query: jsonToGraphQLQuery({
+          query: {
+            sources: {
+              __args: {
+                input: {
+                  subSourceFromSharedPost: false,
+                },
               },
-            },
-            id: true,
-            name: true,
-            subsources: {
               id: true,
               name: true,
-              avatarUrl: true,
+              subsources: {
+                id: true,
+                name: true,
+                avatarUrl: true,
+              },
             },
           },
-        },
+        }),
+      },
+    )
+    yield put(
+      setSourcesAndIdMap({
+        sources: GetAvailableSourcesFromSourcesResponse(sourcesResponse.data),
+        idToSourceOrSubSourceMap: GetIdMapFromSourcesResponse(
+          sourcesResponse.data,
+        ),
       }),
-    },
-  )
-
-  yield put(
-    setSourcesAndIdMap({
-      sources: GetAvailableSourcesFromSourcesResponse(sourcesResponse.data),
-      idToSourceOrSubSourceMap: GetIdMapFromSourcesResponse(
-        sourcesResponse.data,
-      ),
-    }),
-  )
+    )
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 export function* configSagas() {
