@@ -36,6 +36,7 @@ import {
 } from '../themed/ThemedTextInput'
 import { NewsSubtypesWithFilter } from './partials/NewsSubtypesWithFilter'
 import { useColumnCreatedByCurrentUser } from '../../hooks/use-column-created-by-current-user'
+import { SELECT_ALL, UNSELECT_ALL } from '../../resources/strings'
 
 export interface AddColumnDetailsModalProps {
   showBackButton: boolean
@@ -56,6 +57,17 @@ export const AddColumnDetailsModal = React.memo(
     const availableNewsFeedSources = useReduxState(
       selectors.availableNewsFeedSourcesSelector,
     )
+    const allSubsourcesCount = useReduxState(
+      selectors.availableNewsFeedSubsourcesCountSelecter,
+    )
+
+    // openedSource determines which source dropdown is selected. If
+    // openedSource is empty string, it means all options are closed. At any
+    // given time, there could only be a single dropdown opened.
+    const [openedSource, setOpenedSource] = useState('')
+    const [selectedSubSourcesCount, setSelectedSubSourcesCount] = useState(0)
+    const allSubSourcesSelected = selectedSubSourcesCount >= allSubsourcesCount
+
     // Get all main sources.
     const allSources = availableNewsFeedSources.map((source) => source.sourceId)
 
@@ -112,6 +124,23 @@ export const AddColumnDetailsModal = React.memo(
       }
     }
 
+    const updateSubSourcesInFormValues = (option: 'empty' | 'selectAll') => {
+      const formValues: Record<string, any> = {
+        name: formikProps.values.name,
+        dataExpression: formikProps.values.dataExpression,
+        icon: formikProps.values.icon,
+      }
+      allSources.map((source, index) => {
+        if (option === 'selectAll') {
+          formValues[source] = availableNewsFeedSources[index].subSourceIds
+        } else {
+          formValues[source] = []
+        }
+      })
+
+      return formValues
+    }
+
     const formInitialValues: Record<string, any> =
       getFormInitialValues(columnId)
 
@@ -155,23 +184,30 @@ export const AddColumnDetailsModal = React.memo(
       },
       validateOnBlur: true,
       validateOnChange: true,
-      validate(values) {
-        if (!values.name) {
-          return { err: 'name is required' }
-        }
+
+      // avoid multiple setFieldValue at the same time
+      // otherwise validate is not guaranteed to called with latest values
+      validate: (values) => {
+        let newSelectedSubSourcesCount = 0
         for (const key of allSources) {
-          if (values[key].length !== 0) {
-            return undefined
-          }
+          newSelectedSubSourcesCount += values[key]?.length || 0
         }
-        return { err: 'no source selected' }
+
+        if (newSelectedSubSourcesCount !== selectedSubSourcesCount) {
+          setSelectedSubSourcesCount(newSelectedSubSourcesCount)
+        }
+        if (newSelectedSubSourcesCount <= 0) {
+          return { err: 'no source selected' }
+        }
+        if (!values.name || values.name === '') {
+          return { name: 'name is required' }
+        }
+        return undefined
       },
     })
 
-    // openedSource determines which source dropdown is selected. If
-    // openedSource is empty string, it means all options are closed. At any
-    // given time, there could only be a single dropdown opened.
-    const [openedSource, setOpenedSource] = useState('')
+    const submitButtonDisabled =
+      !formikProps.isValid || formikProps.isSubmitting
 
     useEffect(() => {
       void formikProps.validateForm()
@@ -281,9 +317,33 @@ export const AddColumnDetailsModal = React.memo(
       )
     }
 
+    function renderSelectAll() {
+      if (subscribeOnly) {
+        return null
+      } else {
+        return (
+          <View style={{ paddingBottom: contentPadding }}>
+            <Button
+              type={allSubSourcesSelected ? 'danger' : 'neutral'}
+              onPress={() => {
+                formikProps.setValues(
+                  updateSubSourcesInFormValues(
+                    allSubSourcesSelected ? 'empty' : 'selectAll',
+                  ),
+                )
+              }}
+            >
+              {allSubSourcesSelected ? UNSELECT_ALL : SELECT_ALL}
+            </Button>
+          </View>
+        )
+      }
+    }
+
     function renderSourceAndSubtypesSelectors() {
       return (
         <View style={{ paddingHorizontal: contentPadding }}>
+          {renderSelectAll()}
           {availableNewsFeedSources.map((formItem, formItemIndex) => {
             const content = renderSingleSourceOptions(formItem)
 
@@ -484,8 +544,9 @@ export const AddColumnDetailsModal = React.memo(
                 <View style={sharedStyles.paddingHorizontal}>
                   <Button
                     analyticsLabel="add_or_set_column"
-                    disabled={!formikProps.isValid || formikProps.isSubmitting}
+                    disabled={submitButtonDisabled}
                     onPress={formikProps.submitForm}
+                    type="primary"
                   >
                     {subscribeOnly
                       ? 'Subscribe to Feed'

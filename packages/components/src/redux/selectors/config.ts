@@ -14,6 +14,15 @@ export const themePairSelector = (state: RootState) =>
 export const availableNewsFeedSourcesSelector = (state: RootState) =>
   s(state).availableNewsFeedSources
 
+export const availableNewsFeedSubsourcesCountSelecter = createSelector(
+  availableNewsFeedSourcesSelector,
+  (sources) => {
+    return sources
+      .map((source) => source.subSourceIds.length)
+      .reduce((prev: number, current: number) => prev + current)
+  },
+)
+
 export const idToSourceOrSubSourceMapSelector = (state: RootState) =>
   s(state).idToSourceOrSubSourceMap
 
