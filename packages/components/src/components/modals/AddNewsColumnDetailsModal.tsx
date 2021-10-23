@@ -528,10 +528,21 @@ export const AddColumnDetailsModal = React.memo(
                     family="material"
                     name="group"
                     color="foregroundColorMuted65"
-                    style={sharedStyles.alignSelfCenter}
+                    style={
+                      formikProps.values['visibility'] === 'GLOBAL'
+                        ? sharedStyles.alignSelfCenter
+                        : sharedStyles.displayNone
+                    }
                   />
                   <Spacer width={contentPadding / 4} />
-                  <ThemedText color="foregroundColorMuted65">
+                  <ThemedText
+                    color="foregroundColorMuted65"
+                    style={
+                      formikProps.values['visibility'] === 'GLOBAL'
+                        ? sharedStyles.alignItemsCenter
+                        : sharedStyles.displayNone
+                    }
+                  >
                     {formikProps.values['subscriberCount'] ?? '0'}
                   </ThemedText>
                   <Spacer flex={1} />
