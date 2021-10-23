@@ -522,20 +522,18 @@ export const AddColumnDetailsModal = React.memo(
                     sharedStyles.paddingHorizontal,
                   ]}
                 >
-                  <H3>
-                    Set Feed Public
-                    <Spacer width={contentPadding / 2} />
-                    <ThemedIcon
-                      family="material"
-                      name="group"
-                      color="foregroundColorMuted65"
-                      size={normalTextSize - 3 * scaleFactor}
-                    />
-                    <Spacer width={contentPadding / 4} />
-                    <ThemedText color="foregroundColorMuted65">
-                      {formikProps.values['subscriberCount'] ?? '0'}
-                    </ThemedText>
-                  </H3>
+                  <H3>Set Feed Public</H3>
+                  <Spacer width={contentPadding / 2} />
+                  <ThemedIcon
+                    family="material"
+                    name="group"
+                    color="foregroundColorMuted65"
+                    style={sharedStyles.alignSelfCenter}
+                  />
+                  <Spacer width={contentPadding / 4} />
+                  <ThemedText color="foregroundColorMuted65">
+                    {formikProps.values['subscriberCount'] ?? '0'}
+                  </ThemedText>
                   <Spacer flex={1} />
                   <Checkbox
                     containerStyle={{
