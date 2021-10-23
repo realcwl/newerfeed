@@ -17,7 +17,12 @@ import { Platform } from '../../libs/platform'
 import * as actions from '../../redux/actions'
 import * as selectors from '../../redux/selectors'
 import { sharedStyles } from '../../styles/shared'
-import { contentPadding, scaleFactor } from '../../styles/variables'
+import {
+  contentPadding,
+  normalTextSize,
+  scaleFactor,
+  smallTextSize,
+} from '../../styles/variables'
 import { ModalColumn } from '../columns/ModalColumn'
 import { AccordionView } from '../common/AccordionView'
 import { Button } from '../common/Button'
@@ -37,6 +42,7 @@ import {
 import { NewsSubtypesWithFilter } from './partials/NewsSubtypesWithFilter'
 import { useColumnCreatedByCurrentUser } from '../../hooks/use-column-created-by-current-user'
 import { SELECT_ALL, UNSELECT_ALL } from '../../resources/strings'
+import { ThemedText } from '../themed/ThemedText'
 
 export interface AddColumnDetailsModalProps {
   showBackButton: boolean
@@ -516,8 +522,21 @@ export const AddColumnDetailsModal = React.memo(
                     sharedStyles.paddingHorizontal,
                   ]}
                 >
-                  <H3 style={{ flex: 5 }}>Set Feed Public</H3>
-                  <Spacer flex={6} />
+                  <H3>
+                    Set Feed Public
+                    <Spacer width={contentPadding / 2} />
+                    <ThemedIcon
+                      family="material"
+                      name="group"
+                      color="foregroundColorMuted65"
+                      size={normalTextSize - 3 * scaleFactor}
+                    />
+                    <Spacer width={contentPadding / 4} />
+                    <ThemedText color="foregroundColorMuted65">
+                      {formikProps.values['subscriberCount'] ?? '0'}
+                    </ThemedText>
+                  </H3>
+                  <Spacer flex={1} />
                   <Checkbox
                     containerStyle={{
                       height: checkboxSize * scaleFactor,
