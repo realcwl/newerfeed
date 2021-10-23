@@ -46,6 +46,7 @@ import {
   markItemAsSaved,
 } from '../../redux/actions'
 import { Link } from '../common/Link'
+import { useFastScreenshot } from '../../hooks/use-fast-screenshot'
 
 const NUM_OF_LINES = 3
 const SIGNAL_RESET_MAX = 100
@@ -199,12 +200,10 @@ const styles = StyleSheet.create({
   },
 
   mostLeftActionIcon: {
-    alignSelf: 'center',
     marginLeft: 6 * scaleFactor,
   },
 
   actionIcon: {
-    alignSelf: 'center',
     marginLeft: 4 * scaleFactor,
   },
 
@@ -289,6 +288,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   const [hasMore, setHasMore] = useState(false)
   const theme = useTheme()
+  const [supportFastScreenshot] = useFastScreenshot()
+
   const checkHasMore = useCallback(
     ({
       nativeEvent: {
@@ -353,7 +354,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             {subSource ? subSource.name : ''}
           </ThemedText>
 
-          <View style={[sharedStyles.horizontal]}>
+          <View
+            style={[sharedStyles.horizontal, sharedStyles.alignItemsCenter]}
+          >
             {!isRead && !isRetweeted && (
               <ThemedIcon
                 family="octicon"
@@ -371,56 +374,62 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 return (
                   <>
                     <Text>{'  '}</Text>
-                    <ThemedText
-                      color="foregroundColorMuted65"
-                      numberOfLines={1}
-                      style={styles.timestampText}
-                      {...Platform.select({
-                        web: { title: getFullDateText(timestamp) },
-                      })}
+                    <Link
+                      analyticsCategory="card_action"
+                      analyticsLabel={'card_link'}
+                      enableUnderlineHover
+                      href={link}
+                      textProps={{
+                        color: 'foregroundColorMuted65',
+                        style: { fontSize: smallTextSize },
+                      }}
                     >
-                      <Link
-                        analyticsCategory="card_action"
-                        analyticsLabel={'card_link'}
-                        enableUnderlineHover
-                        href={link}
-                        textProps={{
-                          color: 'foregroundColorMuted65',
-                          style: { fontSize: smallTextSize },
-                        }}
+                      <ThemedText
+                        color="foregroundColorMuted65"
+                        numberOfLines={1}
+                        style={styles.timestampText}
+                        {...Platform.select({
+                          web: { title: getFullDateText(timestamp) },
+                        })}
                       >
                         {dateText.toLowerCase()}
-                      </Link>
-                    </ThemedText>
+                      </ThemedText>
+                    </Link>
                   </>
                 )
               }}
             </IntervalRefresh>
             {!isRetweeted && (
               <>
-                <ThemedIcon
-                  family="material"
-                  name={'camera-alt'}
-                  color={'foregroundColorMuted65'}
-                  size={smallTextSize}
-                  style={styles.mostLeftActionIcon}
-                  onPress={() => {
-                    setShowMoreSignal((showMoreSignal % SIGNAL_RESET_MAX) + 1)
-                    dispatch(
-                      capatureView({
-                        itemNodeId: nodeIdOrId,
-                        viewRef: ref,
-                        backgroundColor: theme.backgroundColor,
-                      }),
-                    )
-                  }}
-                />
+                {supportFastScreenshot && (
+                  <ThemedIcon
+                    family="material"
+                    name={'camera-alt'}
+                    color={'foregroundColorMuted65'}
+                    size={smallTextSize}
+                    style={styles.mostLeftActionIcon}
+                    onPress={() => {
+                      setShowMoreSignal((showMoreSignal % SIGNAL_RESET_MAX) + 1)
+                      dispatch(
+                        capatureView({
+                          itemNodeId: nodeIdOrId,
+                          viewRef: ref,
+                          backgroundColor: theme.backgroundColor,
+                        }),
+                      )
+                    }}
+                  />
+                )}
                 <ThemedIcon
                   family="octicon"
                   name={isSaved ? 'bookmark-fill' : 'bookmark'}
                   color={isSaved ? 'orange' : 'foregroundColorMuted65'}
                   size={smallTextSize}
-                  style={styles.actionIcon}
+                  style={
+                    supportFastScreenshot
+                      ? styles.actionIcon
+                      : styles.mostLeftActionIcon
+                  }
                   onPress={() => {
                     dispatch(
                       markItemAsSaved({
