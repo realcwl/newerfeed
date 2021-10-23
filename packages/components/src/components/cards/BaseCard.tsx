@@ -435,24 +435,29 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           </View>
         </View>
 
-        <View
-          style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
-        >
-          <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
-            <View style={sharedStyles.horizontalAndVerticallyAligned}>
-              <ThemedText
-                color="foregroundColor"
-                style={[
-                  styles.title,
-                  sharedStyles.flex,
-                  sharedStyles.marginVerticalQuarter,
-                ]}
-              >
-                {title}
-              </ThemedText>
+        {title && (
+          <View
+            style={[
+              sharedStyles.horizontal,
+              sharedStyles.marginVerticalQuarter,
+            ]}
+          >
+            <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
+              <View style={sharedStyles.horizontalAndVerticallyAligned}>
+                <ThemedText
+                  color="foregroundColor"
+                  style={[
+                    styles.title,
+                    sharedStyles.flex,
+                    sharedStyles.marginVerticalQuarter,
+                  ]}
+                >
+                  {title}
+                </ThemedText>
+              </View>
             </View>
           </View>
-        </View>
+        )}
 
         {text && (
           <View style={sharedStyles.horizontal}>
