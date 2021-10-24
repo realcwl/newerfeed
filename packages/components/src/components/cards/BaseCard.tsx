@@ -289,6 +289,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const [hasMore, setHasMore] = useState(false)
   const theme = useTheme()
   const [supportFastScreenshot] = useFastScreenshot()
+  const hasTitle: boolean = title != null && title !== ''
+  const hasText: boolean = text != null && text !== ''
+  const isWeb: boolean = Platform.OS === 'web'
 
   const checkHasMore = useCallback(
     ({
@@ -331,7 +334,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       <ImageViewer image={imageToView} setImage={setImageToView} />
       <View style={[styles.innerContainer]}>
         <View
-          style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
+          style={[
+            sharedStyles.horizontal,
+            sharedStyles.marginVerticalQuarter,
+            isWeb && !hasTitle && sharedStyles.marginBottomHalf,
+          ]}
         >
           <View style={styles.smallAvatarContainer}>
             <Avatar
@@ -444,27 +451,33 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           </View>
         </View>
 
-        <View
-          style={[sharedStyles.horizontal, sharedStyles.marginVerticalQuarter]}
-        >
-          <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
-            <View style={sharedStyles.horizontalAndVerticallyAligned}>
-              <ThemedText
-                color="foregroundColor"
-                style={[
-                  styles.title,
-                  sharedStyles.flex,
-                  sharedStyles.marginVerticalQuarter,
-                ]}
-              >
-                {title}
-              </ThemedText>
+        {hasTitle && (
+          <View
+            style={[
+              sharedStyles.horizontal,
+              sharedStyles.marginVerticalQuarter,
+            ]}
+          >
+            <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
+              <View style={sharedStyles.horizontalAndVerticallyAligned}>
+                <ThemedText
+                  color="foregroundColor"
+                  style={[styles.title, sharedStyles.flex]}
+                >
+                  {title}
+                </ThemedText>
+              </View>
             </View>
           </View>
-        </View>
+        )}
 
-        {text && (
-          <View style={sharedStyles.horizontal}>
+        {hasText && (
+          <View
+            style={[
+              sharedStyles.horizontal,
+              sharedStyles.marginVerticalQuarter,
+            ]}
+          >
             <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
               <View style={sharedStyles.horizontalAndVerticallyAligned}>
                 <ThemedText
