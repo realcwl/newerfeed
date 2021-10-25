@@ -148,7 +148,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 2709
-        versionName "0.102.0"
+        versionName "0.102.1"
     }
     splits {
         abi {
