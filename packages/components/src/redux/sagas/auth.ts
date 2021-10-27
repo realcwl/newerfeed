@@ -46,7 +46,7 @@ function* init() {
       return
     }
 
-    const fourtyFiveMinutes = 1000 * 60 * 5
+    const fourtyFiveMinutes = 1000 * 60 * 45
     if (Date.now() - lastAuthTime > fourtyFiveMinutes) {
       const user = new CognitoUser({
         Username: currentUser.email,
@@ -77,7 +77,12 @@ function* init() {
           }),
         )
       } catch (error) {
-        yield put(actions.authFailure(error))
+        // Auth failure might come from unstable connection. (e.g. your phone
+        // lost connection for a short period). In such error, where failure is
+        // not attributed to authentication, we don't dispatch auth failure and
+        // kick user out of their current session.
+        if (error.code != constants.COGNITO_NETWORK_ERROR_CODE)
+          yield put(actions.authFailure(error))
       }
 
       continue
