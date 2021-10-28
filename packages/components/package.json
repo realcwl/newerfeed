@@ -37,6 +37,7 @@
     "react": "17.0.1",
     "react-helmet-async": "1.0.3",
     "react-native-appearance": "0.3.4",
+    "react-native-render-html": "^6.2.0",
     "react-redux": "7.2.2",
     "react-test-renderer": "17.0.1",
     "react-window": "1.8.5",

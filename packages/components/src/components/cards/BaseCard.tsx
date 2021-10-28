@@ -14,6 +14,7 @@ import {
   Image,
   Linking,
 } from 'react-native'
+import RenderHtml from 'react-native-render-html'
 import { Attachment, getDateSmallText, getFullDateText } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
@@ -497,6 +498,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                     )
                   }
                 >
+                  <RenderHtml source={{ html: text }} />
                   {parseTextWithLinks(text ?? 'no content')}
                 </ThemedText>
               </View>
