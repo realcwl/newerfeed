@@ -1,20 +1,16 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   PixelRatio,
-  ScrollView,
   StyleSheet,
   View,
   Text,
   Image,
   Linking,
 } from 'react-native'
-import RenderHtml from 'react-native-render-html'
+import RenderHtml, {
+  CustomBlockRenderer,
+  TNodeChildrenRenderer,
+} from 'react-native-render-html'
 import { Attachment, getDateSmallText, getFullDateText } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
@@ -32,7 +28,7 @@ import { smallLabelHeight } from '../common/Label'
 import { Spacer } from '../common/Spacer'
 import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
-import { BaseCardProps, renderCardActions, sizes } from './BaseCard.shared'
+import { BaseCardProps, sizes } from './BaseCard.shared'
 import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
 import { TouchableHighlight } from '../common/TouchableHighlight'
 import { useTheme } from '../context/ThemeContext'
@@ -245,43 +241,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   const dispatch = useDispatch()
 
-  const parseTextWithLinks = (text: string) => {
-    let prev = 0
-    let match: RegExpExecArray | null = null
-    const res: any[] = []
-    while ((match = REGEX_IS_URL.exec(text ?? 'no content')) !== null) {
-      const textLink = text.slice(match.index, match.index + match[0].length)
-      res.push(
-        <ThemedText color="foregroundColorMuted65" key={res.length}>
-          {text.slice(prev, match.index)}
-        </ThemedText>,
-      )
-      res.push(
-        <ThemedText
-          color="red"
-          key={res.length}
-          // assume most website will redirect http to https
-          onPress={() =>
-            Linking.openURL(
-              textLink.startsWith('http') || textLink.startsWith('https')
-                ? textLink
-                : `http://${textLink}`,
-            )
-          }
-        >
-          {textLink}
-        </ThemedText>,
-      )
-      prev = match.index + match[0].length
-    }
-    res.push(
-      <ThemedText color="foregroundColorMuted65" key={res.length}>
-        {text.slice(prev)}
-      </ThemedText>,
-    )
-    return res
-  }
-
   const idToSourceOrSubSourceMap = useReduxState(
     idToSourceOrSubSourceMapSelector,
   )
@@ -300,7 +259,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         layout: { height },
       },
     }) => {
-      if (height > 19 * NUM_OF_LINES) {
+      if (height > 40 * NUM_OF_LINES) {
         if (!hasMore) {
           setTextShown(false)
         }
@@ -320,6 +279,34 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       setTextShown(true)
     }
   }, [showMoreSignal, parentShowMoreSignal])
+
+  // https://github.com/meliorence/react-native-render-html/issues/243#issuecomment-810114785
+  const ParagraphRenderer: CustomBlockRenderer = function ParagraphRenderer({
+    TDefaultRenderer,
+    tnode,
+    type,
+    ...props
+  }) {
+    return (
+      <TDefaultRenderer type={'text'} tnode={tnode} {...props}>
+        <TNodeChildrenRenderer
+          tnode={tnode}
+          // parentMarkers={props.markers}
+          renderChild={
+            ({ childTnode, childElement }) => (
+              // type === "block" ? ( // not sure the impact of remove block cae
+              //   childElement
+              // ) : (
+              <Text numberOfLines={textShown ? 9999 : NUM_OF_LINES}>
+                {childElement}
+              </Text>
+            )
+            // )
+          }
+        />
+      </TDefaultRenderer>
+    )
+  }
 
   return (
     <View
@@ -487,7 +474,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   // reach, so that expanded text will wrap long word instead
                   // of extending out of area.
                   // This is to resolve: https://rrcapital.atlassian.net/jira/software/projects/NEWS/boards/4?selectedIssue=NEWS-160
-                  numberOfLines={textShown ? 9999 : NUM_OF_LINES}
+                  // numberOfLines={textShown ? 9999 : NUM_OF_LINES}
                   onLayout={checkHasMore}
                   onPress={() =>
                     dispatch(
@@ -498,8 +485,15 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                     )
                   }
                 >
-                  <RenderHtml source={{ html: text }} />
-                  {parseTextWithLinks(text ?? 'no content')}
+                  {text && (
+                    <RenderHtml
+                      source={{ html: `<p>${text}</p>` }}
+                      renderers={{
+                        p: ParagraphRenderer,
+                      }}
+                    />
+                  )}
+                  {/* {parseTextWithLinks(text ?? 'no content')} */}
                 </ThemedText>
               </View>
               {hasMore && (
