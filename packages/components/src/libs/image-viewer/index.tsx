@@ -4,16 +4,22 @@ import ReactNativeImageViewer from 'react-native-image-zoom-viewer'
 import { Modal } from 'react-native'
 
 export type Prop = {
-  image: Attachment | null
-  setImage: (arg: Attachment | null) => void
+  images: Attachment[] | undefined
+  index: number
+  setIndex: (arg: number) => void
 }
-const ImageViewer = ({ image, setImage }: Prop) => (
-  <Modal visible={!!image}>
+const ImageViewer = ({ images, index, setIndex }: Prop) => (
+  <Modal visible={!!images && index >= 0}>
     <ReactNativeImageViewer
-      imageUrls={[{ url: image?.url ?? '', props: {} }]}
-      onSwipeDown={() => setImage(null)}
-      onCancel={() => setImage(null)}
+      imageUrls={images?.map((image) => {
+        return { url: image.url, props: {} }
+      })}
+      index={index}
+      onSwipeDown={() => setIndex(-1)}
+      onCancel={() => setIndex(-1)}
       enableSwipeDown={true}
+      enablePreload={true}
+      swipeDownThreshold={50}
     />
   </Modal>
 )

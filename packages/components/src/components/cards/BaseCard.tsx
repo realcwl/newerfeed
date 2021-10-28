@@ -235,7 +235,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   const [textShown, setTextShown] = useState(true)
   const [showMoreSignal, setShowMoreSignal] = useState<number>(0)
-  const [imageToView, setImageToView] = useState<Attachment | null>(null)
+
+  // index of -1 will hide the image viewer, otherwise it's the image index to show
+  const [imageIndexToView, setImageIndexToView] = useState<number>(-1)
   const ref = useRef<View>(null)
 
   const toggleShowMoreText = () => {
@@ -331,7 +333,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       }}
       ref={ref}
     >
-      <ImageViewer image={imageToView} setImage={setImageToView} />
+      <ImageViewer
+        images={attachments?.filter((a) => a.dataType === 'img')}
+        index={imageIndexToView}
+        setIndex={setImageIndexToView}
+      />
       <View style={[styles.innerContainer]}>
         <View
           style={[
@@ -530,12 +536,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 justifyContent: 'flex-start',
               }}
             >
-              {attachments.map((attachment) => {
+              {attachments.map((attachment, i) => {
                 if (attachment.dataType === 'img') {
                   return (
                     <TouchableHighlight
                       onPress={() => {
-                        setImageToView(attachment)
+                        setImageIndexToView(i)
                       }}
                       key={attachment.id}
                     >
