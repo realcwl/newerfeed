@@ -1,5 +1,8 @@
 import {
   fetchColumnDataSuccess,
+  fetchPost,
+  fetchPostFailure,
+  fetchPostSuccess,
   markItemAsRead,
   markItemAsSaved,
 } from '../../actions'
@@ -10,17 +13,17 @@ jest.useFakeTimers('modern').setSystemTime(fakeTime)
 
 describe('dataReducer', () => {
   const invalidItemNodeId = 'invalidItemNodeId'
-  const newsFeedDataArray = [0, 1, 2, 3, 4].map((n) => ({
+  const newsFeedDataArray = [0, 1, 2, 3, 4, 5].map((n) => ({
     id: `NewsFeedDataId_${n}`,
     cursor: n,
     isSaved: n % 2 === 0,
     isRead: n % 2 === 0,
   }))
 
-  // newsFeedDataArray[0] ~ [3], exclude [4]
+  // newsFeedDataArray[0] ~ [3], exclude [4],[5]
   const stateWithData: State = {
     allIds: newsFeedDataArray
-      .filter((data) => data.cursor !== 4)
+      .filter((data) => data.cursor < 4)
       .map((data) => data.id),
     byId: {
       [newsFeedDataArray[0].id]: newsFeedDataArray[0],
@@ -29,6 +32,7 @@ describe('dataReducer', () => {
       [newsFeedDataArray[3].id]: newsFeedDataArray[3],
     },
     savedIds: [],
+    loadingIds: [],
     updatedAt: undefined,
   }
 
@@ -133,5 +137,42 @@ describe('dataReducer', () => {
       newsFeedDataArray[0],
     )
     expect(updatedState.allIds.includes(newsFeedDataArray[0].id)).toBe(true)
+  })
+
+  // FETCH_POST, FETCH_POST_SUCCESS, FETCH_POST_FAILURE
+  test('should update state for fetching post either success or failure', () => {
+    // fetch post for newsFeedDataArray[4]
+    let id = newsFeedDataArray[4].id
+    let data = newsFeedDataArray[4]
+    let fetchPostAction = fetchPost({ id })
+    expect(stateWithData.loadingIds.length).toBe(0)
+    let updatedState = dataReducer(stateWithData, fetchPostAction)
+    expect(updatedState.loadingIds.length).toBe(1)
+    expect(updatedState.loadingIds.includes(id)).toBe(true)
+
+    // fetch success for newsFeedDataArray[4]
+    expect(updatedState.byId[id]).toBe(undefined)
+    expect(updatedState.allIds.includes(id)).toBe(false)
+    const fetchPostSuccessAction = fetchPostSuccess({ id, data })
+    updatedState = dataReducer(updatedState, fetchPostSuccessAction)
+    expect(updatedState.loadingIds.length).toBe(0)
+    expect(updatedState.allIds.includes(id)).toBe(true)
+    expect(updatedState.byId[id]).toBe(data)
+
+    // fetch post for newsFeedDataArray[5]
+    id = newsFeedDataArray[5].id
+    data = newsFeedDataArray[5]
+    fetchPostAction = fetchPost({ id })
+    expect(stateWithData.loadingIds.length).toBe(0)
+    updatedState = dataReducer(stateWithData, fetchPostAction)
+    expect(updatedState.loadingIds.length).toBe(1)
+    expect(updatedState.loadingIds.includes(id)).toBe(true)
+
+    // fetch failure for newsFeedDataArray[5]
+    expect(updatedState.byId[id]).toBe(undefined)
+    const fetchPostFailureAction = fetchPostFailure({ id })
+    updatedState = dataReducer(updatedState, fetchPostFailureAction)
+    expect(updatedState.loadingIds.length).toBe(0)
+    expect(updatedState.allIds.includes(id)).toBe(false)
   })
 })

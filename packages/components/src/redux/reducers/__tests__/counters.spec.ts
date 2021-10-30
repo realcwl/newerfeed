@@ -1,7 +1,7 @@
 import { REHYDRATE } from 'redux-persist'
 import { loginSuccess } from '../../actions'
 import { AllActions } from '../../types'
-import { countReducer } from '../counters'
+import { countReducer, initialState } from '../counters'
 
 describe('countReducer', () => {
   const stateWithSomeCounts = {
@@ -44,9 +44,7 @@ describe('countReducer', () => {
         },
       },
     } as AllActions
-    expect(countReducer(stateWithSomeCounts, action)).toEqual(
-      stateWithSomeCounts,
-    )
+    expect(countReducer(stateWithSomeCounts, action)).toEqual(initialState)
   })
 
   // LOGIN_SUCCESS

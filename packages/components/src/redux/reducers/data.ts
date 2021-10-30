@@ -13,6 +13,8 @@ export interface State {
   savedIds: string[]
   // Last time the data list is updated.
   updatedAt: string | undefined
+  // loading data IDs
+  loadingIds: string[]
 }
 
 export const initialState: State = {
@@ -20,6 +22,7 @@ export const initialState: State = {
   byId: {},
   savedIds: [],
   updatedAt: undefined,
+  loadingIds: [],
 }
 
 export const dataReducer: Reducer<State> = (state = initialState, action) => {
@@ -81,6 +84,45 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
           if (singleData.id in draft.byId) continue
           draft.byId[singleData.id] = singleData
           draft.allIds.push(singleData.id)
+        }
+      })
+    case 'FETCH_POST':
+      return immer(state, (draft) => {
+        const { id } = action.payload
+        if (!draft.loadingIds) {
+          draft.loadingIds = []
+        }
+        if (!draft.loadingIds.includes(id)) {
+          draft.loadingIds.push(id)
+        }
+      })
+    case 'FETCH_POST_SUCCESS':
+      return immer(state, (draft) => {
+        const { data } = action.payload
+        // replace it if it already exists
+        draft.byId[data.id] = data
+        if (!draft.loadingIds) {
+          draft.loadingIds = []
+        }
+        if (!draft.allIds.includes(data.id)) {
+          draft.allIds.push(data.id)
+        }
+        // remove id from loadingIds array
+        const index = draft.loadingIds.indexOf(data.id)
+        if (index > -1) {
+          draft.loadingIds.splice(index)
+        }
+      })
+    case 'FETCH_POST_FAILURE':
+      return immer(state, (draft) => {
+        const { id } = action.payload
+        if (!draft.loadingIds) {
+          draft.loadingIds = []
+        }
+        // remove id from loadingIds array
+        const index = draft.loadingIds.indexOf(id)
+        if (index > -1) {
+          draft.loadingIds.splice(index)
         }
       })
     default:

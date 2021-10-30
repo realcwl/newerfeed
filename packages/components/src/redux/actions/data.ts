@@ -1,3 +1,4 @@
+import { NewsFeedData } from '@devhub/core'
 import { createAction } from '../helpers'
 
 export function markItemAsSaved(payload: {
@@ -36,4 +37,27 @@ export function itemViewSavedToClipboard(payload: {
   viewRef: any
 }) {
   return createAction('VIEW_SAVED_TO_CLIPBOARD', payload)
+}
+
+export function fetchPost(payload: {
+  // post id, which is same as NewsFeedData's itemNodeId
+  id: string
+}) {
+  return createAction('FETCH_POST', payload)
+}
+
+export function fetchPostSuccess(payload: {
+  // post id, which is same as NewsFeedData's itemNodeId
+  id: string
+  // NewsFeedData
+  data: NewsFeedData
+}) {
+  return createAction('FETCH_POST_SUCCESS', payload)
+}
+
+export function fetchPostFailure(payload: {
+  // post id, which is same as NewsFeedData's itemNodeId
+  id: string
+}) {
+  return createAction('FETCH_POST_FAILURE', payload)
 }

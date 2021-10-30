@@ -1,24 +1,20 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   PixelRatio,
-  ScrollView,
   StyleSheet,
   View,
   Text,
   Image,
   Linking,
 } from 'react-native'
-import { Attachment, getDateSmallText, getFullDateText } from '@devhub/core'
+import { useDispatch } from 'react-redux'
+import { getDateSmallText, getFullDateText } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
 import { sharedStyles } from '../../styles/shared'
 import {
+  avatarSize,
+  mediumAvatarSize,
   normalTextSize,
   scaleFactor,
   smallAvatarSize,
@@ -31,7 +27,7 @@ import { smallLabelHeight } from '../common/Label'
 import { Spacer } from '../common/Spacer'
 import { ThemedIcon } from '../themed/ThemedIcon'
 import { ThemedText } from '../themed/ThemedText'
-import { BaseCardProps, renderCardActions, sizes } from './BaseCard.shared'
+import { BaseCardProps, sizes } from './BaseCard.shared'
 import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
 import { TouchableHighlight } from '../common/TouchableHighlight'
 import { useTheme } from '../context/ThemeContext'
@@ -39,7 +35,7 @@ import { useReduxState } from '../../hooks/use-redux-state'
 import { idToSourceOrSubSourceMapSelector } from '../../redux/selectors'
 import ImageViewer from '../../libs/image-viewer'
 import FileDownloader from '../../libs/file-downloader'
-import { useDispatch } from 'react-redux'
+import { useHistory } from '../../libs/react-router'
 import {
   capatureView,
   markItemAsRead,
@@ -47,6 +43,7 @@ import {
 } from '../../redux/actions'
 import { Link } from '../common/Link'
 import { useFastScreenshot } from '../../hooks/use-fast-screenshot'
+import { RouteConfiguration } from '../../navigation/AppNavigator'
 
 const NUM_OF_LINES = 3
 const SIGNAL_RESET_MAX = 100
@@ -119,7 +116,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 
-  text: {
+  showMoreOrLessText: {
     lineHeight: sizes.textLineHeight,
     fontSize: smallerTextSize,
     fontWeight: '300',
@@ -199,12 +196,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 
-  mostLeftActionIcon: {
-    marginLeft: 6 * scaleFactor,
-  },
-
   actionIcon: {
-    marginLeft: 4 * scaleFactor,
+    marginLeft: 12 * scaleFactor,
   },
 
   marginTop6: {
@@ -227,6 +220,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     repostedFrom,
     isRetweeted,
     columnId,
+    shareMode = false,
   } = props
 
   const timestamp = Date.parse(time)
@@ -239,6 +233,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   // index of -1 will hide the image viewer, otherwise it's the image index to show
   const [imageIndexToView, setImageIndexToView] = useState<number>(-1)
   const ref = useRef<View>(null)
+  const history = useHistory()
 
   const toggleShowMoreText = () => {
     setTextShown(!textShown)
@@ -250,10 +245,15 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     let prev = 0
     let match: RegExpExecArray | null = null
     const res: any[] = []
+    const style = largeMode && sharedStyles.extraLargeText
     while ((match = REGEX_IS_URL.exec(text ?? 'no content')) !== null) {
       const textLink = text.slice(match.index, match.index + match[0].length)
       res.push(
-        <ThemedText color="foregroundColorMuted65" key={res.length}>
+        <ThemedText
+          color="foregroundColorMuted65"
+          key={res.length}
+          style={style}
+        >
           {text.slice(prev, match.index)}
         </ThemedText>,
       )
@@ -261,6 +261,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         <ThemedText
           color="red"
           key={res.length}
+          style={style}
           // assume most website will redirect http to https
           onPress={() =>
             Linking.openURL(
@@ -276,7 +277,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       prev = match.index + match[0].length
     }
     res.push(
-      <ThemedText color="foregroundColorMuted65" key={res.length}>
+      <ThemedText color="foregroundColorMuted65" key={res.length} style={style}>
         {text.slice(prev)}
       </ThemedText>,
     )
@@ -294,6 +295,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const hasTitle: boolean = title != null && title !== ''
   const hasText: boolean = text != null && text !== ''
   const isWeb: boolean = Platform.OS === 'web'
+  const largeMode = shareMode
 
   const images = attachments?.filter((a) => a.dataType === 'img') ?? []
   const files = attachments?.filter((a) => a.dataType === 'file') ?? []
@@ -304,14 +306,14 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         layout: { height },
       },
     }) => {
-      if (height > 19 * NUM_OF_LINES) {
+      if (!shareMode && height > 19 * NUM_OF_LINES) {
         if (!hasMore) {
           setTextShown(false)
         }
         setHasMore(true)
       }
     },
-    [hasMore, textShown],
+    [hasMore, textShown, shareMode],
   )
 
   // 0 initial, adding up to trigger expand
@@ -349,20 +351,36 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             isWeb && !hasTitle && sharedStyles.marginBottomHalf,
           ]}
         >
-          <View style={styles.smallAvatarContainer}>
+          <View
+            style={
+              largeMode && !isRetweeted
+                ? styles.avatarContainer
+                : styles.smallAvatarContainer
+            }
+          >
             <Avatar
               avatarUrl={subSource ? subSource.avatarURL : ''}
               // TODO(chenweilunster): Enable link
               disableLink={false}
               linkURL={subSource ? subSource.profileURL : ''}
               style={styles.avatar}
-              size={smallAvatarSize}
+              size={
+                (largeMode && (!isRetweeted ? avatarSize : mediumAvatarSize)) ||
+                smallAvatarSize
+              }
             />
           </View>
           <ThemedText
             color="foregroundColorMuted65"
             numberOfLines={1}
-            style={[styles.authorName]}
+            style={[
+              styles.authorName,
+              sharedStyles.alignSelfCenter,
+              largeMode &&
+                (isRetweeted
+                  ? sharedStyles.largeText
+                  : sharedStyles.extraLargeText),
+            ]}
             {...Platform.select({
               web: { title: getFullDateText(timestamp) },
             })}
@@ -373,7 +391,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           <View
             style={[sharedStyles.horizontal, sharedStyles.alignItemsCenter]}
           >
-            {!isRead && !isRetweeted && (
+            {!isRead && !isRetweeted && !shareMode && (
               <ThemedIcon
                 family="octicon"
                 name="dot-fill"
@@ -403,7 +421,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                       <ThemedText
                         color="foregroundColorMuted65"
                         numberOfLines={1}
-                        style={styles.timestampText}
+                        style={[
+                          styles.timestampText,
+                          largeMode && sharedStyles.largeText,
+                        ]}
                         {...Platform.select({
                           web: { title: getFullDateText(timestamp) },
                         })}
@@ -415,7 +436,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 )
               }}
             </IntervalRefresh>
-            {!isRetweeted && (
+            {!isRetweeted && !shareMode && (
               <>
                 {supportFastScreenshot && (
                   <ThemedIcon
@@ -423,7 +444,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                     name={'camera-alt'}
                     color={'foregroundColorMuted65'}
                     size={smallTextSize}
-                    style={styles.mostLeftActionIcon}
+                    style={styles.actionIcon}
                     onPress={() => {
                       setShowMoreSignal((showMoreSignal % SIGNAL_RESET_MAX) + 1)
                       dispatch(
@@ -437,15 +458,23 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   />
                 )}
                 <ThemedIcon
+                  family="material"
+                  name={'share'}
+                  color={'foregroundColorMuted65'}
+                  size={smallTextSize}
+                  style={styles.actionIcon}
+                  onPress={() => {
+                    history.push(
+                      RouteConfiguration.sharedPost.replace(':id', nodeIdOrId),
+                    )
+                  }}
+                />
+                <ThemedIcon
                   family="octicon"
                   name={isSaved ? 'bookmark-fill' : 'bookmark'}
                   color={isSaved ? 'orange' : 'foregroundColorMuted65'}
                   size={smallTextSize}
-                  style={
-                    supportFastScreenshot
-                      ? styles.actionIcon
-                      : styles.mostLeftActionIcon
-                  }
+                  style={styles.actionIcon}
                   onPress={() => {
                     dispatch(
                       markItemAsSaved({
@@ -471,7 +500,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               <View style={sharedStyles.horizontalAndVerticallyAligned}>
                 <ThemedText
                   color="foregroundColor"
-                  style={[styles.title, sharedStyles.flex]}
+                  style={[
+                    styles.title,
+                    sharedStyles.flex,
+                    largeMode && sharedStyles.extraLargeText,
+                  ]}
                 >
                   {title}
                 </ThemedText>
@@ -495,7 +528,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   // reach, so that expanded text will wrap long word instead
                   // of extending out of area.
                   // This is to resolve: https://rrcapital.atlassian.net/jira/software/projects/NEWS/boards/4?selectedIssue=NEWS-160
-                  numberOfLines={textShown ? 9999 : NUM_OF_LINES}
+                  numberOfLines={textShown || shareMode ? 9999 : NUM_OF_LINES}
                   onLayout={checkHasMore}
                   onPress={() =>
                     dispatch(
@@ -505,6 +538,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                       }),
                     )
                   }
+                  style={largeMode && sharedStyles.extraLargeText}
                 >
                   {parseTextWithLinks(text ?? 'no content')}
                 </ThemedText>
@@ -519,7 +553,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   <ThemedText
                     color="primaryBackgroundColor"
                     onPress={toggleShowMoreText}
-                    style={[styles.text, sharedStyles.flex]}
+                    style={[styles.showMoreOrLessText, sharedStyles.flex]}
                   >
                     {textShown ? 'show less' : 'show more'}
                   </ThemedText>
@@ -551,9 +585,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                       uri: image.url,
                     }}
                     style={{
-                      width: 60 * scaleFactor,
-                      height: 60 * scaleFactor,
-                      margin: 2 * scaleFactor,
+                      width: (shareMode ? 80 : 60) * scaleFactor,
+                      height: (shareMode ? 80 : 60) * scaleFactor,
+                      margin: (shareMode ? 4 : 2) * scaleFactor,
                     }}
                     resizeMode="cover"
                   />
@@ -584,6 +618,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               columnId={columnId}
               isRetweeted={true}
               showMoreSignal={showMoreSignal}
+              shareMode={shareMode}
             />
           </View>
         )}

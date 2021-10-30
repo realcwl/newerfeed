@@ -140,6 +140,7 @@ describe('authReducer', () => {
         id: 'userSeedStateId',
         name: 'userSeedStateName',
         avatarUrl: 'userSeedStateAvatarUrl',
+        email: 'userSeedStateEmail',
       },
       feedSeedState: [],
     }
@@ -147,9 +148,11 @@ describe('authReducer', () => {
 
     allStates.map((state) => {
       const expectedState = immer(state, (draft) => {
+        if (!draft.user) return
         draft.user = {
-          email: draft.user?.email || '',
-          ...seedState.userSeedState,
+          ...draft.user,
+          name: seedState.userSeedState.name,
+          avatarUrl: seedState.userSeedState.avatarUrl,
         }
       })
       expect(authReducer(state, action)).toEqual(expectedState)
