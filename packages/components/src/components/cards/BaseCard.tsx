@@ -295,6 +295,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const hasText: boolean = text != null && text !== ''
   const isWeb: boolean = Platform.OS === 'web'
 
+  const images = attachments?.filter((a) => a.dataType === 'img') ?? []
+  const files = attachments?.filter((a) => a.dataType === 'file') ?? []
+
   const checkHasMore = useCallback(
     ({
       nativeEvent: {
@@ -526,62 +529,52 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
           </View>
         )}
 
-        {!!attachments &&
-          attachments.filter((a) => a.dataType === 'img').length !== 0 && (
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                marginTop: 10 * scaleFactor,
-                justifyContent: 'flex-start',
-              }}
-            >
-              {attachments.map((attachment, i) => {
-                if (attachment.dataType === 'img') {
-                  return (
-                    <TouchableHighlight
-                      onPress={() => {
-                        setImageIndexToView(i)
-                      }}
-                      key={attachment.id}
-                    >
-                      <Image
-                        source={{
-                          uri: attachment.url,
-                        }}
-                        style={{
-                          width: 60 * scaleFactor,
-                          height: 60 * scaleFactor,
-                          margin: 2 * scaleFactor,
-                        }}
-                        resizeMode="cover"
-                      />
-                    </TouchableHighlight>
-                  )
-                }
-              })}
-            </View>
-          )}
+        {images.length > 0 && (
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              marginTop: 10 * scaleFactor,
+              justifyContent: 'flex-start',
+            }}
+          >
+            {images.map((image, i) => {
+              return (
+                <TouchableHighlight
+                  onPress={() => {
+                    setImageIndexToView(i)
+                  }}
+                  key={image.id}
+                >
+                  <Image
+                    source={{
+                      uri: image.url,
+                    }}
+                    style={{
+                      width: 60 * scaleFactor,
+                      height: 60 * scaleFactor,
+                      margin: 2 * scaleFactor,
+                    }}
+                    resizeMode="cover"
+                  />
+                </TouchableHighlight>
+              )
+            })}
+          </View>
+        )}
 
-        {!!attachments &&
-          attachments.filter((a) => a.dataType === 'file').length !== 0 && (
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                marginTop: 10 * scaleFactor,
-                justifyContent: 'flex-start',
-              }}
-            >
-              {attachments
-                .filter((a) => a.dataType === 'file')
-                .map((attachment) => {
-                  return (
-                    <FileDownloader key={attachment.id} file={attachment} />
-                  )
-                })}
-            </View>
-          )}
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            marginTop: 10 * scaleFactor,
+            justifyContent: 'flex-start',
+          }}
+        >
+          {files.map((file) => {
+            return <FileDownloader key={file.id} file={file} />
+          })}
+        </View>
 
         {repostedFrom && (
           <View>
