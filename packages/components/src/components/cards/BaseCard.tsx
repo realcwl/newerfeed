@@ -337,7 +337,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       ref={ref}
     >
       <ImageViewer
-        images={attachments?.filter((a) => a.dataType === 'img')}
+        images={images}
         index={imageIndexToView}
         setIndex={setImageIndexToView}
       />
