@@ -1,7 +1,7 @@
-import React from 'react'
-import { StyleSheet, View, ScrollView } from 'react-native'
+import React, { useCallback } from 'react'
+import { StyleSheet, View, ScrollView, Clipboard } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { ActivityIndicator } from 'react-native-web'
+import { ActivityIndicator, Animated } from 'react-native-web'
 
 import { Screen } from '../components/common/Screen'
 import { ThemedText } from '../components/themed/ThemedText'
@@ -21,6 +21,9 @@ import { ThemedIcon } from '../components/themed/ThemedIcon'
 import * as actions from '../redux/actions'
 import * as selectors from '../redux/selectors'
 import { RootState } from '../redux/types'
+import { CURRENT_APP_URL } from '@devhub/core/src/utils/constants'
+import { setBannerMessage } from '../redux/actions'
+import { DEFAULT_SUCCESS_MESSAGE } from '../redux/sagas/data'
 
 const COLUMN_TYPE_NEWS_FEED = 'COLUMN_TYPE_NEWS_FEED'
 
@@ -42,6 +45,8 @@ export const SharedPostScreen = () => {
   const loading = useSelector((state: RootState) =>
     selectors.dataLoadingSelector(state, id),
   )
+  const [copySuccess, setCopySuccess] = React.useState(false)
+  const [successAnimation] = React.useState(new Animated.Value(1))
 
   React.useEffect(() => {
     if (item == null) {
@@ -69,6 +74,57 @@ export const SharedPostScreen = () => {
     }
   }, [id, item])
 
+  const copyPostLinkToClipboard = useCallback(() => {
+    Clipboard.setString(
+      `${CURRENT_APP_URL}${RouteConfiguration.sharedPost.replace(':id', id)}`,
+    )
+    dispatch(
+      setBannerMessage({
+        id: 'clipboard',
+        type: 'BANNER_TYPE_SUCCESS',
+        message: DEFAULT_SUCCESS_MESSAGE,
+        autoClose: true,
+      }),
+    )
+    setCopySuccess(!copySuccess)
+  }, [id, copySuccess])
+
+  const routeToRoot = useCallback(() => {
+    history.push(RouteConfiguration.root)
+  }, [])
+
+  const startAnimation = useCallback(() => {
+    Animated.sequence([
+      Animated.timing(successAnimation, {
+        toValue: 1.5,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(successAnimation, {
+        toValue: 1.1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(successAnimation, {
+        toValue: 1.3,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(successAnimation, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start()
+  }, [])
+
+  React.useEffect(() => {
+    if (copySuccess) {
+      startAnimation()
+      setCopySuccess(!copySuccess)
+    }
+  }, [copySuccess])
+
   let content
 
   if (id == null || id === '') {
@@ -89,7 +145,7 @@ export const SharedPostScreen = () => {
     content = CardComponent
   }
 
-  const headerIcon = (
+  const headerLeftIcon = (
     <ThemedIcon
       color={'foregroundColor'}
       family="material"
@@ -102,14 +158,37 @@ export const SharedPostScreen = () => {
           textAlign: 'center',
         },
       ]}
-      onPress={() => history.push(RouteConfiguration.root)}
+      onPress={routeToRoot}
     />
+  )
+  // <Animated.View style={{transform: [{ scaleX: c }]}}>
+  const headerRightIcon = (
+    <Animated.View style={{ transform: [{ scaleX: successAnimation }] }}>
+      <ThemedIcon
+        color={'foregroundColor'}
+        family="material"
+        name="content-copy"
+        selectable={false}
+        style={[
+          {
+            width: scaleFactor * 24,
+            fontSize: scaleFactor * 24,
+            textAlign: 'center',
+          },
+        ]}
+        onPress={copyPostLinkToClipboard}
+      />
+    </Animated.View>
   )
 
   return (
     <Screen statusBarBackgroundThemeColor="transparent" enableSafeArea={true}>
       <View style={[styles.container]}>
-        <PageHeader title="Shared Post" icon={headerIcon} />
+        <PageHeader
+          title="Shared Post"
+          leftIcon={headerLeftIcon}
+          rightIcon={headerRightIcon}
+        />
         <ScrollView style={[styles.container]}>
           <Container>
             <View style={[sharedStyles.fullWidth]}>{content}</View>

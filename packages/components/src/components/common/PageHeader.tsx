@@ -31,24 +31,26 @@ interface PageHeaderProps extends ThemedTouchableOpacityProps {
   TextColor?: ThemedTextProps['color']
   textStyle?: ThemedTextProps['style']
   title: string
-  icon: React.ReactNode
+  leftIcon?: React.ReactNode
+  rightIcon?: React.ReactNode
 }
 
 export function PageHeader(props: PageHeaderProps) {
-  const { TextColor, textStyle, title, icon } = props
+  const { TextColor, textStyle, title, leftIcon, rightIcon } = props
   return (
     <ThemedView
       backgroundColor="primaryBackgroundColor"
       style={[sharedStyles.fullWidth, styles.container]}
     >
       <Container style={styles.innerContainer}>
-        {icon}
+        {leftIcon}
         <ThemedText
           color={TextColor || 'foregroundColor'}
           style={[styles.text, textStyle]}
         >
           {title}
         </ThemedText>
+        {rightIcon}
       </Container>
     </ThemedView>
   )
