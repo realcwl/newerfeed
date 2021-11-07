@@ -32,7 +32,7 @@ describe('dataReducer', () => {
       [newsFeedDataArray[3].id]: newsFeedDataArray[3],
     },
     savedIds: [],
-    loadingIds: [],
+    loadingId: '',
     updatedAt: undefined,
   }
 
@@ -145,17 +145,16 @@ describe('dataReducer', () => {
     let id = newsFeedDataArray[4].id
     let data = newsFeedDataArray[4]
     let fetchPostAction = fetchPost({ id })
-    expect(stateWithData.loadingIds.length).toBe(0)
+    expect(stateWithData.loadingId).toBe('')
     let updatedState = dataReducer(stateWithData, fetchPostAction)
-    expect(updatedState.loadingIds.length).toBe(1)
-    expect(updatedState.loadingIds.includes(id)).toBe(true)
+    expect(updatedState.loadingId).toBe(id)
 
     // fetch success for newsFeedDataArray[4]
     expect(updatedState.byId[id]).toBe(undefined)
     expect(updatedState.allIds.includes(id)).toBe(false)
     const fetchPostSuccessAction = fetchPostSuccess({ id, data })
     updatedState = dataReducer(updatedState, fetchPostSuccessAction)
-    expect(updatedState.loadingIds.length).toBe(0)
+    expect(updatedState.loadingId).toBe('')
     expect(updatedState.allIds.includes(id)).toBe(true)
     expect(updatedState.byId[id]).toBe(data)
 
@@ -163,16 +162,15 @@ describe('dataReducer', () => {
     id = newsFeedDataArray[5].id
     data = newsFeedDataArray[5]
     fetchPostAction = fetchPost({ id })
-    expect(stateWithData.loadingIds.length).toBe(0)
+    expect(stateWithData.loadingId).toBe('')
     updatedState = dataReducer(stateWithData, fetchPostAction)
-    expect(updatedState.loadingIds.length).toBe(1)
-    expect(updatedState.loadingIds.includes(id)).toBe(true)
+    expect(updatedState.loadingId).toBe(id)
 
     // fetch failure for newsFeedDataArray[5]
     expect(updatedState.byId[id]).toBe(undefined)
     const fetchPostFailureAction = fetchPostFailure({ id })
     updatedState = dataReducer(updatedState, fetchPostFailureAction)
-    expect(updatedState.loadingIds.length).toBe(0)
+    expect(updatedState.loadingId).toBe('')
     expect(updatedState.allIds.includes(id)).toBe(false)
   })
 })

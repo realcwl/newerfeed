@@ -39,6 +39,14 @@ const styles = StyleSheet.create({
   },
 })
 
+/**
+ * Container is to restrict the children to a certain width, default
+ * to @ScreenBreakpoints.md (900px), set breakpoint to different
+ * ScreenBreakpoints enums based on your usage.
+ * @param props { children, breakpoint?, style?}
+ * @returns Width-constrained Container with children
+ */
+
 export const Container = (props: ContainerProps) => {
   const { children, breakpoint, style } = props
   const maxWidthStyle = {
