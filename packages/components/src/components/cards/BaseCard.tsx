@@ -241,6 +241,22 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   const dispatch = useDispatch()
 
+  const idToSourceOrSubSourceMap = useReduxState(
+    idToSourceOrSubSourceMapSelector,
+  )
+  const subSource = idToSourceOrSubSourceMap[subSourceId]
+
+  const [hasMore, setHasMore] = useState(false)
+  const theme = useTheme()
+  const [supportFastScreenshot] = useFastScreenshot()
+  const hasTitle: boolean = title != null && title !== ''
+  const hasText: boolean = text != null && text !== ''
+  const isWeb: boolean = Platform.OS === 'web'
+  const largeMode = shareMode
+
+  const images = attachments?.filter((a) => a.dataType === 'img') ?? []
+  const files = attachments?.filter((a) => a.dataType === 'file') ?? []
+
   const parseTextWithLinks = (text: string) => {
     let prev = 0
     let match: RegExpExecArray | null = null
@@ -283,22 +299,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     )
     return res
   }
-
-  const idToSourceOrSubSourceMap = useReduxState(
-    idToSourceOrSubSourceMapSelector,
-  )
-  const subSource = idToSourceOrSubSourceMap[subSourceId]
-
-  const [hasMore, setHasMore] = useState(false)
-  const theme = useTheme()
-  const [supportFastScreenshot] = useFastScreenshot()
-  const hasTitle: boolean = title != null && title !== ''
-  const hasText: boolean = text != null && text !== ''
-  const isWeb: boolean = Platform.OS === 'web'
-  const largeMode = shareMode
-
-  const images = attachments?.filter((a) => a.dataType === 'img') ?? []
-  const files = attachments?.filter((a) => a.dataType === 'file') ?? []
 
   const checkHasMore = useCallback(
     ({

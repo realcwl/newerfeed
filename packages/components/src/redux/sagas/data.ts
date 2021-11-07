@@ -103,12 +103,11 @@ function* onFetchPostById(
   action: ExtractActionFromActionCreator<typeof actions.fetchPost>,
 ) {
   const id = action.payload.id
-  const appToken = yield* select(selectors.appTokenSelector) // testing purpose
+  const appToken = yield* select(selectors.appTokenSelector)
 
   try {
-    console.log('YZ will make fetch post call', appToken)
     const response: AxiosResponse = yield axios.post(
-      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, ''), //appToken || ''),
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken || ''),
       { query: constructFetchPostByIdRequest(id) },
     )
     const post: Post = response.data.data.post
