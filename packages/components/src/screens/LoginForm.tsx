@@ -12,6 +12,8 @@ import * as selectors from '../redux/selectors'
 import { useReduxState } from '../hooks/use-redux-state'
 import { loginStyles } from '../styles/loginStyles'
 import SingleTextInputWithErrorMsg from '../components/auth/TextInputWithErrorMessage'
+import { useHistory } from '../libs/react-router'
+import { RouteConfiguration } from '../navigation/AppNavigator'
 
 const EMAIL = 'email'
 const PASSWORD = 'password'
@@ -25,6 +27,8 @@ export const LoginForm = React.memo((props: LoginFormProps) => {
   const { isLoggingIn } = useLoginHelpers()
   const dispatch = useDispatch()
   const authError = useReduxState(selectors.authErrorSelector)
+  const user = useReduxState(selectors.currentUserSelector)
+  const history = useHistory()
 
   const formInitialValues: Record<string, string> = {
     email: '',
@@ -80,6 +84,12 @@ export const LoginForm = React.memo((props: LoginFormProps) => {
     }
     return true
   }
+
+  React.useEffect(() => {
+    if (user) {
+      history.push(RouteConfiguration.root)
+    }
+  }, [user])
 
   return (
     <>
