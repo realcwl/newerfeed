@@ -13,6 +13,8 @@ export interface State {
   savedIds: string[]
   // Last time the data list is updated.
   updatedAt: string | undefined
+  // loading data id
+  loadingId: string
 }
 
 export const initialState: State = {
@@ -20,6 +22,7 @@ export const initialState: State = {
   byId: {},
   savedIds: [],
   updatedAt: undefined,
+  loadingId: '',
 }
 
 export const dataReducer: Reducer<State> = (state = initialState, action) => {
@@ -82,6 +85,26 @@ export const dataReducer: Reducer<State> = (state = initialState, action) => {
           draft.byId[singleData.id] = singleData
           draft.allIds.push(singleData.id)
         }
+      })
+    case 'FETCH_POST':
+      return immer(state, (draft) => {
+        const { id } = action.payload
+        draft.loadingId = id
+      })
+    case 'FETCH_POST_SUCCESS':
+      return immer(state, (draft) => {
+        const { data } = action.payload
+        // replace it if it already exists
+        draft.byId[data.id] = data
+        if (!draft.allIds.includes(data.id)) {
+          draft.allIds.push(data.id)
+        }
+        draft.loadingId = ''
+      })
+    case 'FETCH_POST_FAILURE':
+      return immer(state, (draft) => {
+        const { id } = action.payload
+        draft.loadingId = ''
       })
     default:
       return state

@@ -107,7 +107,7 @@ export const columnsReducer: Reducer<State> = (
           )
         if (
           draft.byId &&
-          draft.byId[action.payload.columnId].visibility === 'PRIVATE'
+          draft.byId[action.payload.columnId]?.visibility === 'PRIVATE'
         )
           delete draft.byId[action.payload.columnId]
       })

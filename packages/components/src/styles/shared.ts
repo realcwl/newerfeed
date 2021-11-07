@@ -1,7 +1,14 @@
 import _ from 'lodash'
 import { StyleSheet } from 'react-native'
+import { sizes } from '../components/cards/BaseCard.shared'
 
-import { contentPadding, mutedOpacity, superMutedOpacity } from './variables'
+import {
+  contentPadding,
+  extraLargeTextSize,
+  largeTextSize,
+  mutedOpacity,
+  superMutedOpacity,
+} from './variables'
 
 export const sharedStyles = StyleSheet.create({
   absolute: { position: 'absolute' },
@@ -52,6 +59,7 @@ export const sharedStyles = StyleSheet.create({
   opacity100: { opacity: 1 },
   overflowHidden: { overflow: 'hidden' },
   overflowVisible: { overflow: 'visible' },
+  overflowScroll: { overflow: 'scroll' },
   padding: { padding: contentPadding },
   paddingHalf: { padding: contentPadding / 2 },
   paddingHorizontal: { paddingHorizontal: contentPadding },
@@ -74,5 +82,15 @@ export const sharedStyles = StyleSheet.create({
     flexDirection: 'row',
     alignContent: 'center',
     alignItems: 'center',
+  },
+
+  largeText: {
+    fontSize: largeTextSize,
+    lineHeight: sizes.largeTitleLineHeight,
+  },
+
+  extraLargeText: {
+    fontSize: extraLargeTextSize,
+    lineHeight: sizes.extraLargeTitleLineHeight,
   },
 })

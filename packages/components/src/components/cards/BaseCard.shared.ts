@@ -15,6 +15,8 @@ import { ExtractActionFromActionCreator } from '../../redux/types/base'
 import {
   avatarSize,
   contentPadding,
+  extraLargeTextSize,
+  largeTextSize,
   normalTextSize,
   scaleFactor,
   smallAvatarSize,
@@ -52,6 +54,8 @@ export const sizes = {
     smallAvatarSize,
   ),
   horizontalSpaceSize: contentPadding / 2,
+  largeTitleLineHeight: largeTextSize * 1.2,
+  extraLargeTitleLineHeight: extraLargeTextSize * 1.3,
   titleLineHeight: normalTextSize * 1.2,
   subtitleLineHeight: smallerTextSize * 1.2,
   textLineHeight: smallerTextSize * 1.2,
@@ -80,6 +84,7 @@ export interface BaseCardProps extends AdditionalCardProps {
   repostedFrom?: Omit<BaseCardProps, keyof AdditionalCardProps>
   isRetweeted?: boolean
   showMoreSignal?: number
+  shareMode?: boolean
 }
 
 function _getCardPropsForItem(

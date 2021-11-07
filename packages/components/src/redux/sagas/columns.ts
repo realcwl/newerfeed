@@ -34,7 +34,7 @@ import {
 import { notify } from '../../utils/notify'
 import { setSharedColumns } from '../actions'
 
-interface Post {
+export interface Post {
   id: string
   title: string
   content: string
@@ -129,51 +129,51 @@ function convertFeedsResponseToSources(
   return convertFeedResponseToSources(response.data.feeds[0])
 }
 
+export const postToNewsFeedData = (post: Post): NewsFeedData => {
+  let attachments: Attachment[] = []
+  if (post.imageUrls.length !== 0) {
+    attachments = attachments.concat(
+      post.imageUrls.map((url) => {
+        return { id: url, dataType: 'img', url: url }
+      }),
+    )
+  }
+  if (post.fileUrls && post.fileUrls.length !== 0) {
+    attachments = attachments.concat(
+      post.fileUrls.map((url) => {
+        return {
+          id: url,
+          dataType: 'file',
+          name: url.split('/')[url.split('/').length - 1],
+          url: url,
+        }
+      }),
+    )
+  }
+  return {
+    id: post.id,
+    title: post.title,
+    text: post.content,
+    crawledTime: post.crawledAt,
+    postTime: post.contentGeneratedAt ? post.contentGeneratedAt : undefined,
+    cursor: post.cursor,
+    subSource: {
+      id: post.subSource.id,
+      name: post.subSource.name,
+      avatarURL: post.subSource.avatarUrl,
+    },
+    repostedFrom: post.sharedFromPost
+      ? postToNewsFeedData(post.sharedFromPost)
+      : undefined,
+    url: post.originUrl,
+    isRead: false,
+    isSaved: false,
+    attachments: attachments,
+  }
+}
+
 function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
   if (response.data.feeds.length === 0) return EMPTY_ARRAY
-
-  const postToNewsFeedData = (post: Post): NewsFeedData => {
-    let attachments: Attachment[] = []
-    if (post.imageUrls.length !== 0) {
-      attachments = attachments.concat(
-        post.imageUrls.map((url) => {
-          return { id: url, dataType: 'img', url: url }
-        }),
-      )
-    }
-    if (post.fileUrls && post.fileUrls.length !== 0) {
-      attachments = attachments.concat(
-        post.fileUrls.map((url) => {
-          return {
-            id: url,
-            dataType: 'file',
-            name: url.split('/')[url.split('/').length - 1],
-            url: url,
-          }
-        }),
-      )
-    }
-    return {
-      id: post.id,
-      title: post.title,
-      text: post.content,
-      crawledTime: post.crawledAt,
-      postTime: post.contentGeneratedAt ? post.contentGeneratedAt : undefined,
-      cursor: post.cursor,
-      subSource: {
-        id: post.subSource.id,
-        name: post.subSource.name,
-        avatarURL: post.subSource.avatarUrl,
-      },
-      repostedFrom: post.sharedFromPost
-        ? postToNewsFeedData(post.sharedFromPost)
-        : undefined,
-      url: post.originUrl,
-      isRead: false,
-      isSaved: false,
-      attachments: attachments,
-    }
-  }
   return response.data.feeds[0].posts.map((post) => {
     return postToNewsFeedData(post)
   })
