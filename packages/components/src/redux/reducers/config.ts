@@ -64,6 +64,40 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
         }
       })
     }
+    case 'ADD_SUBSOURCE':
+      return immer(state, (draft) => {
+        draft.idToSourceOrSubSourceMap[action.payload.sourceId].state =
+          'loading'
+      })
+    case 'ADD_SUBSOURCE_FAIL':
+      return immer(state, (draft) => {
+        draft.idToSourceOrSubSourceMap[action.payload.sourceId].state = 'error'
+      })
+    case 'ADD_SUBSOURCE_SUCCESS':
+      return immer(state, (draft) => {
+        // Add subsource to parent source
+        for (let i = 0; i < draft.availableNewsFeedSources.length; i++) {
+          if (
+            draft.availableNewsFeedSources[i].sourceId ===
+            action.payload.sourceId
+          ) {
+            draft.availableNewsFeedSources[i].subSourceIds.push(
+              action.payload.subsourceId,
+            )
+            break
+          }
+        }
+        // Fill subsource information
+        draft.idToSourceOrSubSourceMap[action.payload.subsourceId] = {
+          name: action.payload.name,
+          id: action.payload.subsourceId,
+        }
+        draft.idToSourceOrSubSourceMap[action.payload.sourceId].state = 'loaded'
+      })
+    case 'ADD_SUBSOURCE_TERMINATE':
+      return immer(state, (draft) => {
+        draft.idToSourceOrSubSourceMap[action.payload.sourceId].state = 'loaded'
+      })
     default:
       return state
   }
