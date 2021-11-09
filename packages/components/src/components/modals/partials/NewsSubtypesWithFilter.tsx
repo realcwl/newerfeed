@@ -298,7 +298,6 @@ export const NewsSubtypesWithFilter = React.memo(
               )
             }, sourceState)
           : null}
-        {sourceState == 'loading' && <ProgressBar indeterminate />}
         <View
           style={{
             marginLeft: columnHeaderItemContentSize + contentPadding / 2,
