@@ -208,6 +208,10 @@ export interface NewsFeedData {
   isSaved?: boolean
   // Indicate whether this card has been read by the user.
   isRead?: boolean
+  // Semantic Hashing for this single data.
+  semanticHashing?: string
+  // All data that are semantically duplicated with this data.
+  semanticDuplication?: NewsFeedData[]
 }
 
 export interface Attachment {

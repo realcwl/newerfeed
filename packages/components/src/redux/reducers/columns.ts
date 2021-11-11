@@ -309,6 +309,8 @@ export const columnsReducer: Reducer<State> = (
         const filteredData = data.filter(
           (d) => !column.itemListIds.includes(d.id),
         )
+        // Append s
+
         if (direction == 'NEW') {
           column.itemListIds = filteredData
             .map((d) => d.id)

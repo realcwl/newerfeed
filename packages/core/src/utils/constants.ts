@@ -100,3 +100,11 @@ export const COLUMN_OUT_OF_SYNC_TIME_IN_MILLI_SECOND = 1000 * 60 * 1 // 1 minute
 
 // Error code when cognito fail due to lost connection.
 export const COGNITO_NETWORK_ERROR_CODE = 'NetworkError'
+
+// if less than or equal to 100*SIMILARITY_THRESHOLD% bits are different between
+// 2 hash string, those 2 are considered as semantically identical.
+export const SIMILARITY_THRESHOLD = 0.08
+
+// Only consider 2 posts to be similar if they are posted within this time
+// window.
+export const SIMILARITY_WINDOW_MILLISECOND = 1000 * 60 * 15 // 15 minute
