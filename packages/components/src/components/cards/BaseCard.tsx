@@ -227,7 +227,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const isMuted = false // appViewMode === 'single-column' ? false : isRead
   const parentShowMoreSignal = props.showMoreSignal
 
-  const [textShown, setTextShown] = useState(true)
+  const [textShown, setTextShown] = useState(false)
   const [showMoreSignal, setShowMoreSignal] = useState<number>(0)
 
   // index of -1 will hide the image viewer, otherwise it's the image index to show
@@ -301,12 +301,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   }
 
   const checkHasMore = useCallback(
-    ({
-      nativeEvent: {
-        layout: { height },
-      },
-    }) => {
-      if (!shareMode && height > 19 * NUM_OF_LINES) {
+    (e) => {
+      console.log(e)
+      if (!shareMode && e.nativeEvent.layout.height > 19 * NUM_OF_LINES) {
         if (!hasMore) {
           setTextShown(false)
         }
