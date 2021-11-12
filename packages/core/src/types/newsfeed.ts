@@ -211,7 +211,7 @@ export interface NewsFeedData {
   // Semantic Hashing for this single data.
   semanticHashing?: string
   // All data that are semantically duplicated with this data.
-  semanticDuplication?: NewsFeedData[]
+  semanticDuplication?: string[]
 }
 
 export interface Attachment {

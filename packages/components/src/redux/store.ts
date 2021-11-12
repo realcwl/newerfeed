@@ -62,7 +62,7 @@ export function configureStore(key = 'root') {
     },
     storage,
     throttle: 500,
-    version: 1,
+    version: 2,
   }
   const persistedReducer = persistReducer(persistConfig, rootReducer)
 

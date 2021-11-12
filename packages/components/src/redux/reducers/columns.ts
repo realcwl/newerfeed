@@ -11,24 +11,50 @@ import { Reducer } from '../types'
 import immer from 'immer'
 
 export interface State {
+  /////////////////////////////////////
+  //          Column Related         //
+  /////////////////////////////////////
+
   // All column ids, each id is a hex string. The rendering order will be the
   // same as the list order.
-  allIds: string[]
+  allColumnIds: string[]
 
   // All shared column ids
-  sharedIds: string[]
+  sharedColumnIds: string[]
 
   // byId maps the hex string column id to the Column type, where details of the
   // Column such as column header, type, are defined. Note that this is only a
   // definition of the column, the mapping between column->data are defined in
   // each Column, and actual data is stored in data reducer.
-  byId: Record<string, Column>
+  columnById: Record<string, Column>
+
+  /////////////////////////////////////
+  //           Data Related          //
+  /////////////////////////////////////
+
+  // Contains all data IDs, that can be referenced by multiple columns.
+  allDataIds: string[]
+  // Contains data id to actual data mapping.
+  dataById: Record<string, NewsFeedData>
+  // Saved ID list that can be rendered together in the Saved column.
+  savedDataIds: string[]
+  // Last time the data list is updated.
+  dataUpdatedAt: string | undefined
+  // loading data id
+  loadingDataId: string
 }
 
 const initialState: State = {
-  allIds: [],
-  sharedIds: [],
-  byId: {},
+  /*===== Column Initial State =====*/
+  allColumnIds: [],
+  sharedColumnIds: [],
+  columnById: {},
+  /*===== Data Initial State =====*/
+  allDataIds: [],
+  dataById: {},
+  savedDataIds: [],
+  dataUpdatedAt: undefined,
+  loadingDataId: '',
 }
 
 // Update the cursor window for this column
@@ -80,7 +106,7 @@ export const columnsReducer: Reducer<State> = (
     case 'ADD_COLUMN':
       return immer(state, (draft) => {
         // Initialize state byId it's not already initialized.
-        draft.byId = draft.byId || {}
+        draft.columnById = draft.columnById || {}
 
         // Get normalized state expression for the action payload, which
         // basically converts from the action payload to actual state.
@@ -91,45 +117,46 @@ export const columnsReducer: Reducer<State> = (
 
         // Is id exists, this is an attribute modification and we should replace
         // the value with new payload and return.
-        if (draft.allIds.includes(normalized.allIds[0])) {
-          draft.byId[normalized.allIds[0]] =
+        if (draft.allColumnIds.includes(normalized.allIds[0])) {
+          draft.columnById[normalized.allIds[0]] =
             normalized.byId[normalized.allIds[0]]
           return
         }
-        draft.allIds.push(normalized.allIds[0])
-        _.merge(draft.byId, normalized.byId)
+        draft.allColumnIds.push(normalized.allIds[0])
+        _.merge(draft.columnById, normalized.byId)
       })
     case 'DELETE_COLUMN':
       return immer(state, (draft) => {
-        if (draft.allIds)
-          draft.allIds = draft.allIds.filter(
+        if (draft.allColumnIds)
+          draft.allColumnIds = draft.allColumnIds.filter(
             (id) => id !== action.payload.columnId,
           )
         if (
-          draft.byId &&
-          draft.byId[action.payload.columnId]?.visibility === 'PRIVATE'
+          draft.columnById &&
+          draft.columnById[action.payload.columnId]?.visibility === 'PRIVATE'
         )
-          delete draft.byId[action.payload.columnId]
+          delete draft.columnById[action.payload.columnId]
       })
     case 'MOVE_COLUMN':
       return immer(state, (draft) => {
-        if (!draft.allIds) return
+        if (!draft.allColumnIds) return
 
-        const currentIndex = draft.allIds.findIndex(
+        const currentIndex = draft.allColumnIds.findIndex(
           (id) => id === action.payload.columnId,
         )
-        if (!(currentIndex >= 0 && currentIndex < draft.allIds.length)) return
+        if (!(currentIndex >= 0 && currentIndex < draft.allColumnIds.length))
+          return
 
         const newIndex = Math.max(
           0,
-          Math.min(action.payload.columnIndex, draft.allIds.length - 1),
+          Math.min(action.payload.columnIndex, draft.allColumnIds.length - 1),
         )
         if (Number.isNaN(newIndex)) return
 
         // move column inside array
-        const columnId = draft.allIds[currentIndex]
-        draft.allIds = draft.allIds.filter((id) => id !== columnId)
-        draft.allIds.splice(newIndex, 0, columnId)
+        const columnId = draft.allColumnIds[currentIndex]
+        draft.allColumnIds = draft.allColumnIds.filter((id) => id !== columnId)
+        draft.allColumnIds.splice(newIndex, 0, columnId)
       })
     case 'UPDATE_SEED_STATE':
       return immer(state, (draft) => {
@@ -138,17 +165,17 @@ export const columnsReducer: Reducer<State> = (
 
         // Get all added feeds as objects
         const addFeeds = feedSeedStates.filter(
-          (v) => !draft.allIds.includes(v.id),
+          (v) => !draft.allColumnIds.includes(v.id),
         )
 
         // All existing feeds that might require update on feed seed state
         const updateFeeds = feedSeedStates.filter(
-          (v) => draft.allIds.includes(v.id) && newAllIds.includes(v.id),
+          (v) => draft.allColumnIds.includes(v.id) && newAllIds.includes(v.id),
         )
 
         // Get all deleted feeds as ids
-        const delIds = draft.allIds.filter(
-          (v) => !newAllIds.includes(v) && !draft.sharedIds.includes(v),
+        const delIds = draft.allColumnIds.filter(
+          (v) => !newAllIds.includes(v) && !draft.sharedColumnIds.includes(v),
         )
 
         // Only update when the ids in feed change. It should:
@@ -156,16 +183,16 @@ export const columnsReducer: Reducer<State> = (
         // 2. remove deleted ones
         // 3. update common feeds
         // 4. add new ids
-        if (!_.isEqual(newAllIds, draft.allIds)) {
-          draft.allIds = newAllIds
+        if (!_.isEqual(newAllIds, draft.allColumnIds)) {
+          draft.allColumnIds = newAllIds
         }
 
         delIds.forEach((v) => {
-          if (draft.byId) delete draft.byId[v]
+          if (draft.columnById) delete draft.columnById[v]
         })
 
         updateFeeds.forEach((v) => {
-          draft.byId[v.id].title = v.name
+          draft.columnById[v.id].title = v.name
         })
 
         addFeeds.forEach((v) => {
@@ -196,23 +223,23 @@ export const columnsReducer: Reducer<State> = (
 
           if (!(normalized.allIds.length === 1)) return
 
-          draft.byId[normalized.allIds[0]] =
+          draft.columnById[normalized.allIds[0]] =
             normalized.byId[normalized.allIds[0]]
         })
       })
     case 'REPLACE_COLUMN_FILTER':
       return immer(state, (draft) => {
         const { columnId, filter } = action.payload
-        if (draft.byId[columnId]) {
-          draft.byId[columnId].filters = filter
+        if (draft.columnById[columnId]) {
+          draft.columnById[columnId].filters = filter
         }
       })
     case 'SET_COLUMN_SAVED_FILTER':
       return immer(state, (draft) => {
         const { columnId, saved } = action.payload
-        if (draft.byId[columnId]) {
-          draft.byId[columnId].filters = {
-            ...draft.byId[columnId].filters,
+        if (draft.columnById[columnId]) {
+          draft.columnById[columnId].filters = {
+            ...draft.columnById[columnId].filters,
             saved: saved,
           }
         }
@@ -220,9 +247,9 @@ export const columnsReducer: Reducer<State> = (
     case 'SET_COLUMN_OPTION': {
       return immer(state, (draft) => {
         const { columnId, option, value } = action.payload
-        if (!draft.byId) return
+        if (!draft.columnById) return
 
-        const column = draft.byId[columnId]
+        const column = draft.columnById[columnId]
         if (!column) return
 
         if (!option) return
@@ -236,19 +263,19 @@ export const columnsReducer: Reducer<State> = (
     case 'SET_COLUMN_LOADING':
       return immer(state, (draft) => {
         const { columnId } = action.payload
-        if (draft.byId[columnId]) {
-          draft.byId[columnId].state = 'loading'
+        if (draft.columnById[columnId]) {
+          draft.columnById[columnId].state = 'loading'
         }
       })
     case 'SET_SHARED_COLUMNS':
       return immer(state, (draft) => {
         if (!action.payload.feeds || action.payload.feeds.length === 0) return
-        draft.sharedIds = action.payload.feeds.map((f) => f.id)
+        draft.sharedColumnIds = action.payload.feeds.map((f) => f.id)
         action.payload.feeds.forEach((v) => {
-          draft.byId[v.id] = {
-            ...draft.byId[v.id],
+          draft.columnById[v.id] = {
+            ...draft.columnById[v.id],
             id: v.id,
-            icon: draft.byId[v.id]?.icon ?? v.icon,
+            icon: draft.columnById[v.id]?.icon ?? v.icon,
             creator: v.creator,
             sources: v.sources ?? [],
             dataExpression: v.dataExpression,
@@ -266,15 +293,15 @@ export const columnsReducer: Reducer<State> = (
           // This could happen when updating feed, where same feedId is returned
           return
         }
-        const idx = draft.allIds.indexOf(prevId)
+        const idx = draft.allColumnIds.indexOf(prevId)
         if (idx === -1) {
           console.error('cannot find the original id: ' + prevId)
           return
         }
-        draft.allIds[idx] = updatedId
-        draft.byId[updatedId] = draft.byId[prevId]
-        draft.byId[updatedId].id = updatedId
-        delete draft.byId[prevId]
+        draft.allColumnIds[idx] = updatedId
+        draft.columnById[updatedId] = draft.columnById[prevId]
+        draft.columnById[updatedId].id = updatedId
+        delete draft.columnById[prevId]
       })
     }
     case 'FETCH_COLUMN_DATA_SUCCESS':
@@ -290,7 +317,14 @@ export const columnsReducer: Reducer<State> = (
           dataByNodeId,
         } = action.payload
 
-        const column = draft.byId[columnId]
+        // insert into data reducer if not already exist.
+        for (const singleData of data) {
+          if (singleData.id in draft.dataById) continue
+          draft.dataById[singleData.id] = singleData
+          draft.allDataIds.push(singleData.id)
+        }
+
+        const column = draft.columnById[columnId]
         if (!column) return
 
         // if explicit drop is requested, we drop all data and the cursors.
@@ -309,7 +343,7 @@ export const columnsReducer: Reducer<State> = (
         const filteredData = data.filter(
           (d) => !column.itemListIds.includes(d.id),
         )
-        // Append s
+        // Append only if un duplicated
 
         if (direction == 'NEW') {
           column.itemListIds = filteredData
@@ -335,11 +369,81 @@ export const columnsReducer: Reducer<State> = (
     case 'FETCH_COLUMN_DATA_FAILURE':
       return immer(state, (draft) => {
         const { columnId } = action.payload
-        const column = draft.byId[columnId]
+        const column = draft.columnById[columnId]
         if (!column) return
 
         column.refreshedAt = new Date().toISOString()
         column.state = 'not_loaded'
+      })
+
+    case 'MARK_ITEM_AS_SAVED':
+      return immer(state, (draft) => {
+        const { itemNodeId, save } = action.payload
+        const now = new Date().toISOString()
+        if (!(itemNodeId in draft.dataById)) {
+          // if the item isn't in the data list, it indicates that we might
+          // encountered an error and should return directly.
+          console.warn(
+            "trying to favorite/unfavorite an item that's not in the data list: ",
+            itemNodeId,
+          )
+          return
+        }
+        const entry = draft.dataById[itemNodeId]
+        entry.isSaved = save
+        draft.dataUpdatedAt = now
+
+        // update savedIds array
+        if (save && !draft.savedDataIds.includes(itemNodeId)) {
+          draft.savedDataIds.push(itemNodeId)
+        } else if (!save && draft.savedDataIds.includes(itemNodeId)) {
+          const index = draft.savedDataIds.findIndex((id) => id === itemNodeId)
+          if (index > -1) {
+            draft.savedDataIds.splice(index, 1)
+          }
+        } else {
+          console.warn(`
+              item ${itemNodeId} was already ${save ? 'saved' : 'unsaved'}`)
+        }
+      })
+    case 'MARK_ITEM_AS_READ':
+      return immer(state, (draft) => {
+        const { itemNodeIds, read } = action.payload
+        const now = new Date().toISOString()
+        for (const itemNodeId of itemNodeIds) {
+          if (!(itemNodeId in draft.dataById)) {
+            // if the item isn't in the data list, it indicates that we might
+            // encountered an error and should return directly.
+            console.warn(
+              "trying to read/unread an item that's not in the data list: ",
+              itemNodeId,
+            )
+            return
+          }
+          const entry = draft.dataById[itemNodeId]
+          entry.isRead = read
+          draft.dataUpdatedAt = now
+        }
+      })
+    case 'FETCH_POST':
+      return immer(state, (draft) => {
+        const { id } = action.payload
+        draft.loadingDataId = id
+      })
+    case 'FETCH_POST_SUCCESS':
+      return immer(state, (draft) => {
+        const { data } = action.payload
+        // replace it if it already exists
+        draft.dataById[data.id] = data
+        if (!draft.allDataIds.includes(data.id)) {
+          draft.allDataIds.push(data.id)
+        }
+        draft.loadingDataId = ''
+      })
+    case 'FETCH_POST_FAILURE':
+      return immer(state, (draft) => {
+        const { id } = action.payload
+        draft.loadingDataId = ''
       })
     default:
       return state

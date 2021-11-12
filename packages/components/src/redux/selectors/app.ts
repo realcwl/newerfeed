@@ -39,10 +39,10 @@ export const selectSeedStateFromRootState = (state: RootState) => {
       avatarUrl: state.auth.user.avatarUrl || '',
       name: state.auth.user.name,
     },
-    feedSeedState: state.columns.allIds.map((v) => {
+    feedSeedState: state.columns.allColumnIds.map((v) => {
       return {
         id: v,
-        name: state.columns.byId[v].title,
+        name: state.columns.columnById[v].title,
       }
     }),
   }

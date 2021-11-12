@@ -3,13 +3,14 @@ import { Column } from '@devhub/core'
 import { EMPTY_ARRAY, EMPTY_OBJ } from '../../utils/constants'
 import { RootState } from '../types'
 import { betterMemoize, createShallowEqualSelector } from './helpers'
+import { createSelector } from 'reselect'
 
 const s = (state: RootState) => state.columns || EMPTY_OBJ
 
 export const columnSelector = (state: RootState, columnId: string) => {
   if (!columnId) return
 
-  const byId = s(state).byId
+  const byId = s(state).columnById
   return (byId && byId[columnId]) || undefined
 }
 
@@ -21,8 +22,8 @@ export const columnsWithRefreshTimeAndNotifySettingSelector = (
     refreshedAt: string
     notifyOnNewPosts: boolean
   }[] = []
-  const byId: Record<string, Column> = s(state).byId
-  const allIds: string[] = s(state).allIds
+  const byId: Record<string, Column> = s(state).columnById
+  const allIds: string[] = s(state).allColumnIds
 
   for (const columnId of allIds) {
     result.push({
@@ -36,16 +37,16 @@ export const columnsWithRefreshTimeAndNotifySettingSelector = (
 }
 
 export const columnIdsSelector = (state: RootState) =>
-  s(state).allIds || EMPTY_ARRAY
+  s(state).allColumnIds || EMPTY_ARRAY
 
 export const sharedFeedsSelector = (state: RootState) =>
-  s(state).sharedIds.map((id) => s(state).byId[id]) || EMPTY_ARRAY
+  s(state).sharedColumnIds.map((id) => s(state).columnById[id]) || EMPTY_ARRAY
 
 export const columnCountSelector = (state: RootState) =>
   columnIdsSelector(state).length
 
 export const columnsArrSelector = createShallowEqualSelector(
-  (state: RootState) => s(state).byId,
+  (state: RootState) => s(state).columnById,
   (state: RootState) => columnIdsSelector(state),
   (byId, columnIds) => {
     if (!(byId && columnIds)) return EMPTY_ARRAY
@@ -54,7 +55,7 @@ export const columnsArrSelector = createShallowEqualSelector(
 )
 
 export const hasCreatedColumnSelector = (state: RootState) =>
-  s(state).byId !== null
+  s(state).columnById !== null
 
 export const createColumnDataSelector = () => {
   return (state: RootState, columnId: string) => {
@@ -63,3 +64,15 @@ export const createColumnDataSelector = () => {
     return column.itemListIds
   }
 }
+
+export const dataByNodeIdOrId = (state: RootState) => s(state).dataById
+
+export const dataSavedIds = (state: RootState) => s(state).savedDataIds
+
+// only be used in a single instance of a single component
+// https://react-redux.js.org/api/hooks#useselector-examples
+export const dataLoadingSelector = createSelector(
+  (state: RootState) => s(state).loadingDataId,
+  (_: RootState, id: string) => id,
+  (loadingId, id) => loadingId === id,
+)
