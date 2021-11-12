@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   PixelRatio,
   StyleSheet,
@@ -45,8 +45,9 @@ import { Link } from '../common/Link'
 import { useFastScreenshot } from '../../hooks/use-fast-screenshot'
 import { RouteConfiguration } from '../../navigation/AppNavigator'
 
-const NUM_OF_LINES = 3
 const SIGNAL_RESET_MAX = 100
+// Number of characters to render show more button.
+const LENGTH_TO_SHOW_MORE = 70
 
 const styles = StyleSheet.create({
   container: {
@@ -118,7 +119,7 @@ const styles = StyleSheet.create({
 
   showMoreOrLessText: {
     lineHeight: sizes.textLineHeight,
-    fontSize: smallerTextSize,
+    fontSize: smallTextSize,
     fontWeight: '300',
     overflow: 'hidden',
   },
@@ -224,10 +225,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   } = props
 
   const timestamp = Date.parse(time)
-  const isMuted = false // appViewMode === 'single-column' ? false : isRead
   const parentShowMoreSignal = props.showMoreSignal
 
-  const [textShown, setTextShown] = useState(true)
+  const [textShown, setTextShown] = useState(false)
   const [showMoreSignal, setShowMoreSignal] = useState<number>(0)
 
   // index of -1 will hide the image viewer, otherwise it's the image index to show
@@ -246,7 +246,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   )
   const subSource = idToSourceOrSubSourceMap[subSourceId]
 
-  const [hasMore, setHasMore] = useState(false)
+  // Whether we should show "show more" button for the text. We calculate this
+  // flag before rendering so that we don't need to render twice. This would
+  // greatly save frontend resources.
+  const hasMore = !!text && text.length > LENGTH_TO_SHOW_MORE
+
   const theme = useTheme()
   const [supportFastScreenshot] = useFastScreenshot()
   const hasTitle: boolean = title != null && title !== ''
@@ -300,32 +304,27 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     return res
   }
 
-  const checkHasMore = useCallback(
-    ({
-      nativeEvent: {
-        layout: { height },
-      },
-    }) => {
-      if (!shareMode && height > 19 * NUM_OF_LINES) {
-        if (!hasMore) {
-          setTextShown(false)
-        }
-        setHasMore(true)
-      }
-    },
-    [hasMore, textShown, shareMode],
-  )
-
   // 0 initial, adding up to trigger expand
   useEffect(() => {
     if (
-      (showMoreSignal !== 0 || parentShowMoreSignal !== 0) &&
+      (showMoreSignal !== 0 ||
+        (!!parentShowMoreSignal && parentShowMoreSignal !== 0)) &&
       hasMore &&
       !textShown
     ) {
       setTextShown(true)
     }
   }, [showMoreSignal, parentShowMoreSignal])
+
+  // Show a text summary snippet when text is too long, otherwise show the
+  // entire text.
+  function getTextComponentToShow(text: string | undefined) {
+    return textShown || shareMode || !hasMore
+      ? parseTextWithLinks(text ?? 'no content')
+      : parseTextWithLinks(
+          text?.substring(0, LENGTH_TO_SHOW_MORE) + '...' ?? 'no content',
+        )
+  }
 
   return (
     <View
@@ -524,12 +523,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               <View style={sharedStyles.horizontalAndVerticallyAligned}>
                 <ThemedText
                   color="foregroundColorMuted65"
-                  // set a really large number of lines that's impossible to
-                  // reach, so that expanded text will wrap long word instead
-                  // of extending out of area.
-                  // This is to resolve: https://rrcapital.atlassian.net/jira/software/projects/NEWS/boards/4?selectedIssue=NEWS-160
-                  numberOfLines={textShown || shareMode ? 9999 : NUM_OF_LINES}
-                  onLayout={checkHasMore}
                   onPress={() =>
                     dispatch(
                       markItemAsRead({
@@ -540,10 +533,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   }
                   style={largeMode && sharedStyles.extraLargeText}
                 >
-                  {parseTextWithLinks(text ?? 'no content')}
+                  {getTextComponentToShow(text)}
                 </ThemedText>
               </View>
-              {hasMore && (
+              {!shareMode && hasMore && (
                 <View
                   style={[
                     sharedStyles.horizontalAndVerticallyAligned,
