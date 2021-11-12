@@ -320,9 +320,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   // entire text.
   function getTextComponentToShow(text: string | undefined) {
     return textShown || shareMode || !hasMore
-      ? parseTextWithLinks(text ?? 'no content')
+      ? parseTextWithLinks(text ?? 'empty content')
       : parseTextWithLinks(
-          text?.substring(0, LENGTH_TO_SHOW_MORE) + '...' ?? 'no content',
+          `${text?.substring(0, LENGTH_TO_SHOW_MORE)}...` ?? 'empty content',
         )
   }
 
