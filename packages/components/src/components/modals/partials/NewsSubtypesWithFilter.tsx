@@ -7,6 +7,7 @@ import {
   NewsFeedColumnSource,
   ThemeColors,
   SourceOrSubSource,
+  constants,
 } from '@devhub/core'
 
 import { sharedStyles } from '../../../styles/shared'
@@ -32,8 +33,8 @@ import { SELECT_ALL } from '../../../resources/strings'
 import { useColumnCreatedByCurrentUser } from '../../../hooks/use-column-created-by-current-user'
 import { TagToken } from '../../common/TagToken'
 import { useDispatch } from 'react-redux'
-import { ProgressBar } from '../../common/ProgressBar'
 import { Text } from '../../common/Text'
+import { useTheme } from '../../context/ThemeContext'
 // We shoud a search bar if there are more than 9 subtypes to be selected.
 const MAX_ITEM_WITHOUT_FILTER = 9
 
@@ -50,7 +51,7 @@ export const NewsSubtypesWithFilter = React.memo(
       selectors.idToSourceOrSubSourceMapSelector,
     )
     const sourceState = idToSourceOrSubSourceMap[source.sourceId].state
-
+    const theme = useTheme()
     // A string filter that will be changed by text input.
     const [filter, setFilter] = useState('')
     const dispatch = useDispatch()
@@ -89,7 +90,7 @@ export const NewsSubtypesWithFilter = React.memo(
               style={[
                 {
                   fontSize: smallTextSize,
-                  color: '#ff0000',
+                  color: theme.red,
                   marginLeft: contentPadding,
                 },
               ]}
@@ -117,7 +118,12 @@ export const NewsSubtypesWithFilter = React.memo(
         autoCorrect: false,
         autoFocus: false,
         blurOnSubmit: false,
-        placeholder: 'Filter or Add by name...',
+        placeholder: isSourceOpenToAddSubsource(
+          source.sourceId,
+          idToSourceOrSubSourceMap,
+        )
+          ? 'Filter or Add by name...'
+          : 'Filter by name...',
       }
 
       return (
@@ -320,7 +326,9 @@ function isSourceOpenToAddSubsource(
   sourceId: string,
   idToSourceOrSubSourceMap: Record<string, SourceOrSubSource>,
 ) {
-  return mapSourceIdToName(sourceId, idToSourceOrSubSourceMap) == '微博'
+  return constants.SOURCE_NAMES_ENABLE_ADD_SUBSOURCE.includes(
+    mapSourceIdToName(sourceId, idToSourceOrSubSourceMap),
+  )
 }
 
 NewsSubtypesWithFilter.displayName = 'NewsSubtypesWithFilter'
