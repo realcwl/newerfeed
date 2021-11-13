@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
 
 export const BaseCard = React.memo((props: BaseCardProps) => {
   const { type, nodeIdOrId, columnId, isRetweeted, shareMode = false } = props
-
+  console.log('render: ' + nodeIdOrId)
   const dispatch = useDispatch()
   const item = useItem(nodeIdOrId)
   if (!item) return null
@@ -701,14 +701,28 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       </View>
       {!isRetweeted &&
         showDuplication &&
-        duplicateIds?.map((id) => (
-          <BaseCard
+        duplicateIds?.map((id, idx) => (
+          <View
             key={`duplication-card-${nodeIdOrId}-${id}`}
-            columnId={columnId}
-            nodeIdOrId={id}
-            isRetweeted={true}
-            type="COLUMN_TYPE_NEWS_FEED"
-          />
+            style={
+              idx === 0
+                ? {
+                    shadowRadius: 10,
+                    shadowColor: theme.foregroundColorMuted40,
+                  }
+                : {
+                    borderTopColor: theme.backgroundColorTransparent05,
+                    borderTopWidth: 1 * scaleFactor,
+                  }
+            }
+          >
+            <BaseCard
+              columnId={columnId}
+              nodeIdOrId={id}
+              isRetweeted={true}
+              type="COLUMN_TYPE_NEWS_FEED"
+            />
+          </View>
         ))}
     </>
   )
