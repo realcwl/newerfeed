@@ -224,7 +224,6 @@ const styles = StyleSheet.create({
 
 export const BaseCard = React.memo((props: BaseCardProps) => {
   const { type, nodeIdOrId, columnId, isRetweeted, shareMode = false } = props
-  console.log('render: ' + nodeIdOrId)
   const dispatch = useDispatch()
   const item = useItem(nodeIdOrId)
   if (!item) return null
