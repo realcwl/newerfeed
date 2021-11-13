@@ -14,6 +14,11 @@ import {
   setColumnSavedFilter,
   updateColumnId,
   updateSeedState,
+  fetchPost,
+  fetchPostFailure,
+  fetchPostSuccess,
+  markItemAsRead,
+  markItemAsSaved,
 } from '../../actions'
 import { columnsReducer, State } from '../columns'
 
@@ -58,10 +63,29 @@ describe('columnsReducer', () => {
       } as Column),
   )
 
+  const invalidItemNodeId = 'invalidItemNodeId'
+  const newsFeedDataArray = [0, 1, 2, 3, 4, 5].map((n) => ({
+    id: `NewsFeedDataId_${n}`,
+    cursor: n,
+    isSaved: n % 2 === 0,
+    isRead: n % 2 === 0,
+  }))
   const defaultState = {
-    allIds: [],
-    byId: {},
-    sharedIds: [],
+    allColumnIds: [],
+    columnById: {},
+    sharedColumnIds: [],
+    allDataIds: newsFeedDataArray
+      .filter((data) => data.cursor < 4)
+      .map((data) => data.id),
+    dataById: {
+      [newsFeedDataArray[0].id]: newsFeedDataArray[0],
+      [newsFeedDataArray[1].id]: newsFeedDataArray[1],
+      [newsFeedDataArray[2].id]: newsFeedDataArray[2],
+      [newsFeedDataArray[3].id]: newsFeedDataArray[3],
+    },
+    savedDataIds: [],
+    loadingDataId: '',
+    dataUpdatedAt: undefined,
   } as State
 
   const getState = (items: number[]): State => {
@@ -70,8 +94,8 @@ describe('columnsReducer', () => {
         if (newsFeedColumns.length > n && n > -1) {
           const newsFeedColumn = newsFeedColumns[n]
           const id = newsFeedColumn.id
-          draft.allIds.push(id)
-          draft.byId[id] = newsFeedColumn
+          draft.allColumnIds.push(id)
+          draft.columnById[id] = newsFeedColumn
         } else {
           throw new Error('item index is out of newsFeedColumns range')
         }
@@ -103,7 +127,7 @@ describe('columnsReducer', () => {
     })
     const addColumnAction = addColumn(updatedNewsFeed)
     const updatedState = immer(getState([0]), (draft) => {
-      draft.byId[updatedNewsFeed.id].title = newTitle
+      draft.columnById[updatedNewsFeed.id].title = newTitle
     })
     expect(columnsReducer(getState([0]), addColumnAction)).toEqual(updatedState)
   })
@@ -221,14 +245,14 @@ describe('columnsReducer', () => {
 
     // newsFeedColumns[1] and [2] will be deleted, [0] is updated to new feed
     const newState = immer(getState([newsFeedColumnIndexToUpdate]), (draft) => {
-      draft.byId[newsFeedColumns[newsFeedColumnIndexToUpdate].id].title =
+      draft.columnById[newsFeedColumns[newsFeedColumnIndexToUpdate].id].title =
         seedState.feedSeedState[0].name
-      draft.byId[newsFeedColumns[newsFeedColumnIndexToAdd].id] =
+      draft.columnById[newsFeedColumns[newsFeedColumnIndexToAdd].id] =
         getAddFeedColumn(
           seedState.feedSeedState[1].id,
           seedState.feedSeedState[1].name,
         )
-      draft.allIds.push(newsFeedColumns[newsFeedColumnIndexToAdd].id)
+      draft.allColumnIds.push(newsFeedColumns[newsFeedColumnIndexToAdd].id)
     })
 
     expect(columnsReducer(getState([0, 1, 2]), updateSeedStateAction)).toEqual(
@@ -248,7 +272,7 @@ describe('columnsReducer', () => {
       filter: newFilter,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      draft.byId[newsFeedColumns[0].id].filters = newFilter
+      draft.columnById[newsFeedColumns[0].id].filters = newFilter
     })
     expect(
       columnsReducer(getState([0, 1, 2]), replaceColumnFiltersAction),
@@ -277,9 +301,9 @@ describe('columnsReducer', () => {
       saved: !newsFeedColumns[0].filters?.saved,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      const filters = draft.byId[newsFeedColumns[0]?.id]?.filters
+      const filters = draft.columnById[newsFeedColumns[0]?.id]?.filters
       if (filters) {
-        draft.byId[newsFeedColumns[0].id].filters = {
+        draft.columnById[newsFeedColumns[0].id].filters = {
           ...filters,
           saved: !newsFeedColumns[0].filters?.saved,
         }
@@ -310,8 +334,9 @@ describe('columnsReducer', () => {
       value: newOptionValue,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      draft.byId[newsFeedColumns[0].id].options.enableAppIconUnreadIndicator =
-        newOptionValue
+      draft.columnById[
+        newsFeedColumns[0].id
+      ].options.enableAppIconUnreadIndicator = newOptionValue
     })
     expect(columnsReducer(getState([0, 1, 2]), setColumnOptionAction)).toEqual(
       newState,
@@ -337,7 +362,7 @@ describe('columnsReducer', () => {
       notifyOnNewPosts: false,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      draft.byId[newsFeedColumns[0].id].state = 'loading'
+      draft.columnById[newsFeedColumns[0].id].state = 'loading'
     })
     expect(
       columnsReducer(getState([0, 1, 2]), fetchColumnDataRequestAction),
@@ -361,7 +386,7 @@ describe('columnsReducer', () => {
       columnId: newsFeedColumns[0].id,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      draft.byId[newsFeedColumns[0].id].state = 'loading'
+      draft.columnById[newsFeedColumns[0].id].state = 'loading'
     })
     expect(columnsReducer(getState([0, 1, 2]), setColumnLoadingAction)).toEqual(
       newState,
@@ -385,13 +410,13 @@ describe('columnsReducer', () => {
       updatedId: newColumnId,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      const index = draft.allIds.findIndex((id) => id === previousId)
+      const index = draft.allColumnIds.findIndex((id) => id === previousId)
       if (index > -1) {
-        draft.allIds[index] = newColumnId
+        draft.allColumnIds[index] = newColumnId
       }
-      draft.byId[newColumnId] = draft.byId[previousId]
-      draft.byId[newColumnId].id = newColumnId
-      delete draft.byId[newsFeedColumns[0].id]
+      draft.columnById[newColumnId] = draft.columnById[previousId]
+      draft.columnById[newColumnId].id = newColumnId
+      delete draft.columnById[newsFeedColumns[0].id]
     })
     expect(columnsReducer(getState([0, 1, 2]), updateColumnIdAction)).toEqual(
       newState,
@@ -433,13 +458,13 @@ describe('columnsReducer', () => {
       sources: columnFetched.sources,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      draft.byId[columnFetched.id].itemListIds = [
+      draft.columnById[columnFetched.id].itemListIds = [
         newsFeedColumns[0].itemListIds[0],
         newsFeedColumns[4].itemListIds[0],
       ]
-      draft.byId[columnFetched.id].newestItemId =
+      draft.columnById[columnFetched.id].newestItemId =
         newsFeedColumns[4].itemListIds[0]
-      draft.byId[columnFetched.id].refreshedAt = new Date(
+      draft.columnById[columnFetched.id].refreshedAt = new Date(
         fakeTime,
       ).toISOString()
     })
@@ -471,14 +496,14 @@ describe('columnsReducer', () => {
       sources: columnFetched.sources,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      draft.byId[columnFetched.id].itemListIds = [
+      draft.columnById[columnFetched.id].itemListIds = [
         newsFeedColumns[4].itemListIds[0], // new
         newsFeedColumns[0].itemListIds[0], // existing
         newsFeedColumns[0].itemListIds[1],
       ]
-      draft.byId[columnFetched.id].newestItemId =
+      draft.columnById[columnFetched.id].newestItemId =
         newsFeedColumns[0].itemListIds[1]
-      draft.byId[columnFetched.id].refreshedAt = new Date(
+      draft.columnById[columnFetched.id].refreshedAt = new Date(
         fakeTime,
       ).toISOString()
     })
@@ -512,13 +537,13 @@ describe('columnsReducer', () => {
 
     // direction doesn't matter if dropExistingData is truue
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      draft.byId[columnFetched.id].itemListIds = [
+      draft.columnById[columnFetched.id].itemListIds = [
         newsFeedColumns[0].itemListIds[0],
         newsFeedColumns[4].itemListIds[0],
       ]
-      draft.byId[columnFetched.id].newestItemId =
+      draft.columnById[columnFetched.id].newestItemId =
         newsFeedColumns[4].itemListIds[0]
-      draft.byId[columnFetched.id].refreshedAt = new Date(
+      draft.columnById[columnFetched.id].refreshedAt = new Date(
         fakeTime,
       ).toISOString()
     })
@@ -550,14 +575,14 @@ describe('columnsReducer', () => {
       sources: columnFetched.sources,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      draft.byId[columnFetched.id].itemListIds = [
+      draft.columnById[columnFetched.id].itemListIds = [
         newsFeedColumns[0].itemListIds[0], // existing
         newsFeedColumns[0].itemListIds[1],
         newsFeedColumns[4].itemListIds[0], // new
       ]
-      draft.byId[columnFetched.id].newestItemId =
+      draft.columnById[columnFetched.id].newestItemId =
         newsFeedColumns[0].itemListIds[1]
-      draft.byId[columnFetched.id].refreshedAt = new Date(
+      draft.columnById[columnFetched.id].refreshedAt = new Date(
         fakeTime,
       ).toISOString()
     })
@@ -588,10 +613,10 @@ describe('columnsReducer', () => {
       columnId: newsFeedColumns[0].id,
     })
     const newState = immer(getState([0, 1, 2]), (draft) => {
-      draft.byId[newsFeedColumns[0].id].refreshedAt = new Date(
+      draft.columnById[newsFeedColumns[0].id].refreshedAt = new Date(
         fakeTime,
       ).toISOString()
-      draft.byId[newsFeedColumns[0].id].state = 'not_loaded'
+      draft.columnById[newsFeedColumns[0].id].state = 'not_loaded'
     })
     expect(
       columnsReducer(getState([0, 1, 2]), fetchColumnDataFailureAction),
@@ -605,5 +630,144 @@ describe('columnsReducer', () => {
     expect(
       columnsReducer(getState([0, 1, 2]), fetchColumnDataFailureAction),
     ).toEqual(getState([0, 1, 2]))
+  })
+  // MARK_ITEM_AS_SAVED
+  test('should mark item as saved/unsaved', () => {
+    const itemNodeId = newsFeedDataArray[0].id
+    expect(defaultState.savedDataIds.includes(itemNodeId)).toBe(false)
+    const saveAction = markItemAsSaved({
+      itemNodeId,
+      save: true,
+    })
+    const itemSavedState = columnsReducer(defaultState, saveAction)
+    expect(itemSavedState.savedDataIds.includes(itemNodeId)).toBe(true)
+    expect(itemSavedState.dataById[itemNodeId].isSaved).toBe(true)
+
+    const unsaveAction = markItemAsSaved({
+      itemNodeId,
+      save: false,
+    })
+    const itemUnsavedState = columnsReducer(itemSavedState, unsaveAction)
+    expect(itemUnsavedState.savedDataIds.includes(itemNodeId)).toBe(false)
+    expect(itemUnsavedState.dataById[itemNodeId].isSaved).toBe(false)
+  })
+
+  test('should not change state if id is not in data', () => {
+    const saveAction = markItemAsSaved({
+      itemNodeId: invalidItemNodeId,
+      save: true,
+    })
+    expect(columnsReducer(defaultState, saveAction)).toEqual(defaultState)
+
+    const unsaveAction = markItemAsSaved({
+      itemNodeId: invalidItemNodeId,
+      save: false,
+    })
+    expect(columnsReducer(defaultState, unsaveAction)).toEqual(defaultState)
+  })
+
+  // MARK_ITEM_AS_READ
+  test('should mark item as read/unread', () => {
+    const readIds = [newsFeedDataArray[1].id, newsFeedDataArray[3].id]
+    const unchangedIds = [newsFeedDataArray[0].id, newsFeedDataArray[2].id]
+
+    readIds.map((readId) => {
+      expect(defaultState.dataById[readId].isRead).toBe(false)
+    })
+    unchangedIds.map((unchangedId) => {
+      expect(defaultState.dataById[unchangedId].isRead).toBe(true)
+    })
+
+    const readAction = markItemAsRead({
+      itemNodeIds: readIds,
+      read: true,
+    })
+    const readState = columnsReducer(defaultState, readAction)
+    readIds.map((readId) => {
+      expect(readState.dataById[readId].isRead).toBe(true)
+    })
+    unchangedIds.map((unchangedId) => {
+      expect(defaultState.dataById[unchangedId].isRead).toBe(true)
+    })
+
+    const unreadAction = markItemAsRead({
+      itemNodeIds: readIds,
+      read: false,
+    })
+    const unreadState = columnsReducer(readState, unreadAction)
+    readIds.map((readId) => {
+      expect(unreadState.dataById[readId].isRead).toBe(false)
+    })
+    unchangedIds.map((unchangedId) => {
+      expect(defaultState.dataById[unchangedId].isRead).toBe(true)
+    })
+  })
+
+  // FETCH_COLUMN_DATA_SUCCESS
+  test('should update data when column data is fetched', () => {
+    const action = fetchColumnDataSuccess({
+      columnId: 'id',
+      direction: 'NEW',
+      data: newsFeedDataArray,
+      updatedAt: 'updatedAt',
+      dropExistingData: true,
+      dataByNodeId: {},
+      sources: [],
+    })
+
+    expect(defaultState.dataById[newsFeedDataArray[4].id]).toBe(undefined)
+    expect(defaultState.allDataIds.includes(newsFeedDataArray[4].id)).toBe(
+      false,
+    )
+    expect(defaultState.dataById[newsFeedDataArray[0].id]).toEqual(
+      newsFeedDataArray[0],
+    )
+    expect(defaultState.allDataIds.includes(newsFeedDataArray[0].id)).toBe(true)
+
+    // newsFeedDataArray[4] is new
+    const updatedState = columnsReducer(defaultState, action)
+    expect(updatedState.dataById[newsFeedDataArray[4].id]).toBe(
+      newsFeedDataArray[4],
+    )
+    expect(updatedState.allDataIds.includes(newsFeedDataArray[4].id)).toBe(true)
+    expect(updatedState.dataById[newsFeedDataArray[0].id]).toEqual(
+      newsFeedDataArray[0],
+    )
+    expect(updatedState.allDataIds.includes(newsFeedDataArray[0].id)).toBe(true)
+  })
+
+  // FETCH_POST, FETCH_POST_SUCCESS, FETCH_POST_FAILURE
+  test('should update state for fetching post either success or failure', () => {
+    // fetch post for newsFeedDataArray[4]
+    let id = newsFeedDataArray[4].id
+    let data = newsFeedDataArray[4]
+    let fetchPostAction = fetchPost({ id })
+    expect(defaultState.loadingDataId).toBe('')
+    let updatedState = columnsReducer(defaultState, fetchPostAction)
+    expect(updatedState.loadingDataId).toBe(id)
+
+    // fetch success for newsFeedDataArray[4]
+    expect(updatedState.dataById[id]).toBe(undefined)
+    expect(updatedState.allDataIds.includes(id)).toBe(false)
+    const fetchPostSuccessAction = fetchPostSuccess({ id, data })
+    updatedState = columnsReducer(updatedState, fetchPostSuccessAction)
+    expect(updatedState.loadingDataId).toBe('')
+    expect(updatedState.allDataIds.includes(id)).toBe(true)
+    expect(updatedState.dataById[id]).toBe(data)
+
+    // fetch post for newsFeedDataArray[5]
+    id = newsFeedDataArray[5].id
+    data = newsFeedDataArray[5]
+    fetchPostAction = fetchPost({ id })
+    expect(defaultState.loadingDataId).toBe('')
+    updatedState = columnsReducer(defaultState, fetchPostAction)
+    expect(updatedState.loadingDataId).toBe(id)
+
+    // fetch failure for newsFeedDataArray[5]
+    expect(updatedState.dataById[id]).toBe(undefined)
+    const fetchPostFailureAction = fetchPostFailure({ id })
+    updatedState = columnsReducer(updatedState, fetchPostFailureAction)
+    expect(updatedState.loadingDataId).toBe('')
+    expect(updatedState.allDataIds.includes(id)).toBe(false)
   })
 })

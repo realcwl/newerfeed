@@ -50,9 +50,23 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
     case 'SET_SOURCES_AND_ID_MAP': {
       return immer(state, (draft) => {
         draft.availableNewsFeedSources = action.payload.sources
-        draft.idToSourceOrSubSourceMap = {
-          ...draft.idToSourceOrSubSourceMap, // map size keeps increasing
-          ...action.payload.idToSourceOrSubSourceMap,
+
+        // We need to do a json merge here instead of using typescript syntax sugar:
+        //
+        // draft.idToSourceOrSubSourceMap = {
+        //   ...draft.idToSourceOrSubSourceMap, // map size keeps increasing
+        //   ...action.payload.idToSourceOrSubSourceMap,
+        // }
+        //
+        // This is because the later will change the address of the subsource
+        // object and triggers a massive reload for components that are hooked
+        // on subsource value.
+        for (const id in action.payload.idToSourceOrSubSourceMap) {
+          if (id in draft.idToSourceOrSubSourceMap) {
+            continue
+          }
+          draft.idToSourceOrSubSourceMap[id] =
+            action.payload.idToSourceOrSubSourceMap[id]
         }
       })
     }

@@ -2,6 +2,11 @@ import _ from 'lodash'
 import moment, { MomentInput } from 'moment'
 import { Column, ColumnOptions } from '..'
 import { SourceOrSubSource } from '..'
+import { NewsFeedData } from '../types'
+import {
+  SIMILARITY_THRESHOLD,
+  SIMILARITY_WINDOW_MILLISECOND,
+} from '../utils/constants'
 
 export function capitalize(str: string) {
   return str.toLowerCase().replace(/^.| ./g, _.toUpper)
@@ -455,4 +460,49 @@ export function mapSourceIdToName(
   idToSubSourceMap: Record<string, SourceOrSubSource>,
 ): string {
   return idToSubSourceMap[id].name || id
+}
+
+// Return true if 2 hash string are semantically identical.
+export function isHashingSemanticallyIdentical(
+  h1: string,
+  h2: string,
+): boolean {
+  // If the hashing is invalid, or not of same length, they cannot be considered
+  // as the semantically identical.
+  if (!h1 || !h2 || h1.length != h2.length) {
+    return false
+  }
+
+  // Calculate hamming distance by counting how many different bits in total.
+  let count = 0
+  for (let idx = 0; idx < h1.length; idx++) {
+    if (h1[idx] != h2[idx]) count++
+  }
+
+  return count <= SIMILARITY_THRESHOLD
+}
+
+// 2 data are considered as duplicate if they are roughly posted at the same
+// time and have semantically identical hashing.
+export function isNewsFeedDataSemanticallyIdentical(
+  lhs: NewsFeedData,
+  rhs: NewsFeedData,
+): boolean {
+  if (
+    !lhs.postTime ||
+    !rhs.postTime ||
+    !lhs.semanticHashing ||
+    !rhs.semanticHashing
+  ) {
+    return false
+  }
+  const lhsTs = Date.parse(lhs.postTime)
+  const rhsTs = Date.parse(rhs.postTime)
+  if (Math.abs(lhsTs - rhsTs) > SIMILARITY_WINDOW_MILLISECOND) {
+    return false
+  }
+  return isHashingSemanticallyIdentical(
+    lhs.semanticHashing,
+    rhs.semanticHashing,
+  )
 }

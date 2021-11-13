@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, ScrollView } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { ActivityIndicator } from 'react-native-web'
 
@@ -108,13 +108,13 @@ export const SharedPostScreen = () => {
 
   return (
     <Screen statusBarBackgroundThemeColor="transparent" enableSafeArea={true}>
-      <View style={[styles.container, sharedStyles.overflowScroll]}>
+      <View style={[styles.container]}>
         <PageHeader title="Shared Post" icon={headerIcon} />
-        <View style={[styles.container]}>
+        <ScrollView style={[styles.container]}>
           <Container>
             <View style={[sharedStyles.fullWidth]}>{content}</View>
           </Container>
-        </View>
+        </ScrollView>
       </View>
     </Screen>
   )

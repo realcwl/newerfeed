@@ -201,14 +201,16 @@ export interface NewsFeedData {
   // When this field is a string,
   // which is the parent data ID, don't render it
   parentId?: string
-  // Put all deplicate children messages.
-  duplicateIds?: string[]
   // cursor associated with this feed that backend uses.
   cursor: number
   // Indicate that whether this item is already saved by user.
   isSaved?: boolean
   // Indicate whether this card has been read by the user.
   isRead?: boolean
+  // Semantic Hashing for this single data.
+  semanticHashing?: string
+  // All data that are semantically duplicated with this data, stored by id.
+  duplicateIds?: string[]
 }
 
 export interface Attachment {

@@ -32,4 +32,9 @@ export default {
       config: state.config,
     }
   },
+  2: (state: RootState) => {
+    return {
+      config: state.config,
+    }
+  },
 }

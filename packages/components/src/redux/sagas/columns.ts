@@ -34,6 +34,9 @@ import {
 import { notify } from '../../utils/notify'
 import { setSharedColumns } from '../actions'
 
+import { saveViewToClipboard } from '../../libs/html-to-image'
+import { capatureView, setBannerMessage } from '../actions'
+
 export interface Post {
   id: string
   title: string
@@ -50,6 +53,7 @@ export interface Post {
   contentGeneratedAt: string
   crawledAt: string
   originUrl: string
+  semanticHashing: string
 }
 
 interface FeedResponse {
@@ -169,6 +173,7 @@ export const postToNewsFeedData = (post: Post): NewsFeedData => {
     isRead: false,
     isSaved: false,
     attachments: attachments,
+    semanticHashing: post.semanticHashing,
   }
 }
 
@@ -325,6 +330,7 @@ function constructFeedRequest(
             contentGeneratedAt: true,
             originUrl: true,
           },
+          semanticHashing: true,
         },
         subSources: {
           id: true,
@@ -645,7 +651,7 @@ function* onFetchColumnDataRequest(
     yield put(
       actions.fetchColumnDataSuccess({
         columnId: column.id,
-        data: convertFeedsResponseToPosts(fetchDataResponse.data),
+        data: posts,
         updatedAt: fetchDataResponse.data.data.feeds[0].updatedAt,
         direction: action.payload.direction,
         dropExistingData: shouldDropExistingData(
@@ -732,6 +738,116 @@ function* fetchSharedFeeds() {
   }
 }
 
+const DEFAULT_ERROR_MESSAGE = 'Failed to save to clipboard'
+const DEFAULT_SUCCESS_MESSAGE = 'Copied to clipboard'
+
+function* onCaptureItemView(
+  action: ExtractActionFromActionCreator<typeof capatureView>,
+) {
+  try {
+    yield delay(50) // wait for potential show more rerender
+    yield saveViewToClipboard(
+      action.payload.viewRef,
+      action.payload.backgroundColor,
+    )
+    yield put(
+      setBannerMessage({
+        id: 'clipboard',
+        type: 'BANNER_TYPE_SUCCESS',
+        message: DEFAULT_SUCCESS_MESSAGE,
+        autoClose: true,
+      }),
+    )
+  } catch (e) {
+    let message = DEFAULT_ERROR_MESSAGE
+    if (e instanceof Error) {
+      message = e.message
+    }
+    yield put(
+      setBannerMessage({
+        id: 'clipboard',
+        type: 'BANNER_TYPE_ERROR',
+        message: message,
+        autoClose: true,
+      }),
+    )
+  }
+}
+
+function constructFetchPostByIdRequest(id: string): string {
+  return jsonToGraphQLQuery({
+    query: {
+      post: {
+        __args: {
+          input: {
+            id,
+          },
+        },
+
+        id: true,
+        title: true,
+        content: true,
+        cursor: true,
+        subSource: {
+          id: true,
+          name: true,
+          avatarUrl: true,
+        },
+        sharedFromPost: {
+          id: true,
+          title: true,
+          content: true,
+          cursor: true,
+          subSource: {
+            id: true,
+            name: true,
+            avatarUrl: true,
+          },
+          imageUrls: true,
+          fileUrls: true,
+          contentGeneratedAt: true,
+          crawledAt: true,
+          originUrl: true,
+        },
+        imageUrls: true,
+        fileUrls: true,
+        contentGeneratedAt: true,
+        crawledAt: true,
+        originUrl: true,
+      },
+    },
+  })
+}
+
+function* onFetchPostById(
+  action: ExtractActionFromActionCreator<typeof actions.fetchPost>,
+) {
+  const id = action.payload.id
+  const appToken = yield* select(selectors.appTokenSelector)
+
+  try {
+    const response: AxiosResponse = yield axios.post(
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken || ''),
+      { query: constructFetchPostByIdRequest(id) },
+    )
+    const post: Post = response.data.data.post
+    const data = postToNewsFeedData(post)
+    yield put(
+      actions.fetchPostSuccess({
+        id,
+        data,
+      }),
+    )
+  } catch (e) {
+    yield put(
+      actions.fetchPostFailure({
+        id,
+      }),
+    )
+    console.error(e)
+  }
+}
+
 export function* columnsSagas() {
   yield* all([
     yield* fork(columnRefresher),
@@ -744,5 +860,7 @@ export function* columnsSagas() {
       ['SET_COLUMN_CLEARED_AT_FILTER', 'CLEAR_ALL_COLUMNS'],
       onClearColumnOrColumns,
     ),
+    yield* takeLatest('CAPTURE_VIEW', onCaptureItemView),
+    yield* takeEvery('FETCH_POST', onFetchPostById),
   ])
 }
