@@ -702,6 +702,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
         showDuplication &&
         duplicateIds?.map((id) => (
           <BaseCard
+            key={`duplication-card-${nodeIdOrId}-${id}`}
             columnId={columnId}
             nodeIdOrId={id}
             isRetweeted={true}
