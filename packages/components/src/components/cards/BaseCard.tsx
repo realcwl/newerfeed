@@ -22,6 +22,7 @@ import {
   smallTextSize,
 } from '../../styles/variables'
 import { Avatar } from '../common/Avatar'
+import { useSubSource } from '../../hooks/use-sub-source'
 import { IntervalRefresh } from '../common/IntervalRefresh'
 import { smallLabelHeight } from '../common/Label'
 import { Spacer } from '../common/Spacer'
@@ -31,8 +32,6 @@ import { BaseCardProps, sizes } from './BaseCard.shared'
 import { REGEX_IS_URL } from '@devhub/core/src/utils/constants'
 import { TouchableHighlight } from '../common/TouchableHighlight'
 import { useTheme } from '../context/ThemeContext'
-import { useReduxState } from '../../hooks/use-redux-state'
-import { idToSourceOrSubSourceMapSelector } from '../../redux/selectors'
 import ImageViewer from '../../libs/image-viewer'
 import FileDownloader from '../../libs/file-downloader'
 import { useHistory } from '../../libs/react-router'
@@ -224,6 +223,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     shareMode = false,
   } = props
 
+  const dispatch = useDispatch()
+
   const timestamp = Date.parse(time)
   const parentShowMoreSignal = props.showMoreSignal
 
@@ -239,12 +240,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     setTextShown(!textShown)
   }
 
-  const dispatch = useDispatch()
-
-  const idToSourceOrSubSourceMap = useReduxState(
-    idToSourceOrSubSourceMapSelector,
-  )
-  const subSource = idToSourceOrSubSourceMap[subSourceId]
+  const subSource = useSubSource(subSourceId)
 
   // Whether we should show "show more" button for the text. We calculate this
   // flag before rendering so that we don't need to render twice. This would
