@@ -365,11 +365,19 @@ export const columnsReducer: Reducer<State> = (
           dataByNodeId,
         } = action.payload
 
-        // insert into data reducer if not already exist.
+        // insert into data reducer if not already exist. This will also apply
+        // to reposted data (e.g. Tweeter, Weibo).
         for (const singleData of data) {
           if (singleData.id in draft.dataById) continue
           draft.dataById[singleData.id] = singleData
           draft.allDataIds.push(singleData.id)
+          if (
+            !!singleData.repostedFrom &&
+            !(singleData.repostedFrom.id in draft.dataById)
+          ) {
+            draft.dataById[singleData.repostedFrom.id] = singleData.repostedFrom
+            draft.allDataIds.push(singleData.repostedFrom.id)
+          }
         }
 
         const column = draft.columnById[columnId]

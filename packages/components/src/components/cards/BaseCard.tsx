@@ -228,6 +228,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const dispatch = useDispatch()
   const item = useItem(nodeIdOrId)
   if (!item) return null
+
   const {
     attachments,
     subSourceId,
@@ -240,8 +241,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     repostedFrom,
     duplicateIds,
   } = getCardPropsForItem(type, columnId, item)
-  if (!subSourceId) return null
 
+  if (!subSourceId) return null
   const timestamp = time ? Date.parse(time) : new Date().toISOString()
   const parentShowMoreSignal = props.showMoreSignal
 
@@ -658,7 +659,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             })}
           </View>
 
-          {repostedFrom && (
+          {!!repostedFrom && (
             <View>
               <Spacer height={sizes.verticalSpaceSize} />
               <BaseCard
