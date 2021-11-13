@@ -479,7 +479,7 @@ export function isHashingSemanticallyIdentical(
     if (h1[idx] != h2[idx]) count++
   }
 
-  return count <= SIMILARITY_THRESHOLD * h1.length
+  return count <= SIMILARITY_THRESHOLD
 }
 
 // 2 data are considered as duplicate if they are roughly posted at the same

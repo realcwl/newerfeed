@@ -53,6 +53,7 @@ export interface Post {
   contentGeneratedAt: string
   crawledAt: string
   originUrl: string
+  semanticHashing: string
 }
 
 interface FeedResponse {
@@ -172,6 +173,7 @@ export const postToNewsFeedData = (post: Post): NewsFeedData => {
     isRead: false,
     isSaved: false,
     attachments: attachments,
+    semanticHashing: post.semanticHashing,
   }
 }
 
@@ -328,6 +330,7 @@ function constructFeedRequest(
             contentGeneratedAt: true,
             originUrl: true,
           },
+          semanticHashing: true,
         },
         subSources: {
           id: true,
@@ -648,7 +651,7 @@ function* onFetchColumnDataRequest(
     yield put(
       actions.fetchColumnDataSuccess({
         columnId: column.id,
-        data: convertFeedsResponseToPosts(fetchDataResponse.data),
+        data: posts,
         updatedAt: fetchDataResponse.data.data.feeds[0].updatedAt,
         direction: action.payload.direction,
         dropExistingData: shouldDropExistingData(

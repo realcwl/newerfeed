@@ -3,6 +3,7 @@ import _ from 'lodash'
 import {
   Column,
   ColumnCreation,
+  isNewsFeedDataSemanticallyIdentical,
   NewsFeedColumn,
   NewsFeedData,
   normalizeColumns,
@@ -95,6 +96,53 @@ function updateColumnCursor(
       dataByNodeId[column.oldestItemId].cursor > minCursor)
   ) {
     column.oldestItemId = data[minIdx].id
+  }
+}
+
+// Insert data into column if:
+// 1. it isn't already existed in column
+// 2. it isn't semantically identical to any data in the column.
+//    - in this case, add the data as children to the existing data.
+function insertDataIntoColumn(
+  column: NewsFeedColumn,
+  data: NewsFeedData[],
+  direction: string,
+  draft: State,
+): void {
+  for (let i = 0; i < data.length; i++) {
+    const newData = data[i]
+    let shouldPushIntoColumn = true
+    for (const existingDataId of column.itemListIds) {
+      // append of insert front based on the direction. Assuming there's no
+      // overlap between returned data and original data. We don't insert the
+      // same data into column item list to keep this reducer idempotent.
+      if (existingDataId === newData.id) {
+        shouldPushIntoColumn = false
+        break
+      }
+
+      // If the newly fetched data is semantically identical to some
+      // existing data in the column, using the existing data as the root
+      // and append the new data as deduplication for the existing data.
+      const existingData: NewsFeedData = draft.dataById[existingDataId]
+      if (isNewsFeedDataSemanticallyIdentical(existingData, newData)) {
+        if (!existingData.duplicateIds) existingData.duplicateIds = []
+        if (!existingData.duplicateIds.includes(newData.id))
+          existingData.duplicateIds?.push(newData.id)
+        shouldPushIntoColumn = false
+        break
+      }
+    }
+
+    // Finally, this is a new data and should be inserted into the frond/end of
+    // column, based on direction.
+    if (shouldPushIntoColumn) {
+      if (direction == 'NEW') {
+        column.itemListIds.unshift(newData.id)
+      } else {
+        column.itemListIds.push(newData.id)
+      }
+    }
   }
 }
 
@@ -334,26 +382,9 @@ export const columnsReducer: Reducer<State> = (
           column.oldestItemId = ''
         }
 
-        // update cursor
+        // update cursor to track the latest (oldest, newest) data within column.
         updateColumnCursor(column, data, dataByNodeId)
-
-        // append of insert front based on the direction. Assuming there's no
-        // overlap between returned data and original data. We don't insert the
-        // same data into column item list to keep this reducer idempotent.
-        const filteredData = data.filter(
-          (d) => !column.itemListIds.includes(d.id),
-        )
-        // Append only if un duplicated
-
-        if (direction == 'NEW') {
-          column.itemListIds = filteredData
-            .map((d) => d.id)
-            .concat(column.itemListIds)
-        } else {
-          column.itemListIds = column.itemListIds.concat(
-            filteredData.map((d) => d.id),
-          )
-        }
+        insertDataIntoColumn(column, data, direction, draft)
 
         // if data expression or sources is returned, update them.
         column.dataExpression = dataExpression
@@ -375,7 +406,6 @@ export const columnsReducer: Reducer<State> = (
         column.refreshedAt = new Date().toISOString()
         column.state = 'not_loaded'
       })
-
     case 'MARK_ITEM_AS_SAVED':
       return immer(state, (draft) => {
         const { itemNodeId, save } = action.payload

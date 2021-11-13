@@ -70,21 +70,23 @@ export interface AdditionalCardProps {
   columnId: string
 }
 
+// TODO(chenweilunster): Clean up this data structure
 export interface BaseCardProps extends AdditionalCardProps {
-  subSourceId: string
+  subSourceId?: string
   attachments?: Attachment[]
   link?: string
   nodeIdOrId: string
   text?: string
   title?: string
   type: Column['type']
-  time: string
+  time?: string
   isRead?: boolean
   isSaved?: boolean
   repostedFrom?: Omit<BaseCardProps, keyof AdditionalCardProps>
   isRetweeted?: boolean
   showMoreSignal?: number
   shareMode?: boolean
+  duplicateIds?: string[]
 }
 
 function _getCardPropsForItem(
@@ -105,6 +107,7 @@ function _getCardPropsForItem(
     repostedFrom: item.repostedFrom
       ? _getCardPropsForItem(type, item.repostedFrom)
       : undefined,
+    duplicateIds: item.duplicateIds,
   }
 }
 
