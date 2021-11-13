@@ -55,11 +55,11 @@ export const API_BASE_URL = 'rnr.capital'
 export const GRAPHQL_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `https://${APP_BASE_URL}/api/graphql`
-    : 'http://localhost:8080/api/graphql'
+    : 'https://rnr.capital/api/graphql'
 export const GRAPHQL_SUBSCRIPTION_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `wss://${APP_BASE_URL}/api/subscription`
-    : 'ws://localhost:8080/api/subscription'
+    : 'wss://rnr.capital/api/subscription'
 
 const LANDING_BASE_URL = 'https://devhubapp.com'
 export const DEVHUB_LINKS = {
@@ -100,3 +100,12 @@ export const COLUMN_OUT_OF_SYNC_TIME_IN_MILLI_SECOND = 1000 * 60 * 1 // 1 minute
 
 // Error code when cognito fail due to lost connection.
 export const COGNITO_NETWORK_ERROR_CODE = 'NetworkError'
+
+// Hamming distance for 2 posts to be considered as semantically identical.
+// For 2 x 128 bit hashing, if with maximal entrophy, the chance of hamming
+// distance < 37 is C(128, 91)/(2^128) < 0.0001% which is pretty safe.
+export const SIMILARITY_THRESHOLD = 37
+
+// Only consider 2 posts to be similar if they are posted within this time
+// window.
+export const SIMILARITY_WINDOW_MILLISECOND = 1000 * 60 * 60 // 1 hour

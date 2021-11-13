@@ -9,7 +9,6 @@ import { authReducer } from './auth'
 import { columnsReducer } from './columns'
 import { configReducer } from './config'
 import { countReducer } from './counters'
-import { dataReducer } from './data'
 import { navigationReducer } from './navigation'
 
 const _rootReducer = combineReducers({
@@ -18,7 +17,6 @@ const _rootReducer = combineReducers({
   columns: columnsReducer,
   config: configReducer,
   counters: countReducer,
-  data: dataReducer,
   navigation: navigationReducer,
 })
 
