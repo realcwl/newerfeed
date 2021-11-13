@@ -31,6 +31,7 @@ import { Separator } from '../common/Separator'
 import { Spacer } from '../common/Spacer'
 import { SubHeader } from '../common/SubHeader'
 import { TouchableWithoutFeedback } from '../common/TouchableWithoutFeedback'
+import { ProgressBar } from '../common/ProgressBar'
 import { DropDownIconPicker } from './partials/DropDownIconPicker'
 import { DialogConsumer, DialogProviderState } from '../context/DialogContext'
 import { useAppLayout } from '../context/LayoutContext'
@@ -369,7 +370,12 @@ export const AddColumnDetailsModal = React.memo(
               >
                 {content}
                 <Spacer height={contentPadding} />
-                <Separator horizontal />
+                {idToSourceOrSubSourceMap[formItem.sourceId].state ==
+                'loading' ? (
+                  <ProgressBar indeterminate />
+                ) : (
+                  <Separator horizontal />
+                )}
                 <Spacer height={contentPadding} />
               </Fragment>
             )

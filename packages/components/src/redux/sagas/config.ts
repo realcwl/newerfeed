@@ -9,7 +9,9 @@ import { analytics } from '../../libs/analytics'
 import { WrapUrlWithToken } from '../../utils/api'
 import { setSourcesAndIdMap } from '../actions'
 import { jsonToGraphQLQuery } from 'json-to-graphql-query'
+import * as actions from '../actions'
 import * as selectors from '../selectors'
+import { ExtractActionFromActionCreator } from '../types/base'
 
 // Response returned from the backend for available sources.
 interface SourcesResponse {
@@ -26,7 +28,14 @@ interface SourcesResponse {
     }[]
   }
 }
-
+interface AddSubsourceResponse {
+  data: {
+    addWeiboSubSource: {
+      id: string
+      name: string
+    }
+  }
+}
 function GetAvailableSourcesFromSourcesResponse(
   sourcesResponse: SourcesResponse,
 ): NewsFeedColumnSource[] {
@@ -115,9 +124,62 @@ function* fetchAvailableSourcesAndIdMap() {
   }
 }
 
+function* onAddSubsource(
+  action: ExtractActionFromActionCreator<typeof actions.addSubsource>,
+) {
+  const sourceId = action.payload.sourceId
+  const name = action.payload.name
+
+  try {
+    const appToken = yield* select(selectors.appTokenSelector)
+    const userId = yield* select(selectors.currentUserIdSelector)
+    if (!userId) {
+      yield put(actions.authFailure(Error('no user id found')))
+      return
+    }
+
+    const addSubsourceResponse: AxiosResponse<AddSubsourceResponse> =
+      yield axios.post(WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken), {
+        query: getAddSubsourceRequest(sourceId, name),
+      })
+
+    yield put(
+      actions.addSubsourceSuccess({
+        sourceId: sourceId,
+        name: name,
+        subsourceId: addSubsourceResponse.data.data.addWeiboSubSource.id,
+      }),
+    )
+  } catch (e) {
+    yield put(
+      actions.addSubsourceFail({
+        sourceId: sourceId,
+        name: name,
+      }),
+    )
+    return
+  }
+}
+
+function getAddSubsourceRequest(sourceId: string, name: string): string {
+  return jsonToGraphQLQuery({
+    mutation: {
+      addWeiboSubSource: {
+        __args: {
+          input: {
+            name: name,
+          },
+        },
+        id: true,
+        name: true,
+      },
+    },
+  })
+}
 export function* configSagas() {
   yield* all([
     yield* takeLatest(['SET_THEME'], onThemeChange),
     yield* takeLatest(['LOGIN_SUCCESS'], fetchAvailableSourcesAndIdMap),
+    yield* takeLatest(['ADD_SUBSOURCE'], onAddSubsource),
   ])
 }

@@ -101,6 +101,8 @@ export const COLUMN_OUT_OF_SYNC_TIME_IN_MILLI_SECOND = 1000 * 60 * 1 // 1 minute
 // Error code when cognito fail due to lost connection.
 export const COGNITO_NETWORK_ERROR_CODE = 'NetworkError'
 
+export const SOURCE_NAMES_ENABLE_ADD_SUBSOURCE = ['微博']
+
 // Hamming distance for 2 posts to be considered as semantically identical.
 // For 2 x 128 bit hashing, if with maximal entrophy, the chance of hamming
 // distance < 37 is C(128, 91)/(2^128) < 0.0001% which is pretty safe.

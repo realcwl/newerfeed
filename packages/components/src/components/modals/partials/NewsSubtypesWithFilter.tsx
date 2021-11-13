@@ -6,11 +6,19 @@ import {
   mapSourceIdToName,
   NewsFeedColumnSource,
   ThemeColors,
+  SourceOrSubSource,
+  constants,
 } from '@devhub/core'
 
+import { sharedStyles } from '../../../styles/shared'
+import {
+  contentPadding,
+  scaleFactor,
+  smallTextSize,
+} from '../../../styles/variables'
 import { useReduxState } from '../../../hooks/use-redux-state'
-import { contentPadding } from '../../../styles/variables'
 import { columnHeaderItemContentSize } from '../../columns/ColumnHeader'
+import * as actions from '../../../redux/actions'
 import { sharedColumnOptionsStyles } from '../../columns/options/shared'
 import { Checkbox } from '../../common/Checkbox'
 import * as selectors from '../../../redux/selectors'
@@ -23,7 +31,10 @@ import { ThemedText } from '../../themed/ThemedText'
 import { Separator } from '../../common/Separator'
 import { SELECT_ALL } from '../../../resources/strings'
 import { useColumnCreatedByCurrentUser } from '../../../hooks/use-column-created-by-current-user'
-
+import { TagToken } from '../../common/TagToken'
+import { useDispatch } from 'react-redux'
+import { Text } from '../../common/Text'
+import { useTheme } from '../../context/ThemeContext'
 // We shoud a search bar if there are more than 9 subtypes to be selected.
 const MAX_ITEM_WITHOUT_FILTER = 9
 
@@ -39,9 +50,11 @@ export const NewsSubtypesWithFilter = React.memo(
     const idToSourceOrSubSourceMap = useReduxState(
       selectors.idToSourceOrSubSourceMapSelector,
     )
-
+    const sourceState = idToSourceOrSubSourceMap[source.sourceId].state
+    const theme = useTheme()
     // A string filter that will be changed by text input.
     const [filter, setFilter] = useState('')
+    const dispatch = useDispatch()
 
     // Show error if all subtypes doesn't contain the specified text f
     function shouldShowError(source: NewsFeedColumnSource) {
@@ -53,6 +66,40 @@ export const NewsSubtypesWithFilter = React.memo(
         }
       }
       return true
+    }
+
+    function renderAddButton(onPress?: () => void, sourceState?: string) {
+      const errorColor = getErrorColor({ required: true })
+      return (
+        <View
+          key={`filter-tag-text`}
+          style={sharedStyles.horizontalAndVerticallyAligned}
+        >
+          <TagToken
+            label="+"
+            onPress={() => {
+              if (!onPress) return
+              onPress()
+            }}
+            size={25 * scaleFactor}
+            disabled={sourceState == 'loading'}
+          />
+          {sourceState == 'error' && (
+            <Text
+              numberOfLines={1}
+              style={[
+                {
+                  fontSize: smallTextSize,
+                  color: theme.red,
+                  marginLeft: contentPadding,
+                },
+              ]}
+            >
+              {"can't add " + filter}
+            </Text>
+          )}
+        </View>
+      )
     }
 
     // Render a source filter that allows user to filter subtypes when there
@@ -71,7 +118,12 @@ export const NewsSubtypesWithFilter = React.memo(
         autoCorrect: false,
         autoFocus: false,
         blurOnSubmit: false,
-        placeholder: 'Filter by name...',
+        placeholder: isSourceOpenToAddSubsource(
+          source.sourceId,
+          idToSourceOrSubSourceMap,
+        )
+          ? 'Filter or Add by name...'
+          : 'Filter by name...',
       }
 
       return (
@@ -88,6 +140,9 @@ export const NewsSubtypesWithFilter = React.memo(
             {...defaultTextInputProps}
             onChangeText={(value) => {
               setFilter(value)
+              dispatch(
+                actions.addSubsourceTerminate({ sourceId: source.sourceId }),
+              )
             }}
             value={filter}
             {...textInputProps}
@@ -238,7 +293,17 @@ export const NewsSubtypesWithFilter = React.memo(
         {source.subSourceIds.length > MAX_ITEM_WITHOUT_FILTER
           ? renderGenericFormTextInput(source, filter, setFilter)
           : null}
-
+        {shouldShowError(source) &&
+        isSourceOpenToAddSubsource(source.sourceId, idToSourceOrSubSourceMap)
+          ? renderAddButton(() => {
+              dispatch(
+                actions.addSubsource({
+                  sourceId: source.sourceId,
+                  name: filter,
+                }),
+              )
+            }, sourceState)
+          : null}
         <View
           style={{
             marginLeft: columnHeaderItemContentSize + contentPadding / 2,
@@ -255,6 +320,15 @@ function getErrorColor({
   required,
 }: { required?: boolean } = {}): keyof ThemeColors {
   return required === false ? 'yellow' : 'lightRed'
+}
+
+function isSourceOpenToAddSubsource(
+  sourceId: string,
+  idToSourceOrSubSourceMap: Record<string, SourceOrSubSource>,
+) {
+  return constants.SOURCE_NAMES_ENABLE_ADD_SUBSOURCE.includes(
+    mapSourceIdToName(sourceId, idToSourceOrSubSourceMap),
+  )
 }
 
 NewsSubtypesWithFilter.displayName = 'NewsSubtypesWithFilter'

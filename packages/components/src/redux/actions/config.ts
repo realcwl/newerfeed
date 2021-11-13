@@ -35,3 +35,23 @@ export function dayNightSwitch() {
 export function appearenceColorSchemeChanged(colorScheme: ColorSchemeName) {
   return createAction('APPEARENCE_COLOR_SCHEME_CHANGED', colorScheme)
 }
+
+export function addSubsource(payload: { sourceId: string; name: string }) {
+  return createAction('ADD_SUBSOURCE', payload)
+}
+
+export function addSubsourceSuccess(payload: {
+  sourceId: string
+  name: string
+  subsourceId: string
+}) {
+  return createAction('ADD_SUBSOURCE_SUCCESS', payload)
+}
+
+export function addSubsourceFail(payload: { sourceId: string; name: string }) {
+  return createAction('ADD_SUBSOURCE_FAIL', payload)
+}
+
+export function addSubsourceTerminate(payload: { sourceId: string }) {
+  return createAction('ADD_SUBSOURCE_TERMINATE', payload)
+}

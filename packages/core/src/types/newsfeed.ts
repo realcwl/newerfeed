@@ -171,6 +171,7 @@ export interface SourceOrSubSource {
   avatarURL?: string
   // profile URL leads to the home page.
   profileURL?: string
+  state?: LoadState
 }
 
 export interface ColumnOptions {
