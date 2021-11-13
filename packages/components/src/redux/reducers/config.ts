@@ -85,6 +85,7 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
       })
     case 'ADD_SUBSOURCE_FAIL':
       return immer(state, (draft) => {
+        // TODO: also pass through the error from backend and display in frontend
         draft.idToSourceOrSubSourceMap[action.payload.sourceId].state = 'error'
       })
     case 'ADD_SUBSOURCE_SUCCESS':
@@ -93,7 +94,10 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
         for (let i = 0; i < draft.availableNewsFeedSources.length; i++) {
           if (
             draft.availableNewsFeedSources[i].sourceId ===
-            action.payload.sourceId
+              action.payload.sourceId &&
+            !draft.availableNewsFeedSources[i].subSourceIds.includes(
+              action.payload.subsourceId,
+            )
           ) {
             draft.availableNewsFeedSources[i].subSourceIds.push(
               action.payload.subsourceId,
