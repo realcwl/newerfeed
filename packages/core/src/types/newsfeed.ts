@@ -211,6 +211,8 @@ export interface NewsFeedData {
   semanticHashing?: string
   // All data that are semantically duplicated with this data, stored by id.
   duplicateIds?: string[]
+  // tags indicating Feed content
+  tags?: string[]
 }
 
 export interface Attachment {

@@ -46,6 +46,7 @@ import { useFastScreenshot } from '../../hooks/use-fast-screenshot'
 import { RouteConfiguration } from '../../navigation/AppNavigator'
 import { Button } from '../common/Button'
 import { useItem } from '../../hooks/use-item'
+import { ButtonGroup } from '../common/ButtonGroup'
 
 const SIGNAL_RESET_MAX = 100
 // Number of characters to render show more button.
@@ -239,6 +240,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     title,
     repostedFrom,
     duplicateIds,
+    tags,
   } = getCardPropsForItem(type, columnId, item)
 
   if (!subSourceId) return null
@@ -620,6 +622,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                 )}
               </View>
             </View>
+          )}
+
+          {!isRetweeted && tags && tags.length > 0 && (
+            <ButtonGroup data={tags.map((tag) => ({ id: tag, name: tag }))} />
           )}
 
           {images.length > 0 && (

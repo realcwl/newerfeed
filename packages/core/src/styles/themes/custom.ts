@@ -123,6 +123,9 @@ export function createThemeFromColor(
   const foregroundColorMuted65 = isDark
     ? setLightness(0.65, foregroundColor)
     : setLightness(1 - 0.65, foregroundColor)
+  const foregroundColorMuted80 = isDark
+    ? setLightness(0.8, foregroundColor)
+    : setLightness(1 - 0.8, foregroundColor)
   const foregroundColorTransparent05 = rgba(foregroundColor, 0.05)
   const foregroundColorTransparent10 = rgba(foregroundColor, 0.1)
 
@@ -169,6 +172,7 @@ export function createThemeFromColor(
     foregroundColorMuted25,
     foregroundColorMuted40,
     foregroundColorMuted65,
+    foregroundColorMuted80,
     foregroundColorTransparent05,
     foregroundColorTransparent10,
 
