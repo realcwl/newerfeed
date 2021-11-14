@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import {
   PixelRatio,
   StyleSheet,
@@ -320,6 +320,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     return res
   }
 
+  const routeToSharedPostPage = useCallback(() => {
+    history.push(RouteConfiguration.sharedPost.replace(':id', nodeIdOrId))
+  }, [nodeIdOrId])
+
   // 0 initial, adding up to trigger expand
   useEffect(() => {
     if (
@@ -528,14 +532,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                     color={'foregroundColorMuted65'}
                     size={smallTextSize}
                     style={styles.actionIcon}
-                    onPress={() => {
-                      history.push(
-                        RouteConfiguration.sharedPost.replace(
-                          ':id',
-                          nodeIdOrId,
-                        ),
-                      )
-                    }}
+                    onPress={routeToSharedPostPage}
                   />
                   <ThemedIcon
                     family="octicon"

@@ -1,5 +1,5 @@
-import React from 'react'
-import { StyleSheet, View, ScrollView } from 'react-native'
+import React, { useCallback } from 'react'
+import { StyleSheet, View, ScrollView, Clipboard } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { ActivityIndicator } from 'react-native-web'
 
@@ -21,8 +21,11 @@ import { ThemedIcon } from '../components/themed/ThemedIcon'
 import * as actions from '../redux/actions'
 import * as selectors from '../redux/selectors'
 import { RootState } from '../redux/types'
+import { CURRENT_APP_URL } from '@devhub/core/src/utils/constants'
+import { delay } from '../utils/helpers/time'
 
 const COLUMN_TYPE_NEWS_FEED = 'COLUMN_TYPE_NEWS_FEED'
+const RESET_COPY_ICON_MS = 1200
 
 const styles = StyleSheet.create({
   container: {
@@ -42,6 +45,7 @@ export const SharedPostScreen = () => {
   const loading = useSelector((state: RootState) =>
     selectors.dataLoadingSelector(state, id),
   )
+  const [copySuccess, setCopySuccess] = React.useState(false)
 
   React.useEffect(() => {
     if (item == null) {
@@ -69,6 +73,25 @@ export const SharedPostScreen = () => {
     }
   }, [id, item])
 
+  const copyPostLinkToClipboard = useCallback(() => {
+    Clipboard.setString(
+      `${CURRENT_APP_URL}${RouteConfiguration.sharedPost.replace(':id', id)}`,
+    )
+    setCopySuccess(!copySuccess)
+  }, [id, copySuccess])
+
+  const routeToRoot = useCallback(() => {
+    history.push(RouteConfiguration.root)
+  }, [])
+
+  React.useEffect(() => {
+    if (copySuccess) {
+      delay(RESET_COPY_ICON_MS).then(() => {
+        setCopySuccess(!copySuccess)
+      })
+    }
+  }, [copySuccess])
+
   let content
 
   if (id == null || id === '') {
@@ -89,7 +112,7 @@ export const SharedPostScreen = () => {
     content = CardComponent
   }
 
-  const headerIcon = (
+  const headerLeftIcon = (
     <ThemedIcon
       color={'foregroundColor'}
       family="material"
@@ -102,14 +125,35 @@ export const SharedPostScreen = () => {
           textAlign: 'center',
         },
       ]}
-      onPress={() => history.push(RouteConfiguration.root)}
+      onPress={routeToRoot}
+    />
+  )
+
+  const headerRightIcon = (
+    <ThemedIcon
+      color={'foregroundColor'}
+      family="material"
+      name={copySuccess ? 'check' : 'content-copy'}
+      selectable={false}
+      style={[
+        {
+          width: scaleFactor * 24,
+          fontSize: scaleFactor * 24,
+          textAlign: 'center',
+        },
+      ]}
+      onPress={copyPostLinkToClipboard}
     />
   )
 
   return (
     <Screen statusBarBackgroundThemeColor="transparent" enableSafeArea={true}>
       <View style={[styles.container]}>
-        <PageHeader title="Shared Post" icon={headerIcon} />
+        <PageHeader
+          title="Shared Post"
+          leftIcon={headerLeftIcon}
+          rightIcon={headerRightIcon}
+        />
         <ScrollView style={[styles.container]}>
           <Container>
             <View style={[sharedStyles.fullWidth]}>{content}</View>

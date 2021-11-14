@@ -60,6 +60,10 @@ export const GRAPHQL_SUBSCRIPTION_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `wss://${APP_BASE_URL}/api/subscription`
     : 'wss://rnr.capital/api/subscription'
+export const CURRENT_APP_URL =
+  process.env.NODE_ENV === 'production'
+    ? `https://${APP_BASE_URL}`
+    : 'http://localhost:3000'
 
 const LANDING_BASE_URL = 'https://devhubapp.com'
 export const DEVHUB_LINKS = {
