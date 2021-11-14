@@ -109,8 +109,20 @@ function insertDataIntoColumn(
   direction: string,
   draft: State,
 ): void {
-  for (let i = 0; i < data.length; i++) {
-    const newData = data[i]
+  // Because:
+  // 1. Returned batch is always in chronological order, and
+  // 2. We are appending/prepending one by one
+  // we need to reorder the returning data when direction is new so that oldest
+  // message get processed first.
+  // e.g. if we received [now, 1m, 2m, 3m] from backend, and direction is new,
+  // without process the incoming data first, we would prepend them one by one
+  // and result in: [3m, 2m, 1m, now, ...existing data...], which is wrong.
+  let reorderedData = data.slice()
+  if (direction == 'NEW') {
+    reorderedData.reverse()
+  }
+  for (let i = 0; i < reorderedData.length; i++) {
+    const newData = reorderedData[i]
     let shouldPushIntoColumn = true
     for (const existingDataId of column.itemListIds) {
       // append of insert front based on the direction. Assuming there's no
