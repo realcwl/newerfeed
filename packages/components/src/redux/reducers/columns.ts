@@ -117,7 +117,7 @@ function insertDataIntoColumn(
   // e.g. if we received [now, 1m, 2m, 3m] from backend, and direction is new,
   // without process the incoming data first, we would prepend them one by one
   // and result in: [3m, 2m, 1m, now, ...existing data...], which is wrong.
-  let reorderedData = data.slice()
+  const reorderedData = data.slice()
   if (direction == 'NEW') {
     reorderedData.reverse()
   }
