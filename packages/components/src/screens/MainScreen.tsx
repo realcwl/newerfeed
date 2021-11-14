@@ -19,7 +19,9 @@ import { SubscriptionClient } from 'subscriptions-transport-ws'
 import { WrapUrlWithToken } from '../utils/api'
 import { constants, SeedState, Signal } from '@devhub/core'
 import Notifier from '../libs/notifier'
+import { Helmet } from '../libs/react-helmet-async'
 import { handleSignal } from '../redux/actions'
+import { NEWS_FEED, NEWS_FEED_DESCRIPTION } from '../resources/strings'
 
 const styles = StyleSheet.create({
   container: {
@@ -83,7 +85,10 @@ export const MainScreen = React.memo(() => {
   return (
     <>
       <AppKeyboardShortcuts />
-
+      <Helmet>
+        <title>{NEWS_FEED}</title>
+        <meta name="description" content={NEWS_FEED_DESCRIPTION} />
+      </Helmet>
       <Screen
         statusBarBackgroundThemeColor="transparent"
         enableSafeArea={false}

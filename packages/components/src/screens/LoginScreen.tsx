@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Image, ScrollView, StyleSheet, View } from 'react-native'
 
-import { constants } from '@devhub/core'
-
 import { FullHeightScrollView } from '../components/common/FullHeightScrollView'
 import { Link } from '../components/common/Link'
 import { Screen } from '../components/common/Screen'
@@ -10,6 +8,7 @@ import { Spacer } from '../components/common/Spacer'
 import { ThemedText } from '../components/themed/ThemedText'
 import { useDimensions } from '../hooks/use-dimensions'
 import { analytics } from '../libs/analytics'
+import { Helmet } from '../libs/react-helmet-async'
 import {
   contentPadding,
   normalTextSize,
@@ -19,6 +18,7 @@ import _ from 'lodash'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
 import logo from '@devhub/components/assets/logo_circle.png'
+import { LOG_IN_OR_SIG_UP, NEWS_FEED_DESCRIPTION } from '../resources/strings'
 
 const styles = StyleSheet.create({
   container: {
@@ -109,6 +109,10 @@ export const LoginScreen = React.memo(() => {
 
   return (
     <Screen>
+      <Helmet>
+        <title>{LOG_IN_OR_SIG_UP}</title>
+        <meta name="description" content={NEWS_FEED_DESCRIPTION} />
+      </Helmet>
       <FullHeightScrollView
         alwaysBounceVertical={false}
         style={[

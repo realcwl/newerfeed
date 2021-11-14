@@ -6,6 +6,7 @@ import { ActivityIndicator } from 'react-native-web'
 import { Screen } from '../components/common/Screen'
 import { ThemedText } from '../components/themed/ThemedText'
 import { useHistory, useParams } from '../libs/react-router'
+import { Helmet } from '../libs/react-helmet-async'
 import {
   RouteConfiguration,
   RouteParamsSharedPost,
@@ -21,8 +22,13 @@ import { ThemedIcon } from '../components/themed/ThemedIcon'
 import * as actions from '../redux/actions'
 import * as selectors from '../redux/selectors'
 import { RootState } from '../redux/types'
-import { CURRENT_APP_URL } from '@devhub/core/src/utils/constants'
 import { delay } from '../utils/helpers/time'
+import { NEWS_FEED } from '../resources/strings'
+import {
+  HtmlMetaType,
+  normalizeHtmlDocMetaText,
+} from '../utils/helpers/browser'
+import { CURRENT_APP_URL } from '@devhub/core/src/utils/constants'
 
 const COLUMN_TYPE_NEWS_FEED = 'COLUMN_TYPE_NEWS_FEED'
 const RESET_COPY_ICON_MS = 1200
@@ -92,8 +98,20 @@ export const SharedPostScreen = () => {
     }
   }, [copySuccess])
 
-  let content
+  const htmlDescription = normalizeHtmlDocMetaText(
+    item?.text,
+    HtmlMetaType.description,
+  )
+  const htmlTitle = normalizeHtmlDocMetaText(
+    item &&
+      `${item.subSource?.name.concat(':')}${
+        item.title && item.title?.concat(',')
+      }${htmlDescription}`,
+    HtmlMetaType.title,
+    NEWS_FEED,
+  )
 
+  let content
   if (id == null || id === '') {
     content = (
       <ThemedText color="foregroundColorMuted65">missing post id</ThemedText>
@@ -148,6 +166,10 @@ export const SharedPostScreen = () => {
 
   return (
     <Screen statusBarBackgroundThemeColor="transparent" enableSafeArea={true}>
+      <Helmet>
+        <title>{htmlTitle}</title>
+        <meta name="description" content={htmlDescription} />
+      </Helmet>
       <View style={[styles.container]}>
         <PageHeader
           title="Shared Post"
