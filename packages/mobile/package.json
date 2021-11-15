@@ -1,6 +1,6 @@
 {
   "name": "@devhub/mobile",
-  "version": "0.102.6",
+  "version": "0.102.7",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -17,8 +17,8 @@
     "xcode": "open ios/devhub.xcworkspace"
   },
   "dependencies": {
-    "@devhub/components": "0.102.6",
-    "@devhub/core": "0.102.6",
+    "@devhub/components": "0.102.7",
+    "@devhub/core": "0.102.7",
     "@react-native-async-storage/async-storage": "^1.15.5",
     "@react-native-firebase/analytics": "10.1.1",
     "@react-native-firebase/app": "10.1.0",
