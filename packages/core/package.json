@@ -1,6 +1,6 @@
 {
   "name": "@devhub/core",
-  "version": "0.102.5",
+  "version": "0.102.6",
   "private": false,
   "main": "dist/index.js",
   "scripts": {
