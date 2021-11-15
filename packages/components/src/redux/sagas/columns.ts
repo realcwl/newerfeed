@@ -331,8 +331,10 @@ function constructFeedRequest(
             imageUrls: true,
             contentGeneratedAt: true,
             originUrl: true,
+            tags: true,
           },
           semanticHashing: true,
+          tags: true,
         },
         subSources: {
           id: true,
