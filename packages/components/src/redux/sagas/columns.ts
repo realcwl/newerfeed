@@ -54,6 +54,7 @@ export interface Post {
   crawledAt: string
   originUrl: string
   semanticHashing: string
+  tags: string[]
 }
 
 interface FeedResponse {
@@ -174,6 +175,7 @@ export const postToNewsFeedData = (post: Post): NewsFeedData => {
     isSaved: false,
     attachments: attachments,
     semanticHashing: post.semanticHashing,
+    tags: post.tags,
   }
 }
 
@@ -808,12 +810,14 @@ function constructFetchPostByIdRequest(id: string): string {
           contentGeneratedAt: true,
           crawledAt: true,
           originUrl: true,
+          tags: true,
         },
         imageUrls: true,
         fileUrls: true,
         contentGeneratedAt: true,
         crawledAt: true,
         originUrl: true,
+        tags: true,
       },
     },
   })

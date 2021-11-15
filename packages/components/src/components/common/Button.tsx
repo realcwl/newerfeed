@@ -257,6 +257,14 @@ export function getButtonColors(
         foregroundHoverThemeColor: 'primaryForegroundColor',
       }
 
+    case 'neutral':
+      return {
+        backgroundThemeColor: 'backgroundColorLess3',
+        foregroundThemeColor: 'foregroundColorMuted80',
+        backgroundHoverThemeColor: 'backgroundColorLess4',
+        foregroundHoverThemeColor: 'foregroundColorMuted80',
+      }
+
     case 'transparent':
       return {
         backgroundThemeColor: 'transparent',

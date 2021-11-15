@@ -67,6 +67,7 @@ export interface ThemeColors extends StaticThemeColors {
   foregroundColorMuted25: string
   foregroundColorMuted40: string
   foregroundColorMuted65: string
+  foregroundColorMuted80: string
   foregroundColorTransparent05: string
   foregroundColorTransparent10: string
 }
