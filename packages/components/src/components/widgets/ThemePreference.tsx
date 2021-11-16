@@ -1,10 +1,9 @@
 import React, { useRef } from 'react'
 import { View } from 'react-native'
 
-import { darkThemesArr, isNight, lightThemesArr, Theme } from '@devhub/core'
+import { darkThemesArr, lightThemesArr, Theme } from '@devhub/core'
 import { useReduxAction } from '../../hooks/use-redux-action'
 import { useReduxState } from '../../hooks/use-redux-state'
-import { Appearance } from '../../libs/appearence'
 import * as actions from '../../redux/actions'
 import * as selectors from '../../redux/selectors'
 import { sharedStyles } from '../../styles/shared'
@@ -14,7 +13,6 @@ import { Checkbox } from '../common/Checkbox'
 import { H3 } from '../common/H3'
 import { Spacer } from '../common/Spacer'
 import { SubHeader } from '../common/SubHeader'
-import { Switch } from '../common/Switch'
 import { useTheme } from '../context/ThemeContext'
 
 export const ThemePreference = React.memo(() => {
@@ -26,7 +24,6 @@ export const ThemePreference = React.memo(() => {
   const currentThemeId = useReduxState(selectors.themePairSelector).id
 
   const setTheme = useReduxAction(actions.setTheme)
-  const setPreferrableTheme = useReduxAction(actions.setPreferrableTheme)
 
   const renderThemeButton = (theme: Theme) => {
     const selected = currentThemeId === theme.id
@@ -46,19 +43,6 @@ export const ThemePreference = React.memo(() => {
             typeof checked === 'boolean' ||
             (currentThemeId === 'auto' && checked === null)
           ) {
-            if (
-              currentThemeId === 'auto' &&
-              theme.isDark ===
-                (Appearance.getColorScheme() === 'dark' ||
-                  (Appearance.getColorScheme() !== 'light' && isNight()))
-            ) {
-              setPreferrableTheme({
-                id: theme.id,
-                color: theme.backgroundColor,
-              })
-              return
-            }
-
             vibrateHapticFeedback()
 
             setTheme({
