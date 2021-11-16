@@ -13,7 +13,7 @@
     "format": "prettier --write '{.,src}/**/*.{js,jsx,ts,tsx,json}'",
     "lint": "eslint src --no-error-on-unmatched-pattern",
     "prepare": "cd .. && yarn patch-package",
-    "serve": "serve -s dist",
+    "serve": "node server.ts",
     "start": "react-app-rewired start",
     "test": "react-app-rewired test"
   },
