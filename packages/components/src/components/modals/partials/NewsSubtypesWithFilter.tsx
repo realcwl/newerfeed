@@ -240,6 +240,15 @@ export const NewsSubtypesWithFilter = React.memo(
       }
       const filteredSubsourceRows = filteredSubSources.map(
         (subtype: string) => {
+          const subSourceNameBold = (
+            <ThemedText
+              color="foregroundColorMuted65"
+              numberOfLines={1}
+              style={{ fontWeight: '800' }}
+            >
+              {mapSourceIdToName(subtype, idToSourceOrSubSourceMap)}
+            </ThemedText>
+          )
           // Filter by the actual name, instead of by id.
           return (
             <View key={`add-news-column-details-source-subtype-${subtype}`}>
@@ -250,7 +259,7 @@ export const NewsSubtypesWithFilter = React.memo(
                 }
                 disabled={!editable}
                 defaultValue={false}
-                label={mapSourceIdToName(subtype, idToSourceOrSubSourceMap)}
+                label={subSourceNameBold}
                 onChange={(checked) => {
                   if (selectedSubtypes.includes(subtype)) {
                     const newlySelectedSubtypes = selectedSubtypes.filter(
