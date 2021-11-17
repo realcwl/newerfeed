@@ -211,6 +211,8 @@ export interface NewsFeedData {
   semanticHashing?: string
   // All data that are semantically duplicated with this data, stored by id.
   duplicateIds?: string[]
+  // Set to true if the duplication tray are all read.
+  isDuplicationRead?: boolean
   // tags indicating Feed content
   tags?: string[]
 }

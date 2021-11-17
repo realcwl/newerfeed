@@ -51,6 +51,7 @@ export const sharedStyles = StyleSheet.create({
   marginVertical: { marginVertical: contentPadding },
   marginVerticalHalf: { marginVertical: contentPadding / 2 },
   marginVerticalQuarter: { marginVertical: contentPadding / 4 },
+  marginTopQuarter: { marginTop: contentPadding / 4 },
   marginBottomHalf: { marginBottom: contentPadding / 2 },
   marginBottom: { marginBottom: contentPadding },
   marginRightHalf: { marginRight: contentPadding / 2 },

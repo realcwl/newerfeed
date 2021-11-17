@@ -141,6 +141,7 @@ function insertDataIntoColumn(
         if (!existingData.duplicateIds) existingData.duplicateIds = []
         if (!existingData.duplicateIds.includes(newData.id))
           existingData.duplicateIds?.push(newData.id)
+        existingData.isDuplicationRead = false
         shouldPushIntoColumn = false
         break
       }
@@ -474,6 +475,21 @@ export const columnsReducer: Reducer<State> = (
           entry.isRead = read
           draft.dataUpdatedAt = now
         }
+      })
+    case 'MARK_ITEM_DUPLICATION_AS_READ':
+      return immer(state, (draft) => {
+        const { itemNodeId, read } = action.payload
+        if (!(itemNodeId in draft.dataById)) {
+          // if the item isn't in the data list, it indicates that we might
+          // encountered an error and should return directly.
+          console.warn(
+            "trying to read/unread an item that's not in the data list: ",
+            itemNodeId,
+          )
+          return
+        }
+        const entry = draft.dataById[itemNodeId]
+        entry.isDuplicationRead = read
       })
     case 'FETCH_POST':
       return immer(state, (draft) => {

@@ -40,6 +40,7 @@ import {
   capatureView,
   markItemAsRead,
   markItemAsSaved,
+  markItemDuplicationAsRead,
 } from '../../redux/actions'
 import { Link } from '../common/Link'
 import { useFastScreenshot } from '../../hooks/use-fast-screenshot'
@@ -78,6 +79,7 @@ const styles = StyleSheet.create({
   deduplicationBarContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginTop: 6 * scaleFactor,
     justifyContent: 'flex-start',
   },
 
@@ -91,6 +93,7 @@ const styles = StyleSheet.create({
     lineHeight: sizes.titleLineHeight,
     flexGrow: 1,
     overflow: 'hidden',
+    fontWeight: '800',
     paddingTop: 2 * scaleFactor,
   },
 
@@ -239,6 +242,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     title,
     repostedFrom,
     duplicateIds,
+    isDuplicationRead,
     tags,
   } = getCardPropsForItem(type, columnId, item)
 
@@ -365,11 +369,34 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             foregroundHoverThemeColor: 'foregroundColor',
           }}
           contentContainerStyle={{ alignItems: 'flex-end' }}
-          onPress={() => setShowDuplication(!showDuplication)}
+          onPress={() => {
+            setShowDuplication(!showDuplication)
+            // Click on the deduplication bar means:
+            // 1. user already read all duplication messages
+            // 2. user must also read the original message
+            dispatch(
+              markItemDuplicationAsRead({ itemNodeId: nodeIdOrId, read: true }),
+            )
+            dispatch(
+              markItemAsRead({
+                itemNodeIds: [nodeIdOrId],
+                read: true,
+              }),
+            )
+          }}
         >
           <View
             style={[sharedStyles.horizontal, sharedStyles.alignItemsCenter]}
           >
+            {!isDuplicationRead && (
+              <ThemedIcon
+                family="octicon"
+                name="dot-fill"
+                color={'primaryBackgroundColor'}
+                size={smallTextSize}
+              />
+            )}
+            <Spacer width={sizes.horizontalSpaceSize} />
             <ThemedText color={'foregroundColor'}>
               {showDuplication ? 'hide' : 'show'}
               <ThemedText color={'foregroundColor'} style={[styles.title]}>
@@ -377,7 +404,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               </ThemedText>
               similar messages
             </ThemedText>
-            <Spacer width={sizes.verticalSpaceSize} />
+            <Spacer width={sizes.horizontalSpaceSize} />
             <ThemedIcon
               style={
                 showDuplication ? { transform: [{ rotate: '180deg' }] } : {}
@@ -581,10 +608,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
           {hasText && (
             <View
-              style={[
-                sharedStyles.horizontal,
-                sharedStyles.marginVerticalQuarter,
-              ]}
+              style={[sharedStyles.horizontal, sharedStyles.marginTopQuarter]}
             >
               <View style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}>
                 <View style={sharedStyles.horizontalAndVerticallyAligned}>
@@ -654,11 +678,13 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             </View>
           )}
 
-          <View style={[styles.fileContainer]}>
-            {files.map((file) => {
-              return <FileDownloader key={file.id} file={file} />
-            })}
-          </View>
+          {files.length > 0 && (
+            <View style={[styles.fileContainer]}>
+              {files.map((file) => {
+                return <FileDownloader key={file.id} file={file} />
+              })}
+            </View>
+          )}
 
           {!!repostedFrom && (
             <View>
