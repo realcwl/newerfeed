@@ -78,7 +78,6 @@ const styles = StyleSheet.create({
   deduplicationBarContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: 6 * scaleFactor,
     justifyContent: 'flex-start',
   },
 
