@@ -13,7 +13,7 @@ describe('countReducer', () => {
     const errorAction = {
       type: REHYDRATE as any,
       err: true,
-      payload: null,
+      payload: {},
     }
     expect(countReducer(stateWithSomeCounts, errorAction)).toEqual(
       stateWithSomeCounts,

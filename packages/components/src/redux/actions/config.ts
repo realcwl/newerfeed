@@ -21,21 +21,6 @@ export function setSourcesAndIdMap(payload: {
   return createAction('SET_SOURCES_AND_ID_MAP', payload)
 }
 
-export function setPreferrableTheme(payload: {
-  id: ThemePair['id']
-  color?: ThemePair['color']
-}) {
-  return createAction('SET_PREFERRABLE_THEME', payload)
-}
-
-export function dayNightSwitch() {
-  return createAction('DAY_NIGHT_SWITCH')
-}
-
-export function appearenceColorSchemeChanged(colorScheme: ColorSchemeName) {
-  return createAction('APPEARENCE_COLOR_SCHEME_CHANGED', colorScheme)
-}
-
 export function addSubsource(payload: { sourceId: string; name: string }) {
   return createAction('ADD_SUBSOURCE', payload)
 }

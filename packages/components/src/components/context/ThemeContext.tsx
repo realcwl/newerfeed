@@ -27,8 +27,6 @@ ThemeContext.displayName = 'ThemeContext'
 
 let _theme: Theme = defaultTheme
 export function ThemeProvider(props: ThemeProviderProps) {
-  const dispatch = useDispatch()
-
   const theme = useReduxState(selectors.themeSelector)
   _theme = theme
 
@@ -37,16 +35,6 @@ export function ThemeProvider(props: ThemeProviderProps) {
     Browser.setBackgroundColor(theme[headerThemeColors.normal])
     Browser.setForegroundColor(theme.foregroundColor)
   }, [theme])
-
-  useEffect(() => {
-    const listener = Appearance.addChangeListener((preferences) => {
-      dispatch(actions.appearenceColorSchemeChanged(preferences.colorScheme))
-    })
-
-    return () => {
-      listener.remove()
-    }
-  }, [])
 
   return (
     <ThemeContext.Provider value={theme}>
