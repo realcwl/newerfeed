@@ -123,11 +123,9 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
       (isHovered) => {
         if (isHoveredRef.current === isHovered) return
         isHoveredRef.current = isHovered
-
         const isAlreadyFocused = isFocusedRef.current
         if (isHovered && !isAlreadyFocused) {
           handleFocusChange(true)
-
           emitter.emit('FOCUS_ON_COLUMN_ITEM', {
             columnId,
             itemNodeIdOrId: '',
@@ -135,14 +133,6 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
         } else {
           updateStyles()
         }
-
-        // Hover on card should be considered as "read"
-        dispatch(
-          actions.markItemAsRead({
-            itemNodeIds: [nodeIdOrId],
-            read: true,
-          }),
-        )
       },
       [columnId],
     ),
