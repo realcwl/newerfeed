@@ -70,3 +70,15 @@ export function fetchPostFailure(payload: {
 }) {
   return createAction('FETCH_POST_FAILURE', payload)
 }
+
+export function setColumnVisibleItems(payload: {
+  columnId: string | undefined
+  firstVisibleItemId: string
+  lastVisibleItemId: string
+}) {
+  return createAction('UPDATE_COLUMN_VISIBLE_ITEMS', payload)
+}
+
+export function resetColumnVisibleItems(payload: { columnId: string }) {
+  return createAction('RESET_COLUMN_VISIBLE_ITEMS', payload)
+}

@@ -3,6 +3,7 @@ import { FlatList, FlatListProps, View } from 'react-native'
 import { useTheme } from '../../../components/context/ThemeContext'
 
 import { sharedStyles } from '../../../styles/shared'
+import { SCROLL_WAIT_MS } from '../../../utils/constants'
 import { AutoSizer } from '../../auto-sizer'
 import { bugsnag } from '../../bugsnag'
 import { Platform } from '../../platform'
@@ -250,6 +251,18 @@ export const OneList = React.memo(
                   data={data}
                   horizontal={horizontal}
                   renderItem={renderItem}
+                  onScrollToIndexFailed={(info) => {
+                    const wait = new Promise((resolve) =>
+                      setTimeout(resolve, SCROLL_WAIT_MS),
+                    )
+                    wait.then(() => {
+                      flatListRef.current?.scrollToIndex({
+                        index: info.index,
+                        animated: false,
+                        viewPosition: 0, // 0: top,  0.5: center, 1: last
+                      })
+                    })
+                  }}
                 />
               )}
             </AutoSizer>

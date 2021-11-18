@@ -5,3 +5,7 @@ export const EMPTY_OBJ = constants.EMPTY_OBJ
 
 export const MAX_HTML_TITLE_LENGTH = 50
 export const MAX_HTML_DESCRIPTION_LENGTH = 200
+
+export const SCROLL_WAIT_MS = 320
+
+export const ON_VISIBLE_ITEM_DELAY = 800

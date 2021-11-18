@@ -1,4 +1,5 @@
 import { Column, constants, getDateSmallText, NewsFeedData } from '@devhub/core'
+import { debounce } from 'lodash'
 import React, { useCallback, useMemo, useRef } from 'react'
 import { Dimensions, View } from 'react-native'
 import { useDispatch } from 'react-redux'
@@ -27,8 +28,10 @@ import { RefreshControl } from '../components/common/RefreshControl'
 import { useAppLayout } from '../components/context/LayoutContext'
 import { OneListProps } from '../libs/one-list'
 import { useSafeArea } from '../libs/safe-area-view'
+import { setColumnVisibleItems } from '../redux/actions'
 import * as selectors from '../redux/selectors'
 import { sharedStyles } from '../styles/shared'
+import { ON_VISIBLE_ITEM_DELAY } from '../utils/constants'
 import { useColumn } from './use-column'
 import { useReduxState } from './use-redux-state'
 
@@ -63,6 +66,7 @@ export function useCardsProps<ItemT extends NewsFeedData>({
   const appToken = useReduxState(selectors.appTokenSelector)
 
   const data: DataItemT[] = itemNodeIdOrIds || []
+  const firstVisibleItemId = column?.firstVisibleItemId
 
   const getItemSize = useCallback<
     NonNullable<OneListProps<DataItemT>['getItemSize']>
@@ -193,9 +197,19 @@ export function useCardsProps<ItemT extends NewsFeedData>({
 
   const onVisibleItemsChanged = useCallback<
     NonNullable<OneListProps<DataItemT>['onVisibleItemsChanged']>
-  >((from, to) => {
-    visibleItemIndexesRef.current = { from, to }
-  }, [])
+  >(
+    (from, to) => {
+      visibleItemIndexesRef.current = { from, to }
+      dispatch(
+        setColumnVisibleItems({
+          columnId,
+          firstVisibleItemId: data[from],
+          lastVisibleItemId: data[to],
+        }),
+      )
+    },
+    [data],
+  )
 
   const refreshControl = useMemo(
     () => (
@@ -255,6 +269,7 @@ export function useCardsProps<ItemT extends NewsFeedData>({
       refreshControl,
       safeAreaInsets,
       visibleItemIndexesRef,
+      firstVisibleItemId,
     }),
     [
       OverrideRender,

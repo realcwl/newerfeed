@@ -236,7 +236,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     subSourceId,
     time,
     isRead,
-    isSaved: isSaved,
+    isSaved,
     link,
     text,
     title,

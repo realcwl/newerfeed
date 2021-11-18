@@ -1,13 +1,19 @@
 import { Column, NewsFeedData } from '@devhub/core'
 import React, { useCallback, useMemo } from 'react'
 import { View, ViewProps } from 'react-native'
+import { useDispatch } from 'react-redux'
 
 import { useCardsKeyboard } from '../../hooks/use-cards-keyboard'
 import { DataItemT, useCardsProps } from '../../hooks/use-cards-props'
 import { BlurView } from '../../libs/blur-view/BlurView'
 import { ErrorBoundary } from '../../libs/bugsnag'
 import { OneList, OneListProps } from '../../libs/one-list'
+import {
+  resetColumnVisibleItems,
+  setColumnVisibleItems,
+} from '../../redux/actions'
 import { sharedStyles } from '../../styles/shared'
+import { SCROLL_WAIT_MS } from '../../utils/constants'
 import { Separator } from '../common/Separator'
 import { EmptyCards, EmptyCardsProps } from './EmptyCards'
 import { NewsFeedCard } from './NewsFeedCard'
@@ -42,6 +48,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
     swipeable,
   } = props
 
+  const dispatch = useDispatch()
   const listRef = React.useRef<typeof OneList>(null)
 
   const getItemKey = useCallback(
@@ -63,6 +70,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
     refreshControl,
     safeAreaInsets,
     visibleItemIndexesRef,
+    firstVisibleItemId,
   } = useCardsProps({
     columnId,
     fetchNextPage,
@@ -83,6 +91,40 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
     type: 'COLUMN_TYPE_NEWS_FEED',
     visibleItemIndexesRef,
   })
+
+  React.useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (firstVisibleItemId) {
+      timer = setTimeout(() => {
+        const from = visibleItemIndexesRef.current.from
+        const to = visibleItemIndexesRef.current.to
+        const index = data.findIndex((item) => item === firstVisibleItemId)
+        if (index < 0) {
+          console.error(
+            'lastVisitedItem not found in data: ',
+            firstVisibleItemId,
+          )
+          return
+        }
+        if (listRef.current == null) {
+          console.error("column's listRef is invalid")
+          return
+        }
+        if (index < from || index > to) {
+          listRef.current?.scrollToIndex(index)
+        } else {
+          console.log(
+            `target index ${index} is already between ${from} and ${to}`,
+          )
+        }
+      }, SCROLL_WAIT_MS) // give cards some time for layout
+    }
+    return () => {
+      if (timer) {
+        clearTimeout(timer)
+      }
+    }
+  }, [])
 
   const renderItem = useCallback<
     NonNullable<OneListProps<DataItemT>['renderItem']>
