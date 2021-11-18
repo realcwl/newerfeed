@@ -250,6 +250,18 @@ export const OneList = React.memo(
                   data={data}
                   horizontal={horizontal}
                   renderItem={renderItem}
+                  onScrollToIndexFailed={(info) => {
+                    const wait = new Promise((resolve) =>
+                      setTimeout(resolve, 300),
+                    )
+                    wait.then(() => {
+                      flatListRef.current?.scrollToIndex({
+                        index: info.index,
+                        animated: false,
+                        viewPosition: 0.5,
+                      })
+                    })
+                  }}
                 />
               )}
             </AutoSizer>

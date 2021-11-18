@@ -41,6 +41,7 @@ import {
   markItemAsRead,
   markItemAsSaved,
   markItemDuplicationAsRead,
+  visitColumnItem,
 } from '../../redux/actions'
 import { Link } from '../common/Link'
 import { useFastScreenshot } from '../../hooks/use-fast-screenshot'
@@ -236,7 +237,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     subSourceId,
     time,
     isRead,
-    isSaved: isSaved,
+    isSaved,
     link,
     text,
     title,
@@ -326,8 +327,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   }
 
   const routeToSharedPostPage = useCallback(() => {
+    dispatch(visitColumnItem({ columnId, itemNodeId: nodeIdOrId }))
     history.push(RouteConfiguration.sharedPost.replace(':id', nodeIdOrId))
-  }, [nodeIdOrId])
+  }, [nodeIdOrId, columnId])
 
   // 0 initial, adding up to trigger expand
   useEffect(() => {

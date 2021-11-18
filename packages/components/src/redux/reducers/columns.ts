@@ -511,6 +511,29 @@ export const columnsReducer: Reducer<State> = (
         const { id } = action.payload
         draft.loadingDataId = ''
       })
+
+    case 'VISIT_COLUMN_ITEM':
+      console.log('VISIT_COLUMN_ITEM', action.payload)
+      return immer(state, (draft) => {
+        const { columnId, itemNodeId } = action.payload
+        const column = draft.columnById[columnId]
+        if (!column) {
+          console.error('column id does not exist: ', columnId)
+          return
+        }
+        column.lastVisitedItemId = itemNodeId
+      })
+    case 'RESET_VISITED_COLUMN_ITEM':
+      console.log('RESET_VISITED_COLUMN_ITEM', action.payload)
+      return immer(state, (draft) => {
+        const { columnId } = action.payload
+        const column = draft.columnById[columnId]
+        if (!column) {
+          console.error('column id does not exist: ', columnId)
+          return
+        }
+        column.lastVisitedItemId = undefined
+      })
     default:
       return state
   }

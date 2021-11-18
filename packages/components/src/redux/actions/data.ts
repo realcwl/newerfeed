@@ -70,3 +70,14 @@ export function fetchPostFailure(payload: {
 }) {
   return createAction('FETCH_POST_FAILURE', payload)
 }
+
+export function visitColumnItem(payload: {
+  columnId: string
+  itemNodeId: string
+}) {
+  return createAction('VISIT_COLUMN_ITEM', payload)
+}
+
+export function resetVisitedColumnItem(payload: { columnId: string }) {
+  return createAction('RESET_VISITED_COLUMN_ITEM', payload)
+}

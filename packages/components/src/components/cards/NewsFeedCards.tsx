@@ -1,12 +1,14 @@
 import { Column, NewsFeedData } from '@devhub/core'
 import React, { useCallback, useMemo } from 'react'
 import { View, ViewProps } from 'react-native'
+import { useDispatch } from 'react-redux'
 
 import { useCardsKeyboard } from '../../hooks/use-cards-keyboard'
 import { DataItemT, useCardsProps } from '../../hooks/use-cards-props'
 import { BlurView } from '../../libs/blur-view/BlurView'
 import { ErrorBoundary } from '../../libs/bugsnag'
 import { OneList, OneListProps } from '../../libs/one-list'
+import { resetVisitedColumnItem } from '../../redux/actions'
 import { sharedStyles } from '../../styles/shared'
 import { Separator } from '../common/Separator'
 import { EmptyCards, EmptyCardsProps } from './EmptyCards'
@@ -42,6 +44,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
     swipeable,
   } = props
 
+  const dispatch = useDispatch()
   const listRef = React.useRef<typeof OneList>(null)
 
   const getItemKey = useCallback(
@@ -63,6 +66,7 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
     refreshControl,
     safeAreaInsets,
     visibleItemIndexesRef,
+    lastVisitedItem,
   } = useCardsProps({
     columnId,
     fetchNextPage,
@@ -83,6 +87,29 @@ export const NewsFeedCards = React.memo((props: EventCardsProps) => {
     type: 'COLUMN_TYPE_NEWS_FEED',
     visibleItemIndexesRef,
   })
+
+  React.useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (lastVisitedItem) {
+      timer = setTimeout(() => {
+        const index = data.findIndex((item) => item === lastVisitedItem)
+        if (index < 0) {
+          console.error('lastVisitedItem not found in data: ', lastVisitedItem)
+          return
+        }
+        if (listRef.current == null) {
+          console.error("column's listRef is invalid")
+        }
+        listRef.current?.scrollToIndex(index)
+        dispatch(resetVisitedColumnItem({ columnId }))
+      }, 300) // give cards some time for layout
+    }
+    return () => {
+      if (timer) {
+        clearTimeout(timer)
+      }
+    }
+  }, [lastVisitedItem])
 
   const renderItem = useCallback<
     NonNullable<OneListProps<DataItemT>['renderItem']>

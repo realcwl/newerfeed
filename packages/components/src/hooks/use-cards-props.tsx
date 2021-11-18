@@ -63,6 +63,7 @@ export function useCardsProps<ItemT extends NewsFeedData>({
   const appToken = useReduxState(selectors.appTokenSelector)
 
   const data: DataItemT[] = itemNodeIdOrIds || []
+  const lastVisitedItem = column?.lastVisitedItemId
 
   const getItemSize = useCallback<
     NonNullable<OneListProps<DataItemT>['getItemSize']>
@@ -255,6 +256,7 @@ export function useCardsProps<ItemT extends NewsFeedData>({
       refreshControl,
       safeAreaInsets,
       visibleItemIndexesRef,
+      lastVisitedItem,
     }),
     [
       OverrideRender,
