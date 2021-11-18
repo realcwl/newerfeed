@@ -12,11 +12,11 @@ interface Data {
 
 const styles = StyleSheet.create({
   wrapper: {
-    minHeight: 28 * scaleFactor,
-    height: 28 * scaleFactor,
+    minHeight: 20 * scaleFactor,
+    height: 20 * scaleFactor,
   },
   text: {
-    fontWeight: '500',
+    fontWeight: '800',
   },
 })
 

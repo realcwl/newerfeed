@@ -87,6 +87,7 @@ export interface BaseCardProps extends AdditionalCardProps {
   showMoreSignal?: number
   shareMode?: boolean
   duplicateIds?: string[]
+  isDuplicationRead?: boolean
   tags?: string[]
 }
 
@@ -109,6 +110,7 @@ function _getCardPropsForItem(
       ? _getCardPropsForItem(type, item.repostedFrom)
       : undefined,
     duplicateIds: item.duplicateIds,
+    isDuplicationRead: item.isDuplicationRead,
     tags: item.tags,
   }
 }

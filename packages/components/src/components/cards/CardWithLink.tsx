@@ -121,18 +121,18 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
     ref,
     useCallback(
       (isHovered) => {
-        if (isHoveredRef.current === isHovered) return
-        isHoveredRef.current = isHovered
-        const isAlreadyFocused = isFocusedRef.current
-        if (isHovered && !isAlreadyFocused) {
-          handleFocusChange(true)
-          emitter.emit('FOCUS_ON_COLUMN_ITEM', {
-            columnId,
-            itemNodeIdOrId: '',
-          })
-        } else {
-          updateStyles()
-        }
+        // if (isHoveredRef.current === isHovered) return
+        // isHoveredRef.current = isHovered
+        // const isAlreadyFocused = isFocusedRef.current
+        // if (isHovered && !isAlreadyFocused) {
+        //   handleFocusChange(true)
+        //   emitter.emit('FOCUS_ON_COLUMN_ITEM', {
+        //     columnId,
+        //     itemNodeIdOrId: '',
+        //   })
+        // } else {
+        //   updateStyles()
+        // }
       },
       [columnId],
     ),

@@ -10,6 +10,15 @@ export function markItemAsSaved(payload: {
   return createAction('MARK_ITEM_AS_SAVED', payload)
 }
 
+export function markItemDuplicationAsRead(payload: {
+  // Indicate the item under action.
+  itemNodeId: string
+  // Indicate whether all duplications are read
+  read: boolean
+}) {
+  return createAction('MARK_ITEM_DUPLICATION_AS_READ', payload)
+}
+
 export function markItemAsRead(payload: {
   // Indicate the item under action.
   itemNodeIds: string[]
