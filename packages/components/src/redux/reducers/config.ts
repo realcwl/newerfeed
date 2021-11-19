@@ -78,6 +78,14 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
         }
       })
     }
+
+    case 'FETCH_POST_SUCCESS': {
+      return immer(state, (draft) => {
+        const { data } = action.payload
+        addDataSourceToIdMap(data, draft.idToSourceOrSubSourceMap)
+      })
+    }
+
     case 'ADD_SUBSOURCE':
       return immer(state, (draft) => {
         draft.idToSourceOrSubSourceMap[action.payload.sourceId].state =

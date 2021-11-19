@@ -6,6 +6,7 @@ import {
   fetchColumnDataSuccess,
   setSourcesAndIdMap,
   setTheme,
+  fetchPostSuccess,
 } from '../../actions'
 import { initialState, configReducer } from '../config'
 
@@ -176,5 +177,26 @@ describe('configReducer', () => {
     })
 
     expect(configReducer(initialState, action)).toEqual(excpectedState)
+  })
+
+  test('should add post data into idToSourceOrSubSourceMap', () => {
+    const newsFeedData = {
+      id: 'id',
+      subSource: {
+        id: 'subSourceId',
+        name: 'subSourceName',
+        avatarURL: 'avatarURL',
+      },
+      cursor: 11,
+    }
+    const action = fetchPostSuccess({
+      id: 'postId',
+      data: newsFeedData,
+    })
+    expect(
+      configReducer(initialState, action).idToSourceOrSubSourceMap[
+        newsFeedData.subSource.id
+      ],
+    ).toEqual(newsFeedData.subSource)
   })
 })
