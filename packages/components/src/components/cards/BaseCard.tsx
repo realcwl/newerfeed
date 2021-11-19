@@ -263,6 +263,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   }
 
   const subSource = useSubSource(subSourceId)
+  const profileUrl = subSource?.profileURL
 
   // Whether we should show "show more" button for the text. We calculate this
   // flag before rendering so that we don't need to render twice. This would
@@ -420,6 +421,14 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     )
   }
 
+  const handleAvatarClick = useCallback(() => {
+    if (profileUrl) {
+      Linking.openURL(profileUrl).catch((err) =>
+        console.error('An error occurred', err),
+      )
+    }
+  }, [profileUrl])
+
   return (
     <>
       <View
@@ -454,7 +463,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             >
               <Avatar
                 avatarUrl={subSource ? subSource.avatarURL : ''}
-                // TODO(chenweilunster): Enable link
                 disableLink={false}
                 linkURL={subSource ? subSource.profileURL : ''}
                 style={styles.avatar}
@@ -479,6 +487,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               {...Platform.select({
                 web: { title: getFullDateText(timestamp) },
               })}
+              onPress={handleAvatarClick}
             >
               {subSource ? subSource.name : ''}
             </ThemedText>
