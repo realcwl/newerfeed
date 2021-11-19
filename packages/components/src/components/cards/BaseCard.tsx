@@ -422,6 +422,23 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     )
   }
 
+  if (subSource.profileURL) {
+    console.log('YZ subSource.profileURL', subSource.profileURL)
+  }
+  const profileUrl = subSource.profileURL // 'https://m.weibo.cn/profile/1640337222'
+
+  const handleAvatarClick = useCallback(() => {
+    console.log('subSource', subSource)
+    if (profileUrl) {
+      console.log('will open', profileUrl)
+      Linking.openURL(profileUrl).catch((err) =>
+        console.error('An error occurred', err),
+      )
+    } else {
+      console.log('empty profile url')
+    }
+  }, [profileUrl])
+
   return (
     <>
       <View
@@ -481,6 +498,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               {...Platform.select({
                 web: { title: getFullDateText(timestamp) },
               })}
+              onPress={handleAvatarClick}
             >
               {subSource ? subSource.name : ''}
             </ThemedText>

@@ -70,7 +70,11 @@ export function Avatar(props: AvatarProps) {
       ? ''
       : _tooltip || (username && `@${username}`) || ''
 
-  const linkUri = undefined
+  const linkUri = linkURL
+
+  if (linkUri) {
+    console.log('linkUri', linkUri)
+  }
 
   return (
     <ConditionalWrap

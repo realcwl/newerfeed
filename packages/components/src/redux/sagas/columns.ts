@@ -46,6 +46,7 @@ export interface Post {
     id: string
     name: string
     avatarUrl: string
+    externalIdentifier: string
   }
   sharedFromPost: Post
   imageUrls: string[]
@@ -134,6 +135,14 @@ function convertFeedsResponseToSources(
   return convertFeedResponseToSources(response.data.feeds[0])
 }
 
+// contructt profile url based on profileId and originaUrl
+function constructProfileUrl(profileId: string, originUrl: string) {
+  if (originUrl.includes('://m.weibo.cn/')) {
+    return `https://m.weibo.cn/profile/${profileId}`
+  }
+  return undefined
+}
+
 export const postToNewsFeedData = (post: Post): NewsFeedData => {
   let attachments: Attachment[] = []
   if (post.imageUrls.length !== 0) {
@@ -166,6 +175,10 @@ export const postToNewsFeedData = (post: Post): NewsFeedData => {
       id: post.subSource.id,
       name: post.subSource.name,
       avatarURL: post.subSource.avatarUrl,
+      profileURL: constructProfileUrl(
+        post.subSource.externalIdentifier,
+        post.originUrl,
+      ),
     },
     repostedFrom: post.sharedFromPost
       ? postToNewsFeedData(post.sharedFromPost)
@@ -314,6 +327,7 @@ function constructFeedRequest(
             id: true,
             name: true,
             avatarUrl: true,
+            externalIdentifier: true,
           },
           originUrl: true,
           imageUrls: true,
@@ -327,6 +341,7 @@ function constructFeedRequest(
               id: true,
               name: true,
               avatarUrl: true,
+              externalIdentifier: true,
             },
             imageUrls: true,
             contentGeneratedAt: true,
@@ -701,6 +716,7 @@ function* fetchSharedFeeds() {
                 source: {
                   id: true,
                 },
+                externalIdentifier: true,
               },
               visibility: true,
               subscriberCount: true,
@@ -796,6 +812,8 @@ function constructFetchPostByIdRequest(id: string): string {
           id: true,
           name: true,
           avatarUrl: true,
+          externalIdentifier: true,
+          originUrl: true,
         },
         sharedFromPost: {
           id: true,
@@ -806,6 +824,8 @@ function constructFetchPostByIdRequest(id: string): string {
             id: true,
             name: true,
             avatarUrl: true,
+            externalIdentifier: true,
+            originUrl: true,
           },
           imageUrls: true,
           fileUrls: true,
