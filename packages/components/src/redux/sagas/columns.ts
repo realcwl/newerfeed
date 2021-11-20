@@ -138,7 +138,7 @@ function convertFeedsResponseToSources(
 // contructt profile url based on profileId and originaUrl
 function constructProfileUrl(profileId: string, originUrl: string) {
   if (originUrl && originUrl.includes('://m.weibo.cn/')) {
-    return `https://m.weibo.cn/profile/${profileId}`
+    return `https://weibo.com/u/${profileId}`
   }
   return undefined
 }
