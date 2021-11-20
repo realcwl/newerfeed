@@ -33,7 +33,9 @@ function addDataSourceToIdMap(
   data: NewsFeedData,
   idToSourceOrSubSourceMap: typeof initialState['idToSourceOrSubSourceMap'],
 ): void {
-  if (data.subSource && !(data.subSource.id in idToSourceOrSubSourceMap)) {
+  // remove "&& !(data.subSource.id in idToSourceOrSubSourceMap)"
+  // resisted subSource data prevents us updating new data into exising key
+  if (data.subSource) {
     idToSourceOrSubSourceMap[data.subSource.id] = data.subSource
   }
   if (data.repostedFrom) {
