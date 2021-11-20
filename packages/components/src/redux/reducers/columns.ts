@@ -45,7 +45,7 @@ export interface State {
   loadingDataId: string
 }
 
-const initialState: State = {
+export const initialState: State = {
   /*===== Column Initial State =====*/
   allColumnIds: [],
   sharedColumnIds: [],
@@ -503,6 +503,13 @@ export const columnsReducer: Reducer<State> = (
         draft.dataById[data.id] = data
         if (!draft.allDataIds.includes(data.id)) {
           draft.allDataIds.push(data.id)
+        }
+        // save repostedFrom post
+        if (data.repostedFrom) {
+          draft.dataById[data.repostedFrom.id] = data.repostedFrom
+          if (!draft.allDataIds.includes(data.repostedFrom.id)) {
+            draft.allDataIds.push(data.repostedFrom.id)
+          }
         }
         draft.loadingDataId = ''
       })
