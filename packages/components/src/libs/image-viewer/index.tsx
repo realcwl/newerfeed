@@ -15,6 +15,7 @@ const ImageViewer = ({ images, index, setIndex }: Prop) => (
         return { url: image.url, props: {} }
       })}
       index={index}
+      onClick={() => setIndex(-1)}
       onSwipeDown={() => setIndex(-1)}
       onCancel={() => setIndex(-1)}
       enableSwipeDown={true}
