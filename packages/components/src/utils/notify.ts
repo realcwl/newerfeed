@@ -1,7 +1,9 @@
 import { NewsFeedData } from '@devhub/core'
+import { buildClientSchema } from 'graphql'
 import { Platform } from '../libs/platform'
 
 const notifiedFeeds = new Set<string>()
+const sharedPostPath = '/shared-posts'
 
 export function beep(message: NewsFeedData) {
   const snd = new Audio(
@@ -14,14 +16,24 @@ export function notify(message: NewsFeedData) {
   if (notifiedFeeds.has(message.id)) return
   notifiedFeeds.add(message.id)
   if (Platform.OS === 'web') {
-    new Notification(message.title ?? '', {
+    const _notif = new Notification(message.title ?? '', {
       body: message.text ?? '',
       icon: message.subSource?.avatarURL,
       timestamp: new Date(
         message.postTime ?? message.crawledTime ?? '',
       ).getTime(),
     })
-    beep(message)
+
+    document.addEventListener('visibilitychange', function (event) {
+      if (document.visibilityState === 'visible') {
+        _notif.close()
+      }
+    })
+
+    _notif.onclick = () => {
+      _notif.close()
+      window.open(`${sharedPostPath}/${message.id}`, '_blank')?.focus()
+    }
   }
   //TODO: implement iOS notification
 }
