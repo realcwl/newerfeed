@@ -34,6 +34,7 @@ export function notify(message: NewsFeedData) {
       _notif.close()
       window.open(`${sharedPostPath}/${message.id}`, '_blank')?.focus()
     }
+    beep(message)
   }
   //TODO: implement iOS notification
 }
