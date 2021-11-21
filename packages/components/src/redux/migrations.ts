@@ -37,4 +37,9 @@ export default {
       config: state.config,
     }
   },
+  3: (state: RootState) => {
+    return {
+      config: state.config,
+    }
+  },
 }
