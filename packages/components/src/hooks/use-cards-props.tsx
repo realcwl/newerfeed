@@ -31,7 +31,6 @@ import { useSafeArea } from '../libs/safe-area-view'
 import { setColumnVisibleItems } from '../redux/actions'
 import * as selectors from '../redux/selectors'
 import { sharedStyles } from '../styles/shared'
-import { ON_VISIBLE_ITEM_DELAY } from '../utils/constants'
 import { useColumn } from './use-column'
 import { useReduxState } from './use-redux-state'
 

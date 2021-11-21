@@ -8,10 +8,6 @@ import { DataItemT, useCardsProps } from '../../hooks/use-cards-props'
 import { BlurView } from '../../libs/blur-view/BlurView'
 import { ErrorBoundary } from '../../libs/bugsnag'
 import { OneList, OneListProps } from '../../libs/one-list'
-import {
-  resetColumnVisibleItems,
-  setColumnVisibleItems,
-} from '../../redux/actions'
 import { sharedStyles } from '../../styles/shared'
 import { SCROLL_WAIT_MS } from '../../utils/constants'
 import { Separator } from '../common/Separator'
