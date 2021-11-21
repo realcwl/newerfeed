@@ -65,6 +65,12 @@ export interface NewsFeedColumn extends BaseColumn {
 
   // subscriberCount is the total subscribers to this feed (it is 1 if not shared b/c the current user is the only subscriber)
   subscriberCount: number
+
+  // first visible item id in column
+  firstVisibleItemId?: string
+
+  // last visible item id in column
+  lastVisibleItemId?: string
 }
 
 export interface NewsFeedColumnSource {

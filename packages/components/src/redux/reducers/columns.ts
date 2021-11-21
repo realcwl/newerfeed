@@ -518,6 +518,33 @@ export const columnsReducer: Reducer<State> = (
         const { id } = action.payload
         draft.loadingDataId = ''
       })
+
+    case 'UPDATE_COLUMN_VISIBLE_ITEMS':
+      return immer(state, (draft) => {
+        const { columnId, firstVisibleItemId, lastVisibleItemId } =
+          action.payload
+        if (columnId == null) {
+          return
+        }
+        const column = draft.columnById[columnId]
+        if (!column) {
+          console.error('column id does not exist: ', columnId)
+          return
+        }
+        column.firstVisibleItemId = firstVisibleItemId
+        column.lastVisibleItemId = lastVisibleItemId
+      })
+    case 'RESET_COLUMN_VISIBLE_ITEMS':
+      return immer(state, (draft) => {
+        const { columnId } = action.payload
+        const column = draft.columnById[columnId]
+        if (!column) {
+          console.error('column id does not exist: ', columnId)
+          return
+        }
+        column.firstVisibleItemId = undefined
+        column.lastVisibleItemId = undefined
+      })
     default:
       return state
   }
