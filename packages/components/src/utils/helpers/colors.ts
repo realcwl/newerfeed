@@ -1,3 +1,4 @@
+import { BannerType, Theme } from '@devhub/core'
 import { darken, getLuminance, lighten } from 'polished'
 
 import { Platform } from '../../libs/platform'
@@ -43,4 +44,22 @@ export function fixColorHexWithoutHash(color: string | undefined) {
     return `#${color}`
 
   return color || ''
+}
+
+export const getNotificationColor = (
+  type: BannerType | undefined,
+  theme: Theme,
+): string => {
+  if (type == null) {
+    return theme.transparent
+  }
+  switch (type) {
+    case 'BANNER_TYPE_SUCCESS':
+      return darken(0.1, theme.green)
+    case 'BANNER_TYPE_ERROR':
+      return theme.red
+    case 'BANNER_TYPE_MESSAGE':
+    default:
+      return theme.blue
+  }
 }

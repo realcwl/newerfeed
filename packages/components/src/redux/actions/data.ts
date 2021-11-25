@@ -39,6 +39,13 @@ export function capatureView(payload: {
   return createAction('CAPTURE_VIEW', payload)
 }
 
+export function capatureViewCompleted(payload: {
+  // Indicate the item under action.
+  itemNodeId: string
+}) {
+  return createAction('CAPTURE_VIEW_COMPLETED', payload)
+}
+
 export function itemViewSavedToClipboard(payload: {
   // Indicate the item under action.
   itemNodeId: string

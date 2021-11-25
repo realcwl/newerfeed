@@ -86,6 +86,7 @@ describe('columnsReducer', () => {
     savedDataIds: [],
     loadingDataId: '',
     dataUpdatedAt: undefined,
+    viewCapturingItemNodeId: '',
   } as State
 
   const getState = (items: number[]): State => {

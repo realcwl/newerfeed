@@ -76,3 +76,6 @@ export const dataLoadingSelector = createSelector(
   (_: RootState, id: string) => id,
   (loadingId, id) => loadingId === id,
 )
+
+export const viewCapturingItemNodeIdSelector = (state: RootState) =>
+  s(state).viewCapturingItemNodeId
