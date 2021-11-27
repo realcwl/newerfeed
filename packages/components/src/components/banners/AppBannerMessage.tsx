@@ -1,7 +1,5 @@
-import { BannerType } from '@devhub/core'
 import React from 'react'
 import { View } from 'react-native'
-import { darken } from 'polished'
 
 import { useReduxAction } from '../../hooks/use-redux-action'
 import { useReduxState } from '../../hooks/use-redux-state'
@@ -16,6 +14,7 @@ import { Separator } from '../common/Separator'
 import { Spacer } from '../common/Spacer'
 import { useTheme } from '../context/ThemeContext'
 import { ThemedText } from '../themed/ThemedText'
+import { getNotificationColor } from '../../utils/helpers/colors'
 
 export function AppBannerMessage() {
   const safeAreaInsets = useSafeArea()
@@ -24,19 +23,8 @@ export function AppBannerMessage() {
   const closeBannerMessage = useReduxAction(actions.closeBannerMessage)
   const theme = useTheme()
 
-  const getBannerBackgroundColor = (type: BannerType): string => {
-    switch (type) {
-      case 'BANNER_TYPE_SUCCESS':
-        return darken(0.1, theme.green)
-      case 'BANNER_TYPE_ERROR':
-        return theme.red
-      case 'BANNER_TYPE_MESSAGE':
-      default:
-        return theme.blue
-    }
-  }
-
   if (!(bannerMessage && bannerMessage.message)) return null
+  const backgroundColor = getNotificationColor(bannerMessage.type, theme)
 
   return (
     <View
@@ -47,7 +35,7 @@ export function AppBannerMessage() {
           paddingLeft: safeAreaInsets.left,
           paddingRight: safeAreaInsets.right,
         },
-        { backgroundColor: getBannerBackgroundColor(bannerMessage.type) },
+        { backgroundColor },
       ]}
     >
       <View

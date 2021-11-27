@@ -64,6 +64,14 @@ export const appReducer: Reducer<State> = (state = initialState, action) => {
       })
     }
 
+    case 'RESET_BANNER_MESSAGE': {
+      return immer(state, (draft) => {
+        // Push to the end of banner array and set signature
+        draft.banners = []
+        draft.bannerSignatures = []
+      })
+    }
+
     default:
       return state
   }

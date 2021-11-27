@@ -7,7 +7,7 @@ import {
   Image,
   Linking,
 } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { getDateSmallText, getFullDateText } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
@@ -48,6 +48,7 @@ import { RouteConfiguration } from '../../navigation/AppNavigator'
 import { Button } from '../common/Button'
 import { useItem } from '../../hooks/use-item'
 import { ButtonGroup } from '../common/ButtonGroup'
+import { viewCapturingItemNodeIdSelector } from '../../redux/selectors'
 
 const SIGNAL_RESET_MAX = 100
 // Number of characters to render show more button.
@@ -275,6 +276,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   const theme = useTheme()
   const [supportFastScreenshot] = useFastScreenshot()
+  const isCapturingView =
+    useSelector(viewCapturingItemNodeIdSelector) === nodeIdOrId
   const hasTitle: boolean = title != null && title !== ''
   const hasText: boolean = text != null && text !== ''
   const isWeb: boolean = Platform.OS === 'web'
@@ -429,6 +432,18 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     }
   }, [profileUrl])
 
+  const handleClickCamera = useCallback(() => {
+    if (isCapturingView) return
+    setShowMoreSignal((showMoreSignal % SIGNAL_RESET_MAX) + 1)
+    dispatch(
+      capatureView({
+        itemNodeId: nodeIdOrId,
+        viewRef: ref,
+        backgroundColor: theme.backgroundColor,
+      }),
+    )
+  }, [nodeIdOrId, ref, theme, isCapturingView])
+
   return (
     <>
       <View
@@ -545,22 +560,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   {supportFastScreenshot && (
                     <ThemedIcon
                       family="material"
-                      name={'camera-alt'}
+                      name={isCapturingView ? 'camera' : 'camera-alt'}
                       color={'foregroundColorMuted65'}
                       size={smallTextSize}
                       style={styles.actionIcon}
-                      onPress={() => {
-                        setShowMoreSignal(
-                          (showMoreSignal % SIGNAL_RESET_MAX) + 1,
-                        )
-                        dispatch(
-                          capatureView({
-                            itemNodeId: nodeIdOrId,
-                            viewRef: ref,
-                            backgroundColor: theme.backgroundColor,
-                          }),
-                        )
-                      }}
+                      onPress={handleClickCamera}
                     />
                   )}
                   <ThemedIcon

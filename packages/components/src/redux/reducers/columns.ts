@@ -43,6 +43,8 @@ export interface State {
   dataUpdatedAt: string | undefined
   // loading data id
   loadingDataId: string
+  // ItemNodeId of a post which is capturing its view to the clipboard
+  viewCapturingItemNodeId: string
 }
 
 export const initialState: State = {
@@ -56,6 +58,7 @@ export const initialState: State = {
   savedDataIds: [],
   dataUpdatedAt: undefined,
   loadingDataId: '',
+  viewCapturingItemNodeId: '',
 }
 
 // Update the cursor window for this column
@@ -545,6 +548,16 @@ export const columnsReducer: Reducer<State> = (
         column.firstVisibleItemId = undefined
         column.lastVisibleItemId = undefined
       })
+    case 'CAPTURE_VIEW': {
+      return immer(state, (draft) => {
+        draft.viewCapturingItemNodeId = action.payload.itemNodeId
+      })
+    }
+    case 'CAPTURE_VIEW_COMPLETED': {
+      return immer(state, (draft) => {
+        draft.viewCapturingItemNodeId = ''
+      })
+    }
     default:
       return state
   }

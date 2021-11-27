@@ -32,10 +32,8 @@ import {
   EMPTY_ARRAY,
 } from '@devhub/core/src/utils/constants'
 import { notify } from '../../utils/notify'
-import { setSharedColumns } from '../actions'
 
 import { saveViewToClipboard } from '../../libs/html-to-image'
-import { capatureView, setBannerMessage } from '../actions'
 
 export interface Post {
   id: string
@@ -727,7 +725,7 @@ function* fetchSharedFeeds() {
     )
 
     yield put(
-      setSharedColumns({
+      actions.setSharedColumns({
         feeds: visibleFeeds.data.data.allVisibleFeeds?.map((f: any) => {
           return {
             ...f,
@@ -762,7 +760,7 @@ const DEFAULT_ERROR_MESSAGE = 'Failed to save to clipboard'
 const DEFAULT_SUCCESS_MESSAGE = 'Copied to clipboard'
 
 function* onCaptureItemView(
-  action: ExtractActionFromActionCreator<typeof capatureView>,
+  action: ExtractActionFromActionCreator<typeof actions.capatureView>,
 ) {
   try {
     yield delay(50) // wait for potential show more rerender
@@ -771,7 +769,12 @@ function* onCaptureItemView(
       action.payload.backgroundColor,
     )
     yield put(
-      setBannerMessage({
+      actions.capatureViewCompleted({
+        itemNodeId: action.payload.itemNodeId,
+      }),
+    )
+    yield put(
+      actions.setBannerMessage({
         id: 'clipboard',
         type: 'BANNER_TYPE_SUCCESS',
         message: DEFAULT_SUCCESS_MESSAGE,
@@ -784,7 +787,12 @@ function* onCaptureItemView(
       message = e.message
     }
     yield put(
-      setBannerMessage({
+      actions.capatureViewCompleted({
+        itemNodeId: action.payload.itemNodeId,
+      }),
+    )
+    yield put(
+      actions.setBannerMessage({
         id: 'clipboard',
         type: 'BANNER_TYPE_ERROR',
         message: message,
