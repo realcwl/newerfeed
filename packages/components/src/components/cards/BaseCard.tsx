@@ -286,27 +286,29 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const images = attachments?.filter((a) => a.dataType === 'img') ?? []
   const files = attachments?.filter((a) => a.dataType === 'file') ?? []
 
+  const textStyle = largeMode && sharedStyles.extraLargeText
+  const parseLinebreak = (text: string) => {
+    return text.split('\\n').map((txt, i, row) => (
+      <ThemedText color="foregroundColorMuted65" key={txt} style={textStyle}>
+        {txt}
+        {i + 1 == row.length ? '' : `\n`}
+      </ThemedText>
+    ))
+  }
+
   const parseTextWithLinks = (text: string) => {
     let prev = 0
     let match: RegExpExecArray | null = null
     const res: any[] = []
-    const style = largeMode && sharedStyles.extraLargeText
+
     while ((match = REGEX_IS_URL.exec(text ?? 'no content')) !== null) {
       const textLink = text.slice(match.index, match.index + match[0].length)
-      res.push(
-        <ThemedText
-          color="foregroundColorMuted65"
-          key={res.length}
-          style={style}
-        >
-          {text.slice(prev, match.index)}
-        </ThemedText>,
-      )
+      res.push(parseLinebreak(text.slice(prev, match.index)))
       res.push(
         <ThemedText
           color="red"
           key={res.length}
-          style={style}
+          style={textStyle}
           // assume most website will redirect http to https
           onPress={() =>
             Linking.openURL(
@@ -321,11 +323,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       )
       prev = match.index + match[0].length
     }
-    res.push(
-      <ThemedText color="foregroundColorMuted65" key={res.length} style={style}>
-        {text.slice(prev)}
-      </ThemedText>,
-    )
+    res.push(parseLinebreak(text.slice(prev)))
     return res
   }
 
