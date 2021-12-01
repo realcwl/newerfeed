@@ -238,8 +238,20 @@ export const NewsSubtypesWithFilter = React.memo(
         }
         return null
       }
-      const filteredSubsourceRows = filteredSubSources.map(
-        (subtype: string) => {
+
+      // move selected to the front
+      const compareFunc = (first: string, second: string) => {
+        if (
+          selectedSubtypes.includes(first) &&
+          !selectedSubtypes.includes(second)
+        ) {
+          return -1
+        }
+        return 0
+      }
+      const filteredSubsourceRows = filteredSubSources
+        .sort(compareFunc)
+        .map((subtype: string) => {
           const subSourceNameBold = (
             <ThemedText
               color="foregroundColorMuted65"
@@ -287,8 +299,7 @@ export const NewsSubtypesWithFilter = React.memo(
               />
             </View>
           )
-        },
-      )
+        })
       return (
         <>
           {renderSelectAll()}
