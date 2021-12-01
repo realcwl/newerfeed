@@ -658,9 +658,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             </View>
           )}
 
-          {!isRetweeted && tags && tags.length > 0 && (
+          {/* {!isRetweeted && tags && tags.length > 0 && (
             <ButtonGroup data={tags.map((tag) => ({ id: tag, name: tag }))} />
-          )}
+          )} */}
 
           {images.length > 0 && (
             <View style={[styles.fileContainer]}>
