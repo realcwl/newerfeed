@@ -710,11 +710,14 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             </View>
           )}
 
-          {!isRetweeted && !!duplicateIds && duplicateIds.length > 0 && (
-            <View style={[styles.deduplicationBarContainer]}>
-              {renderDeduplicationBar()}
-            </View>
-          )}
+          {!isRetweeted &&
+            !!duplicateIds &&
+            duplicateIds.length > 0 &&
+            !isCapturingView && (
+              <View style={[styles.deduplicationBarContainer]}>
+                {renderDeduplicationBar()}
+              </View>
+            )}
 
           <Spacer height={sizes.verticalSpaceSize} />
           {/* 
