@@ -609,6 +609,14 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                       sharedStyles.flex,
                       largeMode && sharedStyles.extraLargeText,
                     ]}
+                    onPress={() =>
+                      link &&
+                      Linking.openURL(
+                        link.startsWith('http') || link.startsWith('https')
+                          ? link
+                          : `http://${link}`,
+                      )
+                    }
                   >
                     {title}
                   </ThemedText>
