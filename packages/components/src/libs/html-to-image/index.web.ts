@@ -19,7 +19,7 @@ const getImageBlobFromRef = async (
   const blob = await toBlob(ref.current as HTMLElement, {
     // if cacheBust is true, it will add a random number to the end of image url
     // to force not using cache
-    cacheBust: false,
+    cacheBust: true,
     backgroundColor: backgroundColor || DEFAULT_BACKGROUND_COLOR,
   })
   if (blob) {
