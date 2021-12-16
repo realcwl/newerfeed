@@ -55,11 +55,11 @@ export const API_BASE_URL = 'rnr.capital'
 export const GRAPHQL_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `https://${APP_BASE_URL}/api/graphql`
-    : 'https://rnr.capital/api/graphql'
+    : 'http://localhost:8080/api/graphql'
 export const GRAPHQL_SUBSCRIPTION_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `wss://${APP_BASE_URL}/api/subscription`
-    : 'wss://rnr.capital/api/subscription'
+    : 'ws://localhost:8080/api/subscription'
 export const CURRENT_APP_URL =
   process.env.NODE_ENV === 'production'
     ? `https://${APP_BASE_URL}`
@@ -105,7 +105,7 @@ export const COLUMN_OUT_OF_SYNC_TIME_IN_MILLI_SECOND = 1000 * 60 * 1 // 1 minute
 // Error code when cognito fail due to lost connection.
 export const COGNITO_NETWORK_ERROR_CODE = 'NetworkError'
 
-export const SOURCE_NAMES_ENABLE_ADD_SUBSOURCE = ['微博']
+export const SOURCE_NAMES_ENABLE_ADD_SUBSOURCE = ['微博', '推特']
 
 // Hamming distance for 2 posts to be considered as semantically identical.
 // For 2 x 128 bit hashing, if with maximal entrophy, the chance of hamming

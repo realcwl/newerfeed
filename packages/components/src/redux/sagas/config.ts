@@ -14,6 +14,7 @@ import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
+import { string } from 'yup'
 
 // Response returned from the backend for available sources.
 interface SourcesResponse {
@@ -32,7 +33,7 @@ interface SourcesResponse {
 }
 interface AddSubsourceResponse {
   data: {
-    addWeiboSubSource: {
+    addSubSource: {
       id: string
       name: string
     }
@@ -176,8 +177,8 @@ function* onAddSubsource(
     yield put(
       actions.addSubsourceSuccess({
         sourceId: sourceId,
-        name: name,
-        subsourceId: addSubsourceResponse.data.data.addWeiboSubSource.id,
+        name: addSubsourceResponse.data.data.addSubSource.name,
+        subsourceId: addSubsourceResponse.data.data.addSubSource.id,
       }),
     )
   } catch (e) {
@@ -194,10 +195,11 @@ function* onAddSubsource(
 function getAddSubsourceRequest(sourceId: string, name: string): string {
   return jsonToGraphQLQuery({
     mutation: {
-      addWeiboSubSource: {
+      addSubSource: {
         __args: {
           input: {
-            name: name,
+            sourceId: sourceId,
+            subSourceUserName: name,
           },
         },
         id: true,

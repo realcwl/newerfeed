@@ -313,7 +313,7 @@ export const NewsSubtypesWithFilter = React.memo(
 
     return (
       <View>
-        {source.subSourceIds.length > MAX_ITEM_WITHOUT_FILTER
+        {shouldShowSubSourceInput(source, idToSourceOrSubSourceMap)
           ? renderGenericFormTextInput(source, filter, setFilter)
           : null}
         {shouldShowError(source) &&
@@ -351,6 +351,20 @@ function isSourceOpenToAddSubsource(
 ) {
   return constants.SOURCE_NAMES_ENABLE_ADD_SUBSOURCE.includes(
     mapSourceIdToName(sourceId, idToSourceOrSubSourceMap),
+  )
+}
+
+// Show a search bar in source iff:
+// 1. The source allows add new sub source.
+// 2. There are more than MAX_ITEM_WITHOUT_FILTER subsources in the source.
+function shouldShowSubSourceInput(
+  source: NewsFeedColumnSource,
+  idToSourceOrSubSourceMap: Record<string, SourceOrSubSource>,
+): boolean {
+  return (
+    constants.SOURCE_NAMES_ENABLE_ADD_SUBSOURCE.includes(
+      mapSourceIdToName(source.sourceId, idToSourceOrSubSourceMap),
+    ) || source.subSourceIds.length > MAX_ITEM_WITHOUT_FILTER
   )
 }
 
