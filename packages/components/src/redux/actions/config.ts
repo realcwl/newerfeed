@@ -76,6 +76,7 @@ export function addSubsourceSuccess(payload: {
   sourceId: string
   name: string
   subsourceId: string
+  externalId: string
 }) {
   return createAction('ADD_SUBSOURCE_SUCCESS', payload)
 }

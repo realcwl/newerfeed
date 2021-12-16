@@ -8,6 +8,7 @@ import {
   ThemeColors,
   SourceOrSubSource,
   constants,
+  mapSourceIdToExternalId,
 } from '@devhub/core'
 
 import { sharedStyles } from '../../../styles/shared'
@@ -161,10 +162,14 @@ export const NewsSubtypesWithFilter = React.memo(
       let selectedFilteredSubSourcesCount = 0
       const filteredSubSources: string[] = source.subSourceIds.filter(
         (subType: string) => {
-          const show = mapSourceIdToName(
-            subType,
-            idToSourceOrSubSourceMap,
-          ).includes(filter)
+          // Either name match or external id match (used for Twitter)
+          const show =
+            mapSourceIdToName(subType, idToSourceOrSubSourceMap).includes(
+              filter,
+            ) ||
+            mapSourceIdToExternalId(subType, idToSourceOrSubSourceMap).includes(
+              filter,
+            )
           if (show && selectedSubtypes.includes(subType)) {
             selectedFilteredSubSourcesCount++
           }

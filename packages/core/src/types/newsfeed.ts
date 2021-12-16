@@ -178,6 +178,8 @@ export interface SourceOrSubSource {
   // profile URL leads to the home page.
   profileURL?: string
   state?: LoadState
+  // User's external id in the original website.
+  externalId?: string
 }
 
 export interface ColumnOptions {

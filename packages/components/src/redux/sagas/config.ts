@@ -27,15 +27,18 @@ interface SourcesResponse {
         name: string
         avatarUrl: string
         updatedAt: string
+        externalIdentifier: string
       }[]
     }[]
   }
 }
+
 interface AddSubsourceResponse {
   data: {
     addSubSource: {
       id: string
       name: string
+      externalIdentifier: string
     }
   }
 }
@@ -67,6 +70,7 @@ interface UpsertSubSourceResponse {
     }
   }
 }
+
 function GetAvailableSourcesFromSourcesResponse(
   sourcesResponse: SourcesResponse,
 ): NewsFeedColumnSource[] {
@@ -98,6 +102,7 @@ function GetIdMapFromSourcesResponse(
         id: subSource.id,
         name: subSource.name,
         avatarURL: subSource.avatarUrl,
+        externalId: subSource.externalIdentifier,
       }
     }
   }
@@ -136,6 +141,7 @@ function* fetchAvailableSourcesAndIdMap() {
                 id: true,
                 name: true,
                 avatarUrl: true,
+                externalIdentifier: true,
               },
             },
           },
@@ -179,6 +185,8 @@ function* onAddSubsource(
         sourceId: sourceId,
         name: addSubsourceResponse.data.data.addSubSource.name,
         subsourceId: addSubsourceResponse.data.data.addSubSource.id,
+        externalId:
+          addSubsourceResponse.data.data.addSubSource.externalIdentifier,
       }),
     )
   } catch (e) {
@@ -204,6 +212,7 @@ function getAddSubsourceRequest(sourceId: string, name: string): string {
         },
         id: true,
         name: true,
+        externalIdentifier: true,
       },
     },
   })
