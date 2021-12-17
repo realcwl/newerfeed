@@ -221,6 +221,8 @@ export interface NewsFeedData {
   isDuplicationRead?: boolean
   // tags indicating Feed content
   tags?: string[]
+  // Ordered thread this data is *replying to*, by NewsFeedData it self.
+  thread?: NewsFeedData[]
 }
 
 export interface Attachment {
