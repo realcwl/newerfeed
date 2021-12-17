@@ -6,6 +6,7 @@ import {
   NewsFeedData,
   SourceOrSubSource,
   ThemePair,
+  TryCustomizedCrawlerPost,
 } from '@devhub/core'
 import { Reducer } from '../types'
 
@@ -18,6 +19,18 @@ export interface State {
 
   // maps the source/subtype id to the actual attributes.
   idToSourceOrSubSourceMap: Record<string, SourceOrSubSource>
+
+  addCustomizedSourceStatus: string
+
+  addCustomizedSourceErrorMsg: string
+
+  addedCustomizedSource: SourceOrSubSource
+
+  tryCustomizedCrawlerStatus: string
+
+  tryCustomizedCrawlerErrorMsg: string
+
+  tryCustomizedCrawlerPosts: TryCustomizedCrawlerPost[]
 }
 
 export const initialState: State = {
@@ -26,6 +39,18 @@ export const initialState: State = {
   availableNewsFeedSources: [],
 
   idToSourceOrSubSourceMap: {},
+
+  addCustomizedSourceStatus: constants.ADD_SOURCE_STATUS.LOADED,
+
+  addCustomizedSourceErrorMsg: '',
+
+  addedCustomizedSource: { id: '', name: '' },
+
+  tryCustomizedCrawlerStatus: constants.TRY_CUSTOMIZED_CRAWLER_STATUS.LOADED,
+
+  tryCustomizedCrawlerErrorMsg: '',
+
+  tryCustomizedCrawlerPosts: [],
 }
 
 // Recursively include all sources or subsources into the id map.
@@ -125,6 +150,55 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
     case 'ADD_SUBSOURCE_TERMINATE':
       return immer(state, (draft) => {
         draft.idToSourceOrSubSourceMap[action.payload.sourceId].state = 'loaded'
+      })
+
+    case 'ADD_SOURCE':
+      return immer(state, (draft) => {
+        draft.addCustomizedSourceStatus = constants.ADD_SOURCE_STATUS.LOADING
+      })
+    case 'ADD_SOURCE_FAIL':
+      return immer(state, (draft) => {
+        draft.addCustomizedSourceErrorMsg = action.payload.errorMsg
+        draft.addCustomizedSourceStatus = constants.ADD_SOURCE_STATUS.FAILED
+      })
+    case 'ADD_SOURCE_SUCCESS':
+      return immer(state, (draft) => {
+        draft.addedCustomizedSource = action.payload
+        draft.addCustomizedSourceStatus = constants.ADD_SOURCE_STATUS.LOADED
+      })
+    case 'ADD_SOURCE_TERMINATE':
+      return immer(state, (draft) => {
+        draft.addedCustomizedSource = { id: '', name: '' }
+        draft.addCustomizedSourceStatus = constants.ADD_SOURCE_STATUS.LOADED
+      })
+
+    case 'TRY_CUSTOMIZED_CRAWLER':
+      return immer(state, (draft) => {
+        draft.tryCustomizedCrawlerStatus =
+          constants.TRY_CUSTOMIZED_CRAWLER_STATUS.LOADING
+      })
+    case 'TRY_CUSTOMIZED_CRAWLER_FAIL':
+      return immer(state, (draft) => {
+        draft.tryCustomizedCrawlerErrorMsg = action.payload.errorMsg
+        draft.tryCustomizedCrawlerStatus =
+          constants.TRY_CUSTOMIZED_CRAWLER_STATUS.FAILED
+      })
+    case 'TRY_CUSTOMIZED_CRAWLER_SUCCESS':
+      return immer(state, (draft) => {
+        draft.tryCustomizedCrawlerPosts = action.payload.allPostsCrawled
+        draft.tryCustomizedCrawlerStatus =
+          constants.TRY_CUSTOMIZED_CRAWLER_STATUS.LOADED
+      })
+    case 'TRY_CUSTOMIZED_CRAWLER_TERMINATE':
+      return immer(state, (draft) => {
+        draft.tryCustomizedCrawlerPosts = []
+        draft.tryCustomizedCrawlerStatus =
+          constants.TRY_CUSTOMIZED_CRAWLER_STATUS.LOADED
+      })
+
+    case 'ADD_CUSTOMIZED_SUBSOURCE':
+      return immer(state, (draft) => {
+        draft.addCustomizedSourceStatus = constants.ADD_SOURCE_STATUS.LOADING
       })
     default:
       return state

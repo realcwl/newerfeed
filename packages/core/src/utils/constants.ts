@@ -55,11 +55,11 @@ export const API_BASE_URL = 'rnr.capital'
 export const GRAPHQL_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `https://${APP_BASE_URL}/api/graphql`
-    : 'https://rnr.capital/api/graphql'
+    : 'http://localhost:8080/api/graphql'
 export const GRAPHQL_SUBSCRIPTION_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `wss://${APP_BASE_URL}/api/subscription`
-    : 'wss://rnr.capital/api/subscription'
+    : 'wss://localhost:8080/api/subscription'
 export const CURRENT_APP_URL =
   process.env.NODE_ENV === 'production'
     ? `https://${APP_BASE_URL}`
@@ -115,3 +115,12 @@ export const SIMILARITY_THRESHOLD = 37
 // Only consider 2 posts to be similar if they are posted within this time
 // window.
 export const SIMILARITY_WINDOW_MILLISECOND = 1000 * 60 * 60 // 1 hour
+
+export const ADD_SOURCE_STATUS = {
+  LOADING: 'LOADING',
+  LOADED: 'LOADED',
+  FAILED: 'FAILED',
+}
+
+export const TRY_CUSTOMIZED_CRAWLER_STATUS = ADD_SOURCE_STATUS
+export const ADD_SUB_SOURCE_STATUS = ADD_SOURCE_STATUS

@@ -34,3 +34,21 @@ export const themeSelector = createSelector(
     return loadTheme(theme)
   },
 )
+
+export const tryCustomizedCrawlerPostsSelector = (state: RootState) =>
+  s(state).tryCustomizedCrawlerPosts
+
+export const tryCustomizedCrawlerStatusSelector = (state: RootState) =>
+  s(state).tryCustomizedCrawlerStatus
+
+export const tryCustomizedCrawlerErrorMsgSelector = (state: RootState) =>
+  s(state).tryCustomizedCrawlerErrorMsg
+
+export const addSourceStatusSelector = (state: RootState) =>
+  s(state).addCustomizedSourceStatus
+
+export const addSourceErrorMsgSelector = (state: RootState) =>
+  s(state).addCustomizedSourceErrorMsg
+
+export const addedCustomizedSourceSelector = (state: RootState) =>
+  s(state).addedCustomizedSource

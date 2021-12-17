@@ -3,6 +3,7 @@ import { ColorSchemeName } from 'react-native'
 import {
   NewsFeedColumnSource,
   SourceOrSubSource,
+  TryCustomizedCrawlerPost,
   ThemePair,
 } from '@devhub/core'
 import { createAction } from '../helpers'
@@ -19,6 +20,73 @@ export function setSourcesAndIdMap(payload: {
   idToSourceOrSubSourceMap: Record<string, SourceOrSubSource>
 }) {
   return createAction('SET_SOURCES_AND_ID_MAP', payload)
+}
+
+export function tryCustomizedCrawler(payload: {
+  startUrl: string
+  base: string
+  title: string
+  content: string
+  externalId: string
+  time: string
+  image: string
+  postUrl: string
+}) {
+  return createAction('TRY_CUSTOMIZED_CRAWLER', payload)
+}
+export function tryCustomizedCrawlerSuccess(payload: {
+  allPostsCrawled: TryCustomizedCrawlerPost[]
+}) {
+  return createAction('TRY_CUSTOMIZED_CRAWLER_SUCCESS', payload)
+}
+
+export function tryCustomizedCrawlerFail(payload: { errorMsg: string }) {
+  return createAction('TRY_CUSTOMIZED_CRAWLER_FAIL', payload)
+}
+
+export function tryCustomizedCrawlerTerminate(payload: {}) {
+  return createAction('TRY_CUSTOMIZED_CRAWLER_TERMINATE', payload)
+}
+
+export function addCustomizedSource(payload: {
+  sourceName: string
+  startUrl: string
+  base: string
+  title: string
+  content: string
+  externalId: string
+  time: string
+  image: string
+  postUrl: string
+}) {
+  return createAction('ADD_SOURCE', payload)
+}
+
+export function addCustomizedSubSource(payload: {
+  subSourceName: string
+  subSourceParentSourceId: string
+  startUrl: string
+  base: string
+  title: string
+  content: string
+  externalId: string
+  time: string
+  image: string
+  postUrl: string
+}) {
+  return createAction('ADD_CUSTOMIZED_SUBSOURCE', payload)
+}
+
+export function addCustomizedCralwerSuccess(payload: SourceOrSubSource) {
+  return createAction('ADD_SOURCE_SUCCESS', payload)
+}
+
+export function addCustomizedCralwerFail(payload: { errorMsg: string }) {
+  return createAction('ADD_SOURCE_FAIL', payload)
+}
+
+export function addCustomizedCrawlerTerminate(payload: {}) {
+  return createAction('ADD_SOURCE_TERMINATE', payload)
 }
 
 export function addSubsource(payload: { sourceId: string; name: string }) {
