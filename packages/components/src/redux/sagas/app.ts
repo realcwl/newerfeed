@@ -12,6 +12,7 @@ import {
   closeBannerMessage,
   handleSignal,
   setBannerMessage,
+  setItemsReadStatus,
   updateSeedState,
 } from '../actions'
 import { ExtractActionFromActionCreator } from '../types/base'
@@ -56,6 +57,15 @@ function* onSignal(
   switch (action.payload.signalType) {
     case 'SEED_STATE': {
       yield* fetchSeedState()
+      break
+    }
+    case 'SYNC_ITEMS_READ_STATUS': {
+      yield put(
+        setItemsReadStatus({
+          itemNodeIds: action.payload.signalPayload,
+          read: true,
+        }),
+      )
       break
     }
     default: {

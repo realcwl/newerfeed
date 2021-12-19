@@ -63,6 +63,7 @@ export const MainScreen = React.memo(() => {
           subscription {
             signal(userId: "${userId}") {
               signalType
+              signalPayload
             }
           }
         `,

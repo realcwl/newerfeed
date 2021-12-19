@@ -38,9 +38,9 @@ import FileDownloader from '../../libs/file-downloader'
 import { useHistory } from '../../libs/react-router'
 import {
   capatureView,
-  markItemAsRead,
-  markItemAsSaved,
-  markItemDuplicationAsRead,
+  setItemSavedStatus,
+  setItemDuplicationReadStatus,
+  setItemsReadStatus,
 } from '../../redux/actions'
 import { Link } from '../common/Link'
 import { useFastScreenshot } from '../../hooks/use-fast-screenshot'
@@ -377,10 +377,13 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             // 1. user already read all duplication messages
             // 2. user must also read the original message
             dispatch(
-              markItemDuplicationAsRead({ itemNodeId: nodeIdOrId, read: true }),
+              setItemDuplicationReadStatus({
+                itemNodeId: nodeIdOrId,
+                read: true,
+              }),
             )
             dispatch(
-              markItemAsRead({
+              setItemsReadStatus({
                 itemNodeIds: [nodeIdOrId],
                 read: true,
               }),
@@ -581,7 +584,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                     style={styles.actionIcon}
                     onPress={() => {
                       dispatch(
-                        markItemAsSaved({
+                        setItemSavedStatus({
                           itemNodeId: nodeIdOrId,
                           save: !isSaved,
                         }),
@@ -635,7 +638,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                     color="foregroundColorMuted65"
                     onPress={() =>
                       dispatch(
-                        markItemAsRead({
+                        setItemsReadStatus({
                           itemNodeIds: [nodeIdOrId],
                           read: true,
                         }),

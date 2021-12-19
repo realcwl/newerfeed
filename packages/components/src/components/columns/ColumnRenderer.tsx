@@ -161,7 +161,7 @@ export const ColumnRenderer = React.memo((props: ColumnRendererProps) => {
               name={!hasOneUnreadItem ? 'eye-closed' : 'eye'}
               onPress={() => {
                 dispatch(
-                  actions.markItemAsRead({
+                  actions.setItemsReadStatus({
                     itemNodeIds: filteredItemsIds,
                     read: true,
                   }),

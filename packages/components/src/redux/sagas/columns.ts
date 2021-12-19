@@ -880,6 +880,49 @@ function* onFetchPostById(
   }
 }
 
+function constructSetItemsReadStatusRequest(
+  itemNodeIds: string[],
+  userId: string,
+  read: boolean,
+) {
+  return jsonToGraphQLQuery({
+    query: {
+      setItemsReadStatus: {
+        __args: {
+          input: {
+            userId,
+            itemNodeIds,
+            read,
+          },
+        },
+      },
+    },
+  })
+}
+
+function* onsetItemsReadStatus(
+  action: ExtractActionFromActionCreator<typeof actions.setItemsReadStatus>,
+) {
+  console.log('I am here')
+  const itemNodeIds = action.payload.itemNodeIds
+  const read = action.payload.read
+  const appToken = yield* select(selectors.appTokenSelector)
+  const userId = yield* select(selectors.currentUserIdSelector)
+  if (!userId) {
+    yield put(actions.authFailure(Error('no user id found')))
+    return
+  }
+
+  try {
+    yield axios.post(
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken || ''),
+      { query: constructSetItemsReadStatusRequest(itemNodeIds, userId, read) },
+    )
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 export function* columnsSagas() {
   yield* all([
     yield* fork(columnRefresher),
@@ -894,5 +937,6 @@ export function* columnsSagas() {
     ),
     yield* takeLatest('CAPTURE_VIEW', onCaptureItemView),
     yield* takeEvery('FETCH_POST', onFetchPostById),
+    yield* takeEvery('SET_ITEMS_READ_STATUS', onsetItemsReadStatus),
   ])
 }
