@@ -7,7 +7,7 @@ import {
   Image,
   Linking,
 } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { getDateSmallText, getFullDateText } from '@devhub/core'
 
 import { Platform } from '../../libs/platform'
@@ -48,6 +48,7 @@ import { RouteConfiguration } from '../../navigation/AppNavigator'
 import { Button } from '../common/Button'
 import { useItem } from '../../hooks/use-item'
 import { ButtonGroup } from '../common/ButtonGroup'
+import { viewCapturingItemNodeIdSelector } from '../../redux/selectors'
 
 const SIGNAL_RESET_MAX = 100
 // Number of characters to render show more button.
@@ -236,7 +237,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     subSourceId,
     time,
     isRead,
-    isSaved: isSaved,
+    isSaved,
     link,
     text,
     title,
@@ -275,6 +276,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   const theme = useTheme()
   const [supportFastScreenshot] = useFastScreenshot()
+  const isCapturingView =
+    useSelector(viewCapturingItemNodeIdSelector) === nodeIdOrId
   const hasTitle: boolean = title != null && title !== ''
   const hasText: boolean = text != null && text !== ''
   const isWeb: boolean = Platform.OS === 'web'
@@ -283,27 +286,29 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const images = attachments?.filter((a) => a.dataType === 'img') ?? []
   const files = attachments?.filter((a) => a.dataType === 'file') ?? []
 
+  const textStyle = largeMode && sharedStyles.extraLargeText
+  const parseLinebreak = (text: string) => {
+    return text.split('\\n').map((txt, i, row) => (
+      <ThemedText color="foregroundColorMuted65" key={txt} style={textStyle}>
+        {txt}
+        {i + 1 == row.length ? '' : `\n`}
+      </ThemedText>
+    ))
+  }
+
   const parseTextWithLinks = (text: string) => {
     let prev = 0
     let match: RegExpExecArray | null = null
     const res: any[] = []
-    const style = largeMode && sharedStyles.extraLargeText
+
     while ((match = REGEX_IS_URL.exec(text ?? 'no content')) !== null) {
       const textLink = text.slice(match.index, match.index + match[0].length)
-      res.push(
-        <ThemedText
-          color="foregroundColorMuted65"
-          key={res.length}
-          style={style}
-        >
-          {text.slice(prev, match.index)}
-        </ThemedText>,
-      )
+      res.push(parseLinebreak(text.slice(prev, match.index)))
       res.push(
         <ThemedText
           color="red"
           key={res.length}
-          style={style}
+          style={textStyle}
           // assume most website will redirect http to https
           onPress={() =>
             Linking.openURL(
@@ -318,11 +323,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       )
       prev = match.index + match[0].length
     }
-    res.push(
-      <ThemedText color="foregroundColorMuted65" key={res.length} style={style}>
-        {text.slice(prev)}
-      </ThemedText>,
-    )
+    res.push(parseLinebreak(text.slice(prev)))
     return res
   }
 
@@ -428,6 +429,18 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       )
     }
   }, [profileUrl])
+
+  const handleClickCamera = useCallback(() => {
+    if (isCapturingView) return
+    setShowMoreSignal((showMoreSignal % SIGNAL_RESET_MAX) + 1)
+    dispatch(
+      capatureView({
+        itemNodeId: nodeIdOrId,
+        viewRef: ref,
+        backgroundColor: theme.backgroundColor,
+      }),
+    )
+  }, [nodeIdOrId, ref, theme, isCapturingView])
 
   return (
     <>
@@ -545,22 +558,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                   {supportFastScreenshot && (
                     <ThemedIcon
                       family="material"
-                      name={'camera-alt'}
+                      name={isCapturingView ? 'camera' : 'camera-alt'}
                       color={'foregroundColorMuted65'}
                       size={smallTextSize}
                       style={styles.actionIcon}
-                      onPress={() => {
-                        setShowMoreSignal(
-                          (showMoreSignal % SIGNAL_RESET_MAX) + 1,
-                        )
-                        dispatch(
-                          capatureView({
-                            itemNodeId: nodeIdOrId,
-                            viewRef: ref,
-                            backgroundColor: theme.backgroundColor,
-                          }),
-                        )
-                      }}
+                      onPress={handleClickCamera}
                     />
                   )}
                   <ThemedIcon
@@ -607,6 +609,14 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                       sharedStyles.flex,
                       largeMode && sharedStyles.extraLargeText,
                     ]}
+                    onPress={() =>
+                      link &&
+                      Linking.openURL(
+                        link.startsWith('http') || link.startsWith('https')
+                          ? link
+                          : `http://${link}`,
+                      )
+                    }
                   >
                     {title}
                   </ThemedText>
@@ -656,9 +666,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             </View>
           )}
 
-          {!isRetweeted && tags && tags.length > 0 && (
+          {/* {!isRetweeted && tags && tags.length > 0 && (
             <ButtonGroup data={tags.map((tag) => ({ id: tag, name: tag }))} />
-          )}
+          )} */}
 
           {images.length > 0 && (
             <View style={[styles.fileContainer]}>
@@ -708,11 +718,14 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             </View>
           )}
 
-          {!isRetweeted && !!duplicateIds && duplicateIds.length > 0 && (
-            <View style={[styles.deduplicationBarContainer]}>
-              {renderDeduplicationBar()}
-            </View>
-          )}
+          {!isRetweeted &&
+            !!duplicateIds &&
+            duplicateIds.length > 0 &&
+            !isCapturingView && (
+              <View style={[styles.deduplicationBarContainer]}>
+                {renderDeduplicationBar()}
+              </View>
+            )}
 
           <Spacer height={sizes.verticalSpaceSize} />
           {/* 

@@ -4,7 +4,6 @@ import { StyleSheet, View } from 'react-native'
 import { useDispatch } from 'react-redux'
 
 import { AppKeyboardShortcuts } from '../components/AppKeyboardShortcuts'
-import { AppBannerMessage } from '../components/banners/AppBannerMessage'
 import { ColumnSeparator } from '../components/columns/ColumnSeparator'
 import { ColumnsRenderer } from '../components/columns/ColumnsRenderer'
 import { Screen } from '../components/common/Screen'
@@ -17,11 +16,12 @@ import { useReduxState } from '../hooks/use-redux-state'
 import * as selectors from '../redux/selectors'
 import { SubscriptionClient } from 'subscriptions-transport-ws'
 import { WrapUrlWithToken } from '../utils/api'
-import { constants, SeedState, Signal } from '@devhub/core'
+import { constants, Signal } from '@devhub/core'
 import Notifier from '../libs/notifier'
 import { Helmet } from '../libs/react-helmet-async'
-import { handleSignal } from '../redux/actions'
+import { handleSignal, resetBannerMessage } from '../redux/actions'
 import { NEWS_FEED, NEWS_FEED_DESCRIPTION } from '../resources/strings'
+import { NotificationModal } from '../components/modals/NotificationModal'
 
 const styles = StyleSheet.create({
   container: {
@@ -93,7 +93,6 @@ export const MainScreen = React.memo(() => {
         statusBarBackgroundThemeColor="transparent"
         enableSafeArea={false}
       >
-        <AppBannerMessage />
         <Notifier />
 
         <View
@@ -130,6 +129,7 @@ export const MainScreen = React.memo(() => {
             {FAB.Component}
           </View>
         </View>
+        <NotificationModal />
       </Screen>
     </>
   )

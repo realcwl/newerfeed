@@ -13,6 +13,10 @@ export function setBannerMessage(banner: BannerMessage) {
   return createAction('SET_BANNER_MESSAGE', banner)
 }
 
+export function resetBannerMessage() {
+  return createAction('RESET_BANNER_MESSAGE')
+}
+
 export function handleSignal(signal: Signal) {
   return createAction('HANDLE_SIGNAL', signal)
 }

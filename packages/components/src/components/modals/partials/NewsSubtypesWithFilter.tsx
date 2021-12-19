@@ -37,6 +37,7 @@ import { Text } from '../../common/Text'
 import { useTheme } from '../../context/ThemeContext'
 // We shoud a search bar if there are more than 9 subtypes to be selected.
 const MAX_ITEM_WITHOUT_FILTER = 9
+const MINIMUM_SUBTYPES_SIZE_FOR_SORTING = 15
 
 export interface NewsSubtypesWithFilterProps {
   source: NewsFeedColumnSource
@@ -238,8 +239,22 @@ export const NewsSubtypesWithFilter = React.memo(
         }
         return null
       }
-      const filteredSubsourceRows = filteredSubSources.map(
-        (subtype: string) => {
+
+      // if subtypes reach certain size, move selected to the front
+      const compareFunc = (first: string, second: string) => {
+        if (
+          filteredSubSources.length >= MINIMUM_SUBTYPES_SIZE_FOR_SORTING &&
+          selectedSubtypes.includes(first) &&
+          !selectedSubtypes.includes(second)
+        ) {
+          return -1
+        }
+        return 0
+      }
+
+      const filteredSubsourceRows = filteredSubSources
+        .sort(compareFunc)
+        .map((subtype: string) => {
           const subSourceNameBold = (
             <ThemedText
               color="foregroundColorMuted65"
@@ -287,8 +302,7 @@ export const NewsSubtypesWithFilter = React.memo(
               />
             </View>
           )
-        },
-      )
+        })
       return (
         <>
           {renderSelectAll()}

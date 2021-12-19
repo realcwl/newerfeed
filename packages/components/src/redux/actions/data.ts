@@ -39,6 +39,13 @@ export function capatureView(payload: {
   return createAction('CAPTURE_VIEW', payload)
 }
 
+export function capatureViewCompleted(payload: {
+  // Indicate the item under action.
+  itemNodeId: string
+}) {
+  return createAction('CAPTURE_VIEW_COMPLETED', payload)
+}
+
 export function itemViewSavedToClipboard(payload: {
   // Indicate the item under action.
   itemNodeId: string
@@ -69,4 +76,16 @@ export function fetchPostFailure(payload: {
   id: string
 }) {
   return createAction('FETCH_POST_FAILURE', payload)
+}
+
+export function setColumnVisibleItems(payload: {
+  columnId: string | undefined
+  firstVisibleItemId: string
+  lastVisibleItemId: string
+}) {
+  return createAction('UPDATE_COLUMN_VISIBLE_ITEMS', payload)
+}
+
+export function resetColumnVisibleItems(payload: { columnId: string }) {
+  return createAction('RESET_COLUMN_VISIBLE_ITEMS', payload)
 }

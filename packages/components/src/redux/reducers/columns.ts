@@ -43,6 +43,8 @@ export interface State {
   dataUpdatedAt: string | undefined
   // loading data id
   loadingDataId: string
+  // ItemNodeId of a post which is capturing its view to the clipboard
+  viewCapturingItemNodeId: string
 }
 
 export const initialState: State = {
@@ -56,6 +58,7 @@ export const initialState: State = {
   savedDataIds: [],
   dataUpdatedAt: undefined,
   loadingDataId: '',
+  viewCapturingItemNodeId: '',
 }
 
 // Update the cursor window for this column
@@ -518,6 +521,43 @@ export const columnsReducer: Reducer<State> = (
         const { id } = action.payload
         draft.loadingDataId = ''
       })
+
+    case 'UPDATE_COLUMN_VISIBLE_ITEMS':
+      return immer(state, (draft) => {
+        const { columnId, firstVisibleItemId, lastVisibleItemId } =
+          action.payload
+        if (columnId == null) {
+          return
+        }
+        const column = draft.columnById[columnId]
+        if (!column) {
+          console.error('column id does not exist: ', columnId)
+          return
+        }
+        column.firstVisibleItemId = firstVisibleItemId
+        column.lastVisibleItemId = lastVisibleItemId
+      })
+    case 'RESET_COLUMN_VISIBLE_ITEMS':
+      return immer(state, (draft) => {
+        const { columnId } = action.payload
+        const column = draft.columnById[columnId]
+        if (!column) {
+          console.error('column id does not exist: ', columnId)
+          return
+        }
+        column.firstVisibleItemId = undefined
+        column.lastVisibleItemId = undefined
+      })
+    case 'CAPTURE_VIEW': {
+      return immer(state, (draft) => {
+        draft.viewCapturingItemNodeId = action.payload.itemNodeId
+      })
+    }
+    case 'CAPTURE_VIEW_COMPLETED': {
+      return immer(state, (draft) => {
+        draft.viewCapturingItemNodeId = ''
+      })
+    }
     default:
       return state
   }
