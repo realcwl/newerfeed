@@ -188,7 +188,9 @@ export const postToNewsFeedData = (post: Post): NewsFeedData => {
     attachments: attachments,
     semanticHashing: post.semanticHashing,
     tags: post.tags,
-    thread: post.replyThread.map((p) => postToNewsFeedData(p)),
+    thread: !!post.replyThread
+      ? post.replyThread.map((p) => postToNewsFeedData(p))
+      : undefined,
   }
 }
 

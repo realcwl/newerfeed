@@ -61,6 +61,37 @@ export const initialState: State = {
   viewCapturingItemNodeId: '',
 }
 
+function insertNewsFeedDataIfNotExist(
+  allDataIds: string[],
+  dataById: Record<string, NewsFeedData>,
+  singleData: NewsFeedData,
+): void {
+  // Insert data itself
+  if (singleData.id in dataById) return
+  dataById[singleData.id] = singleData
+  allDataIds.push(singleData.id)
+
+  // Insert repost data.
+  if (!!singleData.repostedFrom) {
+    insertNewsFeedDataIfNotExist(allDataIds, dataById, singleData.repostedFrom)
+  }
+
+  // Insert thread data.
+  if (!!singleData.thread && singleData.thread.length != 0) {
+    insertNewsFeedDataArray(allDataIds, dataById, singleData.thread)
+  }
+}
+
+function insertNewsFeedDataArray(
+  allDataIds: string[],
+  dataById: Record<string, NewsFeedData>,
+  data: NewsFeedData[],
+) {
+  for (const singleData of data) {
+    insertNewsFeedDataIfNotExist(allDataIds, dataById, singleData)
+  }
+}
+
 // Update the cursor window for this column
 function updateColumnCursor(
   column: NewsFeedColumn,
@@ -382,19 +413,8 @@ export const columnsReducer: Reducer<State> = (
         } = action.payload
 
         // insert into data reducer if not already exist. This will also apply
-        // to reposted data (e.g. Tweeter, Weibo).
-        for (const singleData of data) {
-          if (singleData.id in draft.dataById) continue
-          draft.dataById[singleData.id] = singleData
-          draft.allDataIds.push(singleData.id)
-          if (
-            !!singleData.repostedFrom &&
-            !(singleData.repostedFrom.id in draft.dataById)
-          ) {
-            draft.dataById[singleData.repostedFrom.id] = singleData.repostedFrom
-            draft.allDataIds.push(singleData.repostedFrom.id)
-          }
-        }
+        // to reposted data (e.g. Tweeter, Weibo), as well as thread.
+        insertNewsFeedDataArray(draft.allDataIds, draft.dataById, data)
 
         const column = draft.columnById[columnId]
         if (!column) return
