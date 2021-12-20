@@ -1,10 +1,9 @@
-import { ColorSchemeName } from 'react-native'
-
 import {
   NewsFeedColumnSource,
   SourceOrSubSource,
   TryCustomizedCrawlerPost,
   ThemePair,
+  CustomizedCrawlerSpec,
 } from '@devhub/core'
 import { createAction } from '../helpers'
 
@@ -23,17 +22,11 @@ export function setSourcesAndIdMap(payload: {
 }
 
 export function tryCustomizedCrawler(payload: {
-  startUrl: string
-  base: string
-  title: string
-  content: string
-  externalId: string
-  time: string
-  image: string
-  postUrl: string
+  customizedCrawlerSpec: CustomizedCrawlerSpec
 }) {
   return createAction('TRY_CUSTOMIZED_CRAWLER', payload)
 }
+
 export function tryCustomizedCrawlerSuccess(payload: {
   allPostsCrawled: TryCustomizedCrawlerPost[]
 }) {
@@ -50,14 +43,7 @@ export function tryCustomizedCrawlerTerminate(payload: {}) {
 
 export function addCustomizedSource(payload: {
   sourceName: string
-  startUrl: string
-  base: string
-  title: string
-  content: string
-  externalId: string
-  time: string
-  image: string
-  postUrl: string
+  customizedCrawlerSpec: CustomizedCrawlerSpec
 }) {
   return createAction('ADD_SOURCE', payload)
 }
@@ -65,14 +51,7 @@ export function addCustomizedSource(payload: {
 export function addCustomizedSubSource(payload: {
   subSourceName: string
   subSourceParentSourceId: string
-  startUrl: string
-  base: string
-  title: string
-  content: string
-  externalId: string
-  time: string
-  image: string
-  postUrl: string
+  customizedCrawlerSpec: CustomizedCrawlerSpec
 }) {
   return createAction('ADD_CUSTOMIZED_SUBSOURCE', payload)
 }

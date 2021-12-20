@@ -426,3 +426,14 @@ export interface TryCustomizedCrawlerPost {
 
   baseHtml: string
 }
+
+export interface CustomizedCrawlerSpec {
+  startUrl: string
+  base: string
+  title: string
+  content: string
+  externalId: string
+  time: string
+  image: string
+  postUrl: string
+}

@@ -1,12 +1,5 @@
 import { useDispatch } from 'react-redux'
-import {
-  useFormik,
-  FormikProps,
-  FormikValues,
-  Field,
-  Formik,
-  ErrorMessage,
-} from 'formik'
+import { useFormik } from 'formik'
 import { Screen } from '../components/common/Screen'
 import { Helmet } from '../libs/react-helmet-async'
 import { View, ScrollView } from 'react-native'
@@ -90,14 +83,14 @@ export const AddSourceOrSubsourceScreen = React.memo(
     )
 
     const getWarningMsg = () => {
-      if (addCustomizedSourceStatus === constants.ADD_SOURCE_STATUS.FAILED) {
+      if (addCustomizedSourceStatus === constants.AddSourceStatus.Failed) {
         return addCustomizedSourceErrorMsg
       }
-      if (tryCrawlerStatus === constants.ADD_SOURCE_STATUS.FAILED) {
+      if (tryCrawlerStatus === constants.TryCustomizedCrawlerStatus.Failed) {
         return tryCrawlerErrorMsg
       }
       if (
-        addCustomizedSourceStatus === constants.ADD_SOURCE_STATUS.LOADED &&
+        addCustomizedSourceStatus === constants.AddSourceStatus.Loaded &&
         addedCustomizedSource.id != ''
       ) {
         return (
@@ -122,19 +115,11 @@ export const AddSourceOrSubsourceScreen = React.memo(
       return availableNewsFeedSources[0].sourceId
     }
 
-    const sharedSchema = Yup.object().shape({
-      startUrl: Yup.string().url().required('Required'),
-      base: Yup.string().required('Required'),
-      content: Yup.string().required('Required'),
-    })
-
     const sourceSchema = Yup.object().shape({
-      sharedSchema,
       sourceName: Yup.string().required('Required'),
     })
 
     const subsourceSchema = Yup.object().shape({
-      sharedSchema,
       subSourceName: Yup.string().required('Required'),
       subSourceParentSourceId: Yup.string().required('Required'),
       startUrl: Yup.string().url().required('Required'),
@@ -170,19 +155,28 @@ export const AddSourceOrSubsourceScreen = React.memo(
         if (values.isTrying) {
           dispatch(
             tryCustomizedCrawler({
-              ...values,
+              customizedCrawlerSpec: {
+                ...values,
+              },
             }),
           )
         } else if (props.isAddingSource) {
           dispatch(
             addCustomizedSource({
-              ...values,
+              sourceName: values.sourceName,
+              customizedCrawlerSpec: {
+                ...values,
+              },
             }),
           )
         } else {
           dispatch(
             addCustomizedSubSource({
-              ...values,
+              subSourceName: values.subSourceName,
+              subSourceParentSourceId: values.subSourceParentSourceId,
+              customizedCrawlerSpec: {
+                ...values,
+              },
             }),
           )
         }
@@ -390,11 +384,11 @@ export const AddSourceOrSubsourceScreen = React.memo(
                   }}
                   disabled={
                     tryCrawlerStatus ===
-                    constants.TRY_CUSTOMIZED_CRAWLER_STATUS.LOADING
+                    constants.TryCustomizedCrawlerStatus.Loading
                   }
                 >
                   {tryCrawlerStatus ===
-                  constants.TRY_CUSTOMIZED_CRAWLER_STATUS.LOADING
+                  constants.TryCustomizedCrawlerStatus.Loading
                     ? 'Loading...'
                     : 'Try crawler'}
                 </Button>
@@ -408,11 +402,11 @@ export const AddSourceOrSubsourceScreen = React.memo(
                   }}
                   disabled={
                     tryCrawlerStatus ===
-                    constants.TRY_CUSTOMIZED_CRAWLER_STATUS.LOADING
+                    constants.TryCustomizedCrawlerStatus.Loading
                   }
                 >
                   {addCustomizedSourceStatus ===
-                  constants.ADD_SOURCE_STATUS.LOADING
+                  constants.AddSourceStatus.Loading
                     ? 'Loading...'
                     : 'Add ' + target}
                 </Button>

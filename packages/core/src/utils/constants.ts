@@ -116,11 +116,20 @@ export const SIMILARITY_THRESHOLD = 37
 // window.
 export const SIMILARITY_WINDOW_MILLISECOND = 1000 * 60 * 60 // 1 hour
 
-export const ADD_SOURCE_STATUS = {
-  LOADING: 'LOADING',
-  LOADED: 'LOADED',
-  FAILED: 'FAILED',
+export enum AddSourceStatus {
+  Loading = 'LOADING',
+  Loaded = 'LOADED',
+  Failed = 'FAILED',
 }
 
-export const TRY_CUSTOMIZED_CRAWLER_STATUS = ADD_SOURCE_STATUS
-export const ADD_SUB_SOURCE_STATUS = ADD_SOURCE_STATUS
+export enum TryCustomizedCrawlerStatus {
+  Loading = 'LOADING',
+  Loaded = 'LOADED',
+  Failed = 'FAILED',
+}
+
+export enum AddSubSourceStatus {
+  Loading = 'LOADING',
+  Loaded = 'LOADED',
+  Failed = 'FAILED',
+}

@@ -3,6 +3,7 @@ import {
   NewsFeedColumnSource,
   SourceOrSubSource,
   TryCustomizedCrawlerPost,
+  CustomizedCrawlerSpec,
 } from '@devhub/core'
 import { all, select, takeLatest, delay, put } from 'typed-redux-saga'
 import axios, { AxiosResponse } from 'axios'
@@ -220,14 +221,7 @@ function* onTryCustomizedCawler(
     const tryCustomizedCrawlerResponse: AxiosResponse<TryCustomizedCrawlerResponse> =
       yield axios.post(WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken), {
         query: tryCustomizedCrawlerRequest(
-          action.payload.startUrl,
-          action.payload.base,
-          action.payload.title,
-          action.payload.content,
-          action.payload.externalId,
-          action.payload.time,
-          action.payload.image,
-          action.payload.postUrl,
+          action.payload.customizedCrawlerSpec,
         ),
       })
     yield put(
@@ -261,29 +255,20 @@ function GetPostsFromTryCustomizedCrawlerResponse(
   return res
 }
 
-function tryCustomizedCrawlerRequest(
-  startUrl: string,
-  base: string,
-  title: string,
-  content: string,
-  externalId: string,
-  time: string,
-  image: string,
-  postUrl: string,
-): string {
+function tryCustomizedCrawlerRequest(spec: CustomizedCrawlerSpec): string {
   return jsonToGraphQLQuery({
     query: {
       tryCustomizedCrawler: {
         __args: {
           input: {
-            crawlUrl: startUrl,
-            baseSelector: base,
-            titleRelativeSelector: title,
-            contentRelativeSelector: content,
-            externalIdRelativeSelector: externalId,
-            timeRelativeSelector: time,
-            imageRelativeSelector: image,
-            originUrlRelativeSelector: postUrl,
+            crawlUrl: spec.startUrl,
+            baseSelector: spec.base,
+            titleRelativeSelector: spec.title,
+            contentRelativeSelector: spec.content,
+            externalIdRelativeSelector: spec.externalId,
+            timeRelativeSelector: spec.time,
+            imageRelativeSelector: spec.image,
+            originUrlRelativeSelector: spec.postUrl,
           },
         },
         title: true,
@@ -305,21 +290,14 @@ function* onAddCustomizedSubSource(
       yield put(actions.authFailure(Error('no user id found')))
       return
     }
-    const domain = new URL(action.payload.startUrl)
+    const domain = new URL(action.payload.customizedCrawlerSpec.startUrl)
     const addSubSourceResponse: AxiosResponse<UpsertSubSourceResponse> =
       yield axios.post(WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken), {
         query: getAddCustomizedSubSourceRequest(
           action.payload.subSourceName,
           action.payload.subSourceParentSourceId,
           domain.hostname,
-          action.payload.startUrl,
-          action.payload.base,
-          action.payload.title,
-          action.payload.content,
-          action.payload.externalId,
-          action.payload.time,
-          action.payload.image,
-          action.payload.postUrl,
+          action.payload.customizedCrawlerSpec,
         ),
       })
 
@@ -349,14 +327,7 @@ function getAddCustomizedSubSourceRequest(
   name: string,
   sourceId: string,
   originUrl: string,
-  startUrl: string,
-  base: string,
-  title: string,
-  content: string,
-  externalId: string,
-  time: string,
-  image: string,
-  postUrl: string,
+  spec: CustomizedCrawlerSpec,
 ): string {
   return jsonToGraphQLQuery({
     mutation: {
@@ -373,14 +344,14 @@ function getAddCustomizedSubSourceRequest(
             isFromSharedPost: false,
             originUrl: originUrl,
             customizedCrawlerParams: {
-              crawlUrl: startUrl,
-              baseSelector: base,
-              titleRelativeSelector: title,
-              contentRelativeSelector: content,
-              externalIdRelativeSelector: externalId,
-              timeRelativeSelector: time,
-              imageRelativeSelector: image,
-              originUrlRelativeSelector: postUrl,
+              crawlUrl: spec.startUrl,
+              baseSelector: spec.base,
+              titleRelativeSelector: spec.title,
+              contentRelativeSelector: spec.content,
+              externalIdRelativeSelector: spec.externalId,
+              timeRelativeSelector: spec.time,
+              imageRelativeSelector: spec.image,
+              originUrlRelativeSelector: spec.postUrl,
             },
           },
         },
@@ -400,21 +371,14 @@ function* onAddSource(
       yield put(actions.authFailure(Error('no user id found')))
       return
     }
-    const domain = new URL(action.payload.startUrl)
+    const domain = new URL(action.payload.customizedCrawlerSpec.startUrl)
     const addSourceResponse: AxiosResponse<AddSourceResponse> =
       yield axios.post(WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken), {
         query: getAddSourceRequest(
           userId,
           action.payload.sourceName,
           domain.hostname,
-          action.payload.startUrl,
-          action.payload.base,
-          action.payload.title,
-          action.payload.content,
-          action.payload.externalId,
-          action.payload.time,
-          action.payload.image,
-          action.payload.postUrl,
+          action.payload.customizedCrawlerSpec,
         ),
       })
     yield put(
@@ -441,14 +405,7 @@ function getAddSourceRequest(
   userId: string,
   sourceName: string,
   domain: string,
-  startUrl: string,
-  base: string,
-  title: string,
-  content: string,
-  externalId: string,
-  time: string,
-  image: string,
-  postUrl: string,
+  spec: CustomizedCrawlerSpec,
 ): string {
   return jsonToGraphQLQuery({
     mutation: {
@@ -460,14 +417,14 @@ function getAddSourceRequest(
             domain: domain,
             customizedCrawlerPanopticConfigForm: {
               customizedCrawlerParams: {
-                crawlUrl: startUrl,
-                baseSelector: base,
-                titleRelativeSelector: title,
-                contentRelativeSelector: content,
-                externalIdRelativeSelector: externalId,
-                timeRelativeSelector: time,
-                imageRelativeSelector: image,
-                originUrlRelativeSelector: postUrl,
+                crawlUrl: spec.startUrl,
+                baseSelector: spec.base,
+                titleRelativeSelector: spec.title,
+                contentRelativeSelector: spec.content,
+                externalIdRelativeSelector: spec.externalId,
+                timeRelativeSelector: spec.time,
+                imageRelativeSelector: spec.image,
+                originUrlRelativeSelector: spec.postUrl,
               },
             },
           },
