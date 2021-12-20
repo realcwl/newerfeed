@@ -93,12 +93,7 @@ export const AddSourceOrSubsourceScreen = React.memo(
         addCustomizedSourceStatus === constants.AddSourceStatus.Loaded &&
         addedCustomizedSource.id != ''
       ) {
-        return (
-          'Successfully upserted ' +
-          addedCustomizedSource.name +
-          ', id ' +
-          addedCustomizedSource.id
-        )
+        return `Successfully upserted  ${addedCustomizedSource.name}, id ${addedCustomizedSource.id}`
       }
       return null
     }
