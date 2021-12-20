@@ -59,11 +59,17 @@ function* onSignal(
       yield* fetchSeedState()
       break
     }
-    case 'SYNC_ITEMS_READ_STATUS': {
+    case 'SET_ITEMS_READ_STATUS': {
+      // TODO: move the payload parser to a dedicated file when we have more types of signals
+      const REDIS_TRUE = '1'
+      const PAYLOAD_DELIMITER = '_'
       yield put(
         setItemsReadStatus({
-          itemNodeIds: action.payload.signalPayload,
-          read: true,
+          itemNodeIds: action.payload.signalPayload
+            .split(PAYLOAD_DELIMITER)
+            .slice(1),
+          read: action.payload.signalPayload[0] === REDIS_TRUE,
+          syncup: false,
         }),
       )
       break

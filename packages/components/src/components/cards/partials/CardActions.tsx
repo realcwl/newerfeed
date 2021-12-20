@@ -95,6 +95,7 @@ export function CardActions(props: CardActionsProps) {
             actions.setItemsReadStatus({
               itemNodeIds: [itemNodeId],
               read: !isRead,
+              syncup: true,
             }),
           )
         }}

@@ -410,7 +410,7 @@ export interface FeedSeedState {
 
 export interface Signal {
   signalType: SignalType
-  signalPayload: string[]
+  signalPayload: string
 }
 
-export type SignalType = 'SEED_STATE' | 'SYNC_ITEMS_READ_STATUS'
+export type SignalType = 'SEED_STATE' | 'SET_ITEMS_READ_STATUS'

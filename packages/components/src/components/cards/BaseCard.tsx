@@ -386,6 +386,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               setItemsReadStatus({
                 itemNodeIds: [nodeIdOrId],
                 read: true,
+                syncup: true,
               }),
             )
           }}
@@ -641,6 +642,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                         setItemsReadStatus({
                           itemNodeIds: [nodeIdOrId],
                           read: true,
+                          syncup: true,
                         }),
                       )
                     }

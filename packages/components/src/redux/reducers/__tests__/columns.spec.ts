@@ -684,6 +684,7 @@ describe('columnsReducer', () => {
     const readAction = setItemsReadStatus({
       itemNodeIds: readIds,
       read: true,
+      syncup: true,
     })
     const readState = columnsReducer(defaultState, readAction)
     readIds.map((readId) => {
@@ -696,6 +697,7 @@ describe('columnsReducer', () => {
     const unreadAction = setItemsReadStatus({
       itemNodeIds: readIds,
       read: false,
+      syncup: true,
     })
     const unreadState = columnsReducer(readState, unreadAction)
     readIds.map((readId) => {

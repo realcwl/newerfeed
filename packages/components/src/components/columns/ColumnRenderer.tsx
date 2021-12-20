@@ -164,6 +164,7 @@ export const ColumnRenderer = React.memo((props: ColumnRendererProps) => {
                   actions.setItemsReadStatus({
                     itemNodeIds: filteredItemsIds,
                     read: true,
+                    syncup: true,
                   }),
                 )
 

@@ -54,6 +54,7 @@ export interface Post {
   originUrl: string
   semanticHashing: string
   tags: string[]
+  isRead: boolean
 }
 
 interface FeedResponse {
@@ -182,7 +183,7 @@ export const postToNewsFeedData = (post: Post): NewsFeedData => {
       ? postToNewsFeedData(post.sharedFromPost)
       : undefined,
     url: post.originUrl,
-    isRead: false,
+    isRead: post.isRead,
     isSaved: false,
     attachments: attachments,
     semanticHashing: post.semanticHashing,
@@ -348,6 +349,7 @@ function constructFeedRequest(
           },
           semanticHashing: true,
           tags: true,
+          isRead: true,
         },
         subSources: {
           id: true,
@@ -886,7 +888,7 @@ function constructSetItemsReadStatusRequest(
   read: boolean,
 ) {
   return jsonToGraphQLQuery({
-    query: {
+    mutation: {
       setItemsReadStatus: {
         __args: {
           input: {
@@ -903,7 +905,10 @@ function constructSetItemsReadStatusRequest(
 function* onsetItemsReadStatus(
   action: ExtractActionFromActionCreator<typeof actions.setItemsReadStatus>,
 ) {
-  console.log('I am here')
+  if (!action.payload.syncup) {
+    return
+  }
+
   const itemNodeIds = action.payload.itemNodeIds
   const read = action.payload.read
   const appToken = yield* select(selectors.appTokenSelector)
@@ -916,7 +921,9 @@ function* onsetItemsReadStatus(
   try {
     yield axios.post(
       WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken || ''),
-      { query: constructSetItemsReadStatusRequest(itemNodeIds, userId, read) },
+      {
+        query: constructSetItemsReadStatusRequest(itemNodeIds, userId, read),
+      },
     )
   } catch (e) {
     console.error(e)

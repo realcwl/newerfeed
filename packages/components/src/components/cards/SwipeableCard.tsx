@@ -27,6 +27,7 @@ export function SwipeableCard(props: CardWithLinkProps) {
       actions.setItemsReadStatus({
         itemNodeIds: [item.id],
         read: !isRead,
+        syncup: true,
       }),
     )
   }

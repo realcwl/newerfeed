@@ -24,6 +24,8 @@ export function setItemsReadStatus(payload: {
   itemNodeIds: string[]
   // Indicate whether user read this item or not
   read: boolean
+  // syncup
+  syncup: boolean
 }) {
   return createAction('SET_ITEMS_READ_STATUS', payload)
 }
