@@ -115,3 +115,21 @@ export const SIMILARITY_THRESHOLD = 37
 // Only consider 2 posts to be similar if they are posted within this time
 // window.
 export const SIMILARITY_WINDOW_MILLISECOND = 1000 * 60 * 60 // 1 hour
+
+export enum AddSourceStatus {
+  Loading = 'LOADING',
+  Loaded = 'LOADED',
+  Failed = 'FAILED',
+}
+
+export enum TryCustomizedCrawlerStatus {
+  Loading = 'LOADING',
+  Loaded = 'LOADED',
+  Failed = 'FAILED',
+}
+
+export enum AddSubSourceStatus {
+  Loading = 'LOADING',
+  Loaded = 'LOADED',
+  Failed = 'FAILED',
+}

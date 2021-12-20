@@ -413,3 +413,27 @@ export interface Signal {
 }
 
 export type SignalType = 'SEED_STATE'
+
+export interface TryCustomizedCrawlerPost {
+  // Source is a predefined list of information sources, such as "weibo",
+  // "twitter", "caixin".
+  title: string
+
+  // Subtypes is a predefined list of subtypes of type string.
+  content: string
+
+  images: string[]
+
+  baseHtml: string
+}
+
+export interface CustomizedCrawlerSpec {
+  startUrl: string
+  base: string
+  title: string
+  content: string
+  externalId: string
+  time: string
+  image: string
+  postUrl: string
+}

@@ -12,11 +12,13 @@ import * as selectors from '../redux/selectors'
 import { LoginScreen } from '../screens/LoginScreen'
 import { MainScreen } from '../screens/MainScreen'
 import { SharedPostScreen } from '../screens/SharedPostScreen'
+import { AddSourceOrSubsourceScreen } from '../screens/AddSourceOrSubsourceScreen'
 
 export const RouteConfiguration = {
   root: '/',
   login: '/login',
   sharedPost: '/shared-posts/:id',
+  addCustomizedSubsource: '/add-subsource',
 }
 
 export interface RouteParamsSharedPost {
@@ -37,7 +39,9 @@ export const AppNavigator = React.memo(() => {
             <Redirect
               to={{
                 pathname: RouteConfiguration.login,
-                state: { from: location },
+                state: {
+                  from: location,
+                },
               }}
             />
           )
@@ -57,6 +61,12 @@ export const AppNavigator = React.memo(() => {
         </Route>
         <Route exact path={RouteConfiguration.sharedPost}>
           <SharedPostScreen key="shared-post-screen" />
+        </Route>
+        <Route exact path={RouteConfiguration.addCustomizedSubsource}>
+          <AddSourceOrSubsourceScreen
+            isAddingSource={false}
+            key="add-subsource-screen"
+          />
         </Route>
       </Switch>
     </Router>
