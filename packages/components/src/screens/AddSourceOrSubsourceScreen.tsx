@@ -110,7 +110,7 @@ export const AddSourceOrSubsourceScreen = React.memo(
     }
 
     const getDefaultSourceId = () => {
-      for (let i = 0; i <= availableNewsFeedSources.length; i++) {
+      for (let i = 0; i < availableNewsFeedSources.length; i++) {
         if (
           idToSourceOrSubSourceMap[availableNewsFeedSources[i].sourceId]
             .name === '公司博客'
