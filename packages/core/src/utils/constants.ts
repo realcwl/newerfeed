@@ -55,11 +55,11 @@ export const API_BASE_URL = 'rnr.capital'
 export const GRAPHQL_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `https://${APP_BASE_URL}/api/graphql`
-    : 'http://localhost:8080/api/graphql'
+    : 'https://rnr.capital/api/graphql'
 export const GRAPHQL_SUBSCRIPTION_ENDPOINT =
   process.env.NODE_ENV === 'production'
     ? `wss://${APP_BASE_URL}/api/subscription`
-    : 'wss://localhost:8080/api/subscription'
+    : 'wss://rnr.capital/api/subscription'
 export const CURRENT_APP_URL =
   process.env.NODE_ENV === 'production'
     ? `https://${APP_BASE_URL}`
