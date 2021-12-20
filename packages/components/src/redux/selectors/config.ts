@@ -14,6 +14,9 @@ export const themePairSelector = (state: RootState) =>
 export const availableNewsFeedSourcesSelector = (state: RootState) =>
   s(state).availableNewsFeedSources
 
+export const availableCustomizedSubSourcesIdsSelector = (state: RootState) =>
+  s(state).availableCustomizedSubSourcesIds
+
 export const availableNewsFeedSubsourcesCountSelecter = createSelector(
   availableNewsFeedSourcesSelector,
   (sources) => {

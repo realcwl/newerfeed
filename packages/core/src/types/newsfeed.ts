@@ -178,6 +178,9 @@ export interface SourceOrSubSource {
   // profile URL leads to the home page.
   profileURL?: string
   state?: LoadState
+
+  // record subsource's parent source id
+  parentSourceId?: string
 }
 
 export interface ColumnOptions {

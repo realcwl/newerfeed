@@ -10,13 +10,16 @@ import { ThemedText } from '../components/themed/ThemedText'
 import { Button } from '../components/common/Button'
 import { Container, ScreenBreakpoints } from '../components/common/Container'
 import { sharedStyles } from '../styles/shared'
-import { contentPadding } from '../styles/variables'
+import { TagToken } from '../components/common/TagToken'
+import { contentPadding, scaleFactor } from '../styles/variables'
 import {
   tryCustomizedCrawler,
   addCustomizedSource,
   addCustomizedSubSource,
   tryCustomizedCrawlerTerminate,
   addCustomizedCrawlerTerminate,
+  fetchCustomizedSubsources,
+  deleteCustomizedSubSource,
 } from '../redux/actions'
 import { useReduxState } from '../hooks/use-redux-state'
 import * as Yup from 'yup'
@@ -50,6 +53,10 @@ export const AddSourceOrSubsourceScreen = React.memo(
     const dispatch = useDispatch()
     const target = props.isAddingSource ? 'Source' : 'Sub Source'
 
+    React.useEffect(() => {
+      dispatch(fetchCustomizedSubsources({}))
+    }, [])
+
     const tryCrawlerStatus = useReduxState(
       selectors.tryCustomizedCrawlerStatusSelector,
     )
@@ -80,6 +87,10 @@ export const AddSourceOrSubsourceScreen = React.memo(
 
     const availableNewsFeedSources = useReduxState(
       selectors.availableNewsFeedSourcesSelector,
+    )
+
+    const availableCustomizedSubSourcesIds = useReduxState(
+      selectors.availableCustomizedSubSourcesIdsSelector,
     )
 
     const getWarningMsg = () => {
@@ -224,7 +235,7 @@ export const AddSourceOrSubsourceScreen = React.memo(
     const sourceForm = () => {
       return (
         <View>
-          <HeaderMessage>{target}</HeaderMessage>
+          <HeaderMessage>{'Add New ' + target}</HeaderMessage>
           <Spacer height={contentPadding} />
           {getTextInput(formik, 'Name of the Source', '', 'sourceName')}
         </View>
@@ -234,7 +245,7 @@ export const AddSourceOrSubsourceScreen = React.memo(
     const subSourceForm = () => {
       return (
         <View>
-          <HeaderMessage>{target}</HeaderMessage>
+          <HeaderMessage>{'Add New ' + target}</HeaderMessage>
           <Spacer height={contentPadding} />
           <ThemedText color="foregroundColor" style={[sharedStyles.largeText]}>
             Add into this Source
@@ -298,6 +309,50 @@ export const AddSourceOrSubsourceScreen = React.memo(
       )
     }
 
+    const getListForDeletion = () => {
+      return (
+        <View style={[sharedStyles.fullWidth]}>
+          {availableCustomizedSubSourcesIds.map((subSourceId, index) => {
+            return (
+              <View key={index} style={{ width: '100%' }}>
+                <Spacer height={contentPadding} />
+                <View style={{ flexDirection: 'row' }}>
+                  <TagToken
+                    label={'Delete'}
+                    colors={{
+                      backgroundThemeColor: theme.isDark
+                        ? 'blueGray'
+                        : undefined,
+                      foregroundThemeColor: theme.isDark ? 'white' : 'black',
+                      foregroundHoverThemeColor: theme.isDark
+                        ? 'white'
+                        : 'black',
+                    }}
+                    onPress={() => {
+                      dispatch(
+                        deleteCustomizedSubSource({
+                          id: subSourceId,
+                        }),
+                      )
+                    }}
+                    size={20 * scaleFactor}
+                  />
+                  <ThemedText
+                    color="foregroundColor"
+                    style={{ textAlign: 'center' }}
+                  >
+                    {idToSourceOrSubSourceMap[subSourceId]
+                      ? idToSourceOrSubSourceMap[subSourceId].name
+                      : 'subsource id not found'}
+                  </ThemedText>
+                </View>
+              </View>
+            )
+          })}
+        </View>
+      )
+    }
+
     return (
       <Screen statusBarBackgroundThemeColor="transparent" enableSafeArea={true}>
         <Helmet>
@@ -332,11 +387,12 @@ export const AddSourceOrSubsourceScreen = React.memo(
                 (*为选填项目)
                 <br />
               </ThemedText>
+              <HeaderMessage>All Customize Subsources</HeaderMessage>
+              {getListForDeletion()}
               <Spacer height={contentPadding} />
-
               {props.isAddingSource ? sourceForm() : subSourceForm()}
               <Spacer height={contentPadding} />
-              <HeaderMessage>Customize crawler</HeaderMessage>
+              <HeaderMessage>Define Customize crawler</HeaderMessage>
 
               {getTextInput(
                 formik,
