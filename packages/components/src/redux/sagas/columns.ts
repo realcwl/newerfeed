@@ -35,6 +35,8 @@ import { notify } from '../../utils/notify'
 
 import { saveViewToClipboard } from '../../libs/html-to-image'
 
+export type ItemType = 'POST' | 'DUPLICATION'
+
 export interface Post {
   id: string
   title: string
@@ -886,6 +888,7 @@ function constructSetItemsReadStatusRequest(
   itemNodeIds: string[],
   userId: string,
   read: boolean,
+  type: EnumType,
 ) {
   return jsonToGraphQLQuery({
     mutation: {
@@ -895,6 +898,7 @@ function constructSetItemsReadStatusRequest(
             userId,
             itemNodeIds,
             read,
+            type,
           },
         },
       },
@@ -922,7 +926,47 @@ function* onsetItemsReadStatus(
     yield axios.post(
       WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken || ''),
       {
-        query: constructSetItemsReadStatusRequest(itemNodeIds, userId, read),
+        query: constructSetItemsReadStatusRequest(
+          itemNodeIds,
+          userId,
+          read,
+          new EnumType('POST'),
+        ),
+      },
+    )
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+function* onsetItemDuplicationReadStatus(
+  action: ExtractActionFromActionCreator<
+    typeof actions.setItemDuplicationReadStatus
+  >,
+) {
+  if (!action.payload.syncup) {
+    return
+  }
+
+  const itemNodeId = action.payload.itemNodeId
+  const read = action.payload.read
+  const appToken = yield* select(selectors.appTokenSelector)
+  const userId = yield* select(selectors.currentUserIdSelector)
+  if (!userId) {
+    yield put(actions.authFailure(Error('no user id found')))
+    return
+  }
+
+  try {
+    yield axios.post(
+      WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken || ''),
+      {
+        query: constructSetItemsReadStatusRequest(
+          [itemNodeId],
+          userId,
+          read,
+          new EnumType('DUPLICATION'),
+        ),
       },
     )
   } catch (e) {
@@ -945,5 +989,9 @@ export function* columnsSagas() {
     yield* takeLatest('CAPTURE_VIEW', onCaptureItemView),
     yield* takeEvery('FETCH_POST', onFetchPostById),
     yield* takeEvery('SET_ITEMS_READ_STATUS', onsetItemsReadStatus),
+    yield* takeEvery(
+      'SET_ITEM_DUPLICATION_READ_STATUS',
+      onsetItemDuplicationReadStatus,
+    ),
   ])
 }

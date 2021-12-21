@@ -12,6 +12,7 @@ import {
   closeBannerMessage,
   handleSignal,
   setBannerMessage,
+  setItemDuplicationReadStatus,
   setItemsReadStatus,
   updateSeedState,
 } from '../actions'
@@ -20,6 +21,7 @@ import * as selectors from '../selectors'
 import { WrapUrlWithToken } from '../../utils/api'
 import { constants, SeedState } from '@devhub/core'
 import { jsonToGraphQLQuery } from 'json-to-graphql-query'
+import { split } from 'lodash'
 
 // Response returned from the backend for userState.
 interface UserStateResponse {
@@ -63,15 +65,27 @@ function* onSignal(
       // TODO: move the payload parser to a dedicated file when we have more types of signals
       const REDIS_TRUE = '1'
       const PAYLOAD_DELIMITER = '_'
-      yield put(
-        setItemsReadStatus({
-          itemNodeIds: action.payload.signalPayload
-            .split(PAYLOAD_DELIMITER)
-            .slice(1),
-          read: action.payload.signalPayload[0] === REDIS_TRUE,
-          syncup: false,
-        }),
-      )
+      const splits = action.payload.signalPayload.split(PAYLOAD_DELIMITER)
+      switch (splits[0]) {
+        case 'POST':
+          yield put(
+            setItemsReadStatus({
+              itemNodeIds: splits.slice(2),
+              read: splits[1] === REDIS_TRUE,
+              syncup: false,
+            }),
+          )
+          break
+        case 'DUPLICATION':
+          yield put(
+            setItemDuplicationReadStatus({
+              itemNodeId: splits[2],
+              read: splits[1] === REDIS_TRUE,
+              syncup: false,
+            }),
+          )
+          break
+      }
       break
     }
     default: {

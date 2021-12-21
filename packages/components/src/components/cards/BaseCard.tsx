@@ -380,6 +380,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               setItemDuplicationReadStatus({
                 itemNodeId: nodeIdOrId,
                 read: true,
+                syncup: true,
               }),
             )
             dispatch(
