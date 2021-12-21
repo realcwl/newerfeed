@@ -13,7 +13,8 @@ function dataMatchesQuery(data: NewsFeedData, query: string): boolean {
   if (!query) return true
   return (
     (!!data.text && data.text.includes(query)) ||
-    (!!data.title && data.title.includes(query))
+    (!!data.title && data.title.includes(query)) ||
+    (!!data.subSource?.name && data.subSource?.name.includes(query))
   )
 }
 
