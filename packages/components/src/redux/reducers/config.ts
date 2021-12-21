@@ -17,6 +17,10 @@ export interface State {
   // all available sources, which will be fetched everytime we launch NewsFeed.
   availableNewsFeedSources: NewsFeedColumnSource[]
 
+  // all available customized subsources "IDs", which will be fetched everytime we go to add-subsource page.
+  // look up details for subsources in idToSourceOrSubSourceMap
+  availableCustomizedSubSourcesIds: string[]
+
   // maps the source/subtype id to the actual attributes.
   idToSourceOrSubSourceMap: Record<string, SourceOrSubSource>
 
@@ -37,6 +41,8 @@ export const initialState: State = {
   theme: constants.DEFAULT_THEME_PAIR,
 
   availableNewsFeedSources: [],
+
+  availableCustomizedSubSourcesIds: [],
 
   idToSourceOrSubSourceMap: {},
 
@@ -95,6 +101,40 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
           draft.idToSourceOrSubSourceMap[id] =
             action.payload.idToSourceOrSubSourceMap[id]
         }
+      })
+    }
+    case 'SET_CUSTOMIZED_SUBSOURCES': {
+      return immer(state, (draft) => {
+        draft.availableCustomizedSubSourcesIds = []
+        for (let i = 0; i < action.payload.subSources.length; i++) {
+          const subsourceId = action.payload.subSources[i].id.toString()
+
+          // update customized subsources ids
+          draft.availableCustomizedSubSourcesIds.push(subsourceId)
+
+          // update id to subsource map
+          if (!(subsourceId in draft.idToSourceOrSubSourceMap)) {
+            draft.idToSourceOrSubSourceMap[subsourceId] =
+              action.payload.subSources[i]
+          }
+
+          // update sources children
+          for (let i = 0; i < draft.availableNewsFeedSources.length; i++) {
+            if (
+              !(subsourceId in draft.availableNewsFeedSources[i].subSourceIds)
+            ) {
+              draft.availableNewsFeedSources[i].subSourceIds.push(subsourceId)
+            }
+          }
+        }
+      })
+    }
+    case 'DELETE_CUSTOMIZED_SUBSOURCE_SUCCESS': {
+      return immer(state, (draft) => {
+        draft.availableCustomizedSubSourcesIds =
+          draft.availableCustomizedSubSourcesIds.filter(
+            (subsourceId) => subsourceId !== action.payload.id,
+          )
       })
     }
     case 'FETCH_COLUMN_DATA_SUCCESS': {

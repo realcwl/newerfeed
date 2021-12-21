@@ -178,6 +178,9 @@ export interface SourceOrSubSource {
   // profile URL leads to the home page.
   profileURL?: string
   state?: LoadState
+
+  // record subsource's parent source id
+  parentSourceId?: string
   // User's external id in the original website.
   externalId?: string
 }
