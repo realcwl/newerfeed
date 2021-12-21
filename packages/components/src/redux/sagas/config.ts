@@ -26,15 +26,18 @@ interface SourcesResponse {
         name: string
         avatarUrl: string
         updatedAt: string
+        externalIdentifier: string
       }[]
     }[]
   }
 }
+
 interface AddSubsourceResponse {
   data: {
-    addWeiboSubSource: {
+    addSubSource: {
       id: string
       name: string
+      externalIdentifier: string
     }
   }
 }
@@ -66,6 +69,7 @@ interface UpsertSubSourceResponse {
     }
   }
 }
+
 function GetAvailableSourcesFromSourcesResponse(
   sourcesResponse: SourcesResponse,
 ): NewsFeedColumnSource[] {
@@ -97,6 +101,7 @@ function GetIdMapFromSourcesResponse(
         id: subSource.id,
         name: subSource.name,
         avatarURL: subSource.avatarUrl,
+        externalId: subSource.externalIdentifier,
       }
     }
   }
@@ -135,6 +140,7 @@ function* fetchAvailableSourcesAndIdMap() {
                 id: true,
                 name: true,
                 avatarUrl: true,
+                externalIdentifier: true,
               },
             },
           },
@@ -176,8 +182,10 @@ function* onAddSubsource(
     yield put(
       actions.addSubsourceSuccess({
         sourceId: sourceId,
-        name: name,
-        subsourceId: addSubsourceResponse.data.data.addWeiboSubSource.id,
+        name: addSubsourceResponse.data.data.addSubSource.name,
+        subsourceId: addSubsourceResponse.data.data.addSubSource.id,
+        externalId:
+          addSubsourceResponse.data.data.addSubSource.externalIdentifier,
       }),
     )
   } catch (e) {
@@ -194,14 +202,16 @@ function* onAddSubsource(
 function getAddSubsourceRequest(sourceId: string, name: string): string {
   return jsonToGraphQLQuery({
     mutation: {
-      addWeiboSubSource: {
+      addSubSource: {
         __args: {
           input: {
-            name: name,
+            sourceId: sourceId,
+            subSourceUserName: name,
           },
         },
         id: true,
         name: true,
+        externalIdentifier: true,
       },
     },
   })
