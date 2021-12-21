@@ -450,7 +450,7 @@ export const columnsReducer: Reducer<State> = (
         column.refreshedAt = new Date().toISOString()
         column.state = 'not_loaded'
       })
-    case 'MARK_ITEM_AS_SAVED':
+    case 'SET_ITEM_SAVED_STATUS':
       return immer(state, (draft) => {
         const { itemNodeId, save } = action.payload
         const now = new Date().toISOString()
@@ -480,7 +480,7 @@ export const columnsReducer: Reducer<State> = (
               item ${itemNodeId} was already ${save ? 'saved' : 'unsaved'}`)
         }
       })
-    case 'MARK_ITEM_AS_READ':
+    case 'SET_ITEMS_READ_STATUS':
       return immer(state, (draft) => {
         const { itemNodeIds, read } = action.payload
         const now = new Date().toISOString()
@@ -499,7 +499,7 @@ export const columnsReducer: Reducer<State> = (
           draft.dataUpdatedAt = now
         }
       })
-    case 'MARK_ITEM_DUPLICATION_AS_READ':
+    case 'SET_ITEM_DUPLICATION_READ_STATUS':
       return immer(state, (draft) => {
         const { itemNodeId, read } = action.payload
         if (!(itemNodeId in draft.dataById)) {

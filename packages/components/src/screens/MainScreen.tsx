@@ -19,7 +19,7 @@ import { WrapUrlWithToken } from '../utils/api'
 import { constants, Signal } from '@devhub/core'
 import Notifier from '../libs/notifier'
 import { Helmet } from '../libs/react-helmet-async'
-import { handleSignal, resetBannerMessage } from '../redux/actions'
+import { handleSignal } from '../redux/actions'
 import { NEWS_FEED, NEWS_FEED_DESCRIPTION } from '../resources/strings'
 import { NotificationModal } from '../components/modals/NotificationModal'
 
@@ -63,6 +63,7 @@ export const MainScreen = React.memo(() => {
           subscription {
             signal(userId: "${userId}") {
               signalType
+              signalPayload
             }
           }
         `,

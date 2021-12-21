@@ -12,6 +12,8 @@ import {
   closeBannerMessage,
   handleSignal,
   setBannerMessage,
+  setItemDuplicationReadStatus,
+  setItemsReadStatus,
   updateSeedState,
 } from '../actions'
 import { ExtractActionFromActionCreator } from '../types/base'
@@ -19,6 +21,7 @@ import * as selectors from '../selectors'
 import { WrapUrlWithToken } from '../../utils/api'
 import { constants, SeedState } from '@devhub/core'
 import { jsonToGraphQLQuery } from 'json-to-graphql-query'
+import { split } from 'lodash'
 
 // Response returned from the backend for userState.
 interface UserStateResponse {
@@ -56,6 +59,42 @@ function* onSignal(
   switch (action.payload.signalType) {
     case 'SEED_STATE': {
       yield* fetchSeedState()
+      break
+    }
+    case 'SET_ITEMS_READ_STATUS': {
+      // TODO: move the payload parser to a dedicated file when we have more types of signals
+      const REDIS_TRUE = '1'
+      const PAYLOAD_DELIMITER = '_'
+      const splits = action.payload.signalPayload.split(PAYLOAD_DELIMITER)
+      if (splits.length < 3) {
+        // TODO: add log when we have frontend monitoring
+        console.log('Invalid signal type:', action.payload)
+        break
+      }
+      switch (splits[0]) {
+        case 'POST':
+          yield put(
+            setItemsReadStatus({
+              itemNodeIds: splits.slice(2),
+              read: splits[1] === REDIS_TRUE,
+              syncup: false,
+            }),
+          )
+          break
+        case 'DUPLICATION':
+          yield put(
+            setItemDuplicationReadStatus({
+              itemNodeId: splits[2],
+              read: splits[1] === REDIS_TRUE,
+              syncup: false,
+            }),
+          )
+          break
+        default:
+          // TODO: add log when we have frontend monitoring
+          console.log('Unknown signal type:', action.payload)
+          break
+      }
       break
     }
     default: {
