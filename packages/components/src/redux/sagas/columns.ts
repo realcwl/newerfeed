@@ -138,6 +138,8 @@ function convertFeedsResponseToSources(
 function constructProfileUrl(profileId: string, originUrl: string) {
   if (originUrl && originUrl.includes('://m.weibo.cn/')) {
     return `https://weibo.com/u/${profileId}`
+  } else if (originUrl && originUrl.includes('twitter.com')) {
+    return originUrl
   }
   return undefined
 }
