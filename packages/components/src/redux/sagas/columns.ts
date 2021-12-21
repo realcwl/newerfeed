@@ -947,8 +947,7 @@ function* onsetItemsReadStatus(
     return
   }
 
-  const itemNodeIds = action.payload.itemNodeIds
-  const read = action.payload.read
+  const { itemNodeIds, read } = action.payload
   const appToken = yield* select(selectors.appTokenSelector)
   const userId = yield* select(selectors.currentUserIdSelector)
   if (!userId) {

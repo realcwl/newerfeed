@@ -66,6 +66,11 @@ function* onSignal(
       const REDIS_TRUE = '1'
       const PAYLOAD_DELIMITER = '_'
       const splits = action.payload.signalPayload.split(PAYLOAD_DELIMITER)
+      if (splits.length < 3) {
+        // TODO: add log when we have frontend monitoring
+        console.log('Invalid signal type:', action.payload)
+        break
+      }
       switch (splits[0]) {
         case 'POST':
           yield put(
@@ -84,6 +89,10 @@ function* onSignal(
               syncup: false,
             }),
           )
+          break
+        default:
+          // TODO: add log when we have frontend monitoring
+          console.log('Unknown signal type:', action.payload)
           break
       }
       break
