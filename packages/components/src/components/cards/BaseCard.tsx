@@ -37,9 +37,9 @@ import FileDownloader from '../../libs/file-downloader'
 import { useHistory } from '../../libs/react-router'
 import {
   capatureView,
-  setItemSavedStatus,
-  setItemDuplicationReadStatus,
-  setItemsReadStatus,
+  markItemAsRead,
+  markItemAsSaved,
+  markItemDuplicationAsRead,
 } from '../../redux/actions'
 import { Link } from '../common/Link'
 import { useFastScreenshot } from '../../hooks/use-fast-screenshot'
@@ -403,17 +403,12 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             // 1. user already read all duplication messages
             // 2. user must also read the original message
             dispatch(
-              setItemDuplicationReadStatus({
-                itemNodeId: nodeIdOrId,
-                read: true,
-                syncup: true,
-              }),
+              markItemDuplicationAsRead({ itemNodeId: nodeIdOrId, read: true }),
             )
             dispatch(
-              setItemsReadStatus({
+              markItemAsRead({
                 itemNodeIds: [nodeIdOrId],
                 read: true,
-                syncup: true,
               }),
             )
           }}
@@ -664,7 +659,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                       style={styles.actionIcon}
                       onPress={() => {
                         dispatch(
-                          setItemSavedStatus({
+                          markItemAsSaved({
                             itemNodeId: nodeIdOrId,
                             save: !isSaved,
                           }),
@@ -729,10 +724,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                           color="foregroundColorMuted65"
                           onPress={() =>
                             dispatch(
-                              setItemsReadStatus({
+                              markItemAsRead({
                                 itemNodeIds: [nodeIdOrId],
                                 read: true,
-                                syncup: true,
                               }),
                             )
                           }

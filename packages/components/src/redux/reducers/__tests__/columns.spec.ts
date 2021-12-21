@@ -17,8 +17,8 @@ import {
   fetchPost,
   fetchPostFailure,
   fetchPostSuccess,
-  setItemsReadStatus,
-  setItemSavedStatus,
+  markItemAsRead,
+  markItemAsSaved,
 } from '../../actions'
 import { columnsReducer, initialState, State } from '../columns'
 
@@ -634,11 +634,11 @@ describe('columnsReducer', () => {
       columnsReducer(getState([0, 1, 2]), fetchColumnDataFailureAction),
     ).toEqual(getState([0, 1, 2]))
   })
-  // SET_ITEM_SAVED_STATUS
+  // MARK_ITEM_AS_SAVED
   test('should mark item as saved/unsaved', () => {
     const itemNodeId = newsFeedDataArray[0].id
     expect(defaultState.savedDataIds.includes(itemNodeId)).toBe(false)
-    const saveAction = setItemSavedStatus({
+    const saveAction = markItemAsSaved({
       itemNodeId,
       save: true,
     })
@@ -646,7 +646,7 @@ describe('columnsReducer', () => {
     expect(itemSavedState.savedDataIds.includes(itemNodeId)).toBe(true)
     expect(itemSavedState.dataById[itemNodeId].isSaved).toBe(true)
 
-    const unsaveAction = setItemSavedStatus({
+    const unsaveAction = markItemAsSaved({
       itemNodeId,
       save: false,
     })
@@ -656,20 +656,20 @@ describe('columnsReducer', () => {
   })
 
   test('should not change state if id is not in data', () => {
-    const saveAction = setItemSavedStatus({
+    const saveAction = markItemAsSaved({
       itemNodeId: invalidItemNodeId,
       save: true,
     })
     expect(columnsReducer(defaultState, saveAction)).toEqual(defaultState)
 
-    const unsaveAction = setItemSavedStatus({
+    const unsaveAction = markItemAsSaved({
       itemNodeId: invalidItemNodeId,
       save: false,
     })
     expect(columnsReducer(defaultState, unsaveAction)).toEqual(defaultState)
   })
 
-  // SET_ITEMS_READ_STATUS
+  // MARK_ITEM_AS_READ
   test('should mark item as read/unread', () => {
     const readIds = [newsFeedDataArray[1].id, newsFeedDataArray[3].id]
     const unchangedIds = [newsFeedDataArray[0].id, newsFeedDataArray[2].id]
@@ -681,10 +681,9 @@ describe('columnsReducer', () => {
       expect(defaultState.dataById[unchangedId].isRead).toBe(true)
     })
 
-    const readAction = setItemsReadStatus({
+    const readAction = markItemAsRead({
       itemNodeIds: readIds,
       read: true,
-      syncup: true,
     })
     const readState = columnsReducer(defaultState, readAction)
     readIds.map((readId) => {
@@ -694,10 +693,9 @@ describe('columnsReducer', () => {
       expect(defaultState.dataById[unchangedId].isRead).toBe(true)
     })
 
-    const unreadAction = setItemsReadStatus({
+    const unreadAction = markItemAsRead({
       itemNodeIds: readIds,
       read: false,
-      syncup: true,
     })
     const unreadState = columnsReducer(readState, unreadAction)
     readIds.map((readId) => {
