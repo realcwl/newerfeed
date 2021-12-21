@@ -439,4 +439,5 @@ export interface CustomizedCrawlerSpec {
   time: string
   image: string
   postUrl: string
+  postUrlIsRelativePath: boolean
 }
