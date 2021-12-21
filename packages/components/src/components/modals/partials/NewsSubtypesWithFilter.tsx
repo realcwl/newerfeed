@@ -359,7 +359,7 @@ function isSourceOpenToAddSubsource(
   )
 }
 
-// Show a search bar in source iff:
+// Show a search bar in source if one of following conditions is met:
 // 1. The source allows add new sub source.
 // 2. There are more than MAX_ITEM_WITHOUT_FILTER subsources in the source.
 function shouldShowSubSourceInput(

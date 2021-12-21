@@ -14,7 +14,6 @@ import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
-import { string } from 'yup'
 
 // Response returned from the backend for available sources.
 interface SourcesResponse {
