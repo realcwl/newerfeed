@@ -117,6 +117,8 @@ export const CardsSearchHeader = React.memo((props: CardsSearchHeaderProps) => {
 
   const onChangeText = useCallback((query: string) => {
     formikProps.setFieldValue('query', `${query || ''}`)
+    // make search more responsive
+    formikProps.submitForm()
   }, [])
 
   const onKeyPress = useCallback(
