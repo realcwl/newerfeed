@@ -9,7 +9,7 @@ import { all, select, takeLatest, delay, put } from 'typed-redux-saga'
 import axios, { AxiosResponse } from 'axios'
 import { analytics } from '../../libs/analytics'
 import { WrapUrlWithToken } from '../../utils/api'
-import { setSourcesAndIdMap } from '../actions'
+import { setSourcesAndIdMap, setCustomizedSubSources } from '../actions'
 import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
@@ -26,15 +26,39 @@ interface SourcesResponse {
         name: string
         avatarUrl: string
         updatedAt: string
+        externalIdentifier: string
       }[]
     }[]
   }
 }
-interface AddSubsourceResponse {
+// Response returned from the backend for available subsources.
+interface CustomizedSubSourcesResponse {
   data: {
-    addWeiboSubSource: {
+    subSources: {
       id: string
       name: string
+      source: {
+        id: string
+        name: string
+      }
+      isFromSharedPost: boolean
+      customizedCrawlerParams: string
+    }[]
+  }
+}
+interface DeleteSubsourceResponse {
+  data: {
+    deleteSubSource: {
+      id: string
+    }
+  }
+}
+interface AddSubsourceResponse {
+  data: {
+    addSubSource: {
+      id: string
+      name: string
+      externalIdentifier: string
     }
   }
 }
@@ -66,6 +90,7 @@ interface UpsertSubSourceResponse {
     }
   }
 }
+
 function GetAvailableSourcesFromSourcesResponse(
   sourcesResponse: SourcesResponse,
 ): NewsFeedColumnSource[] {
@@ -97,6 +122,7 @@ function GetIdMapFromSourcesResponse(
         id: subSource.id,
         name: subSource.name,
         avatarURL: subSource.avatarUrl,
+        externalId: subSource.externalIdentifier,
       }
     }
   }
@@ -135,6 +161,7 @@ function* fetchAvailableSourcesAndIdMap() {
                 id: true,
                 name: true,
                 avatarUrl: true,
+                externalIdentifier: true,
               },
             },
           },
@@ -147,6 +174,89 @@ function* fetchAvailableSourcesAndIdMap() {
         idToSourceOrSubSourceMap: GetIdMapFromSourcesResponse(
           sourcesResponse.data,
         ),
+      }),
+    )
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+function* deleteCustomizedSubSource(
+  action: ExtractActionFromActionCreator<
+    typeof actions.deleteCustomizedSubSource
+  >,
+) {
+  const id = action.payload.id
+
+  try {
+    const appToken = yield* select(selectors.appTokenSelector)
+    const userId = yield* select(selectors.currentUserIdSelector)
+    if (!userId) {
+      yield put(actions.authFailure(Error('no user id found')))
+      return
+    }
+    const deleteSubsourceResponse: AxiosResponse<DeleteSubsourceResponse> =
+      yield axios.post(WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken), {
+        query: jsonToGraphQLQuery({
+          mutation: {
+            deleteSubSource: {
+              __args: {
+                input: {
+                  subsourceId: id,
+                },
+              },
+              id: true,
+            },
+          },
+        }),
+      })
+    yield put(
+      actions.deleteCustomizedSubsourceSuccess({
+        id: deleteSubsourceResponse.data.data.deleteSubSource.id,
+      }),
+    )
+  } catch (e) {
+    alert(`can't remove subsource: ${e}`)
+    return
+  }
+}
+// On each login success we fetch all login sources available.
+function* fetchCustomizedSubSources() {
+  const appToken = yield* select(selectors.appTokenSelector)
+
+  try {
+    const subSourcesResponse: AxiosResponse<CustomizedSubSourcesResponse> =
+      yield axios.post(WrapUrlWithToken(constants.GRAPHQL_ENDPOINT, appToken), {
+        query: jsonToGraphQLQuery({
+          query: {
+            subSources: {
+              __args: {
+                input: {
+                  isFromSharedPost: false,
+                  isCustomized: true,
+                },
+              },
+              id: true,
+              name: true,
+              source: {
+                id: true,
+                name: true,
+              },
+              isFromSharedPost: true,
+              customizedCrawlerParams: true,
+            },
+          },
+        }),
+      })
+    yield put(
+      setCustomizedSubSources({
+        subSources: subSourcesResponse.data.data.subSources.map((subSource) => {
+          return {
+            id: subSource.id,
+            name: subSource.name,
+            parentSourceId: subSource.source.id,
+          }
+        }),
       }),
     )
   } catch (err) {
@@ -176,8 +286,10 @@ function* onAddSubsource(
     yield put(
       actions.addSubsourceSuccess({
         sourceId: sourceId,
-        name: name,
-        subsourceId: addSubsourceResponse.data.data.addWeiboSubSource.id,
+        name: addSubsourceResponse.data.data.addSubSource.name,
+        subsourceId: addSubsourceResponse.data.data.addSubSource.id,
+        externalId:
+          addSubsourceResponse.data.data.addSubSource.externalIdentifier,
       }),
     )
   } catch (e) {
@@ -194,14 +306,16 @@ function* onAddSubsource(
 function getAddSubsourceRequest(sourceId: string, name: string): string {
   return jsonToGraphQLQuery({
     mutation: {
-      addWeiboSubSource: {
+      addSubSource: {
         __args: {
           input: {
-            name: name,
+            sourceId: sourceId,
+            subSourceUserName: name,
           },
         },
         id: true,
         name: true,
+        externalIdentifier: true,
       },
     },
   })
@@ -300,12 +414,14 @@ function* onAddCustomizedSubSource(
           action.payload.customizedCrawlerSpec,
         ),
       })
-
-    yield put(
-      actions.addCustomizedCralwerSuccess(
-        GetAddCustomizedSubSourceResponse(addSubSourceResponse.data),
+    yield all([
+      put(
+        actions.addCustomizedCralwerSuccess(
+          GetAddCustomizedSubSourceResponse(addSubSourceResponse.data),
+        ),
       ),
-    )
+      put(actions.fetchCustomizedSubsources({})),
+    ])
   } catch (e) {
     yield put(
       actions.addCustomizedCralwerFail({ errorMsg: (<Error>e).message }),
@@ -445,5 +561,13 @@ export function* configSagas() {
     yield* takeLatest(['ADD_SOURCE'], onAddSource),
     yield* takeLatest(['ADD_CUSTOMIZED_SUBSOURCE'], onAddCustomizedSubSource),
     yield* takeLatest(['TRY_CUSTOMIZED_CRAWLER'], onTryCustomizedCawler),
+    yield* takeLatest(
+      ['FETCH_CUSTOMIZED_SUBSOURCES'],
+      fetchCustomizedSubSources,
+    ),
+    yield* takeLatest(
+      ['DELETE_CUSTOMIZED_SUBSOURCE'],
+      deleteCustomizedSubSource,
+    ),
   ])
 }

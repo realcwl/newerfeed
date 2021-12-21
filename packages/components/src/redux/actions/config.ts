@@ -21,6 +21,23 @@ export function setSourcesAndIdMap(payload: {
   return createAction('SET_SOURCES_AND_ID_MAP', payload)
 }
 
+export function setCustomizedSubSources(payload: {
+  subSources: SourceOrSubSource[]
+}) {
+  return createAction('SET_CUSTOMIZED_SUBSOURCES', payload)
+}
+
+export function fetchCustomizedSubsources(payload: {}) {
+  return createAction('FETCH_CUSTOMIZED_SUBSOURCES', payload)
+}
+
+export function deleteCustomizedSubSource(payload: { id: string }) {
+  return createAction('DELETE_CUSTOMIZED_SUBSOURCE', payload)
+}
+export function deleteCustomizedSubsourceSuccess(payload: { id: string }) {
+  return createAction('DELETE_CUSTOMIZED_SUBSOURCE_SUCCESS', payload)
+}
+
 export function tryCustomizedCrawler(payload: {
   customizedCrawlerSpec: CustomizedCrawlerSpec
 }) {
@@ -76,6 +93,7 @@ export function addSubsourceSuccess(payload: {
   sourceId: string
   name: string
   subsourceId: string
+  externalId: string
 }) {
   return createAction('ADD_SUBSOURCE_SUCCESS', payload)
 }

@@ -5,7 +5,7 @@ import {
   constants,
   NewsFeedData,
 } from '@devhub/core'
-import { PixelRatio } from 'react-native'
+import { PixelRatio, View } from 'react-native'
 
 import { Platform } from '../../libs/platform'
 import { IconProp } from '../../libs/vector-icons'
@@ -89,6 +89,11 @@ export interface BaseCardProps extends AdditionalCardProps {
   duplicateIds?: string[]
   isDuplicationRead?: boolean
   tags?: string[]
+  hideActions?: boolean
+  rootRef?: React.Ref<View> | undefined
+  rootNodeIdOrId?: string
+  setThreadVisibility?: () => void | undefined
+  defaultExpand?: boolean
 }
 
 function _getCardPropsForItem(

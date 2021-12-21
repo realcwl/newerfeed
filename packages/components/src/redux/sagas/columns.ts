@@ -56,6 +56,7 @@ export interface Post {
   originUrl: string
   semanticHashing: string
   tags: string[]
+  replyThread: Post[]
   isRead: boolean
 }
 
@@ -190,10 +191,15 @@ export const postToNewsFeedData = (post: Post): NewsFeedData => {
     attachments: attachments,
     semanticHashing: post.semanticHashing,
     tags: post.tags,
+    thread: !!post.replyThread
+      ? post.replyThread.map((p) => postToNewsFeedData(p))
+      : undefined,
   }
 }
 
-function convertFeedsResponseToPosts(response: FeedsResponse): NewsFeedData[] {
+function convertFeedsResponseToNewsFeedData(
+  response: FeedsResponse,
+): NewsFeedData[] {
   if (response.data.feeds.length === 0) return EMPTY_ARRAY
   return response.data.feeds[0].posts.map((post) => {
     return postToNewsFeedData(post)
@@ -352,6 +358,34 @@ function constructFeedRequest(
           semanticHashing: true,
           tags: true,
           isRead: true,
+          replyThread: {
+            id: true,
+            title: true,
+            content: true,
+            cursor: true,
+            subSource: {
+              id: true,
+              name: true,
+              avatarUrl: true,
+            },
+            originUrl: true,
+            imageUrls: true,
+            fileUrls: true,
+            contentGeneratedAt: true,
+            sharedFromPost: {
+              id: true,
+              title: true,
+              content: true,
+              subSource: {
+                id: true,
+                name: true,
+                avatarUrl: true,
+              },
+              imageUrls: true,
+              contentGeneratedAt: true,
+              originUrl: true,
+            },
+          },
         },
         subSources: {
           id: true,
@@ -662,7 +696,7 @@ function* onFetchColumnDataRequest(
 
     const feed = fetchDataResponse.data.data.feeds[0]
 
-    const posts = convertFeedsResponseToPosts(fetchDataResponse.data)
+    const posts = convertFeedsResponseToNewsFeedData(fetchDataResponse.data)
     if (action.payload.notifyOnNewPosts && action.payload.direction === 'NEW') {
       for (const post of posts) {
         notify(post)
