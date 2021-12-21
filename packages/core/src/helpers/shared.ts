@@ -462,6 +462,13 @@ export function mapSourceIdToName(
   return idToSubSourceMap[id].name || id
 }
 
+export function mapSourceIdToExternalId(
+  id: string,
+  idToSubSourceMap: Record<string, SourceOrSubSource>,
+): string {
+  return idToSubSourceMap[id].externalId || ''
+}
+
 // Return true if 2 hash string are semantically identical.
 export function isHashingSemanticallyIdentical(
   h1: string,

@@ -8,6 +8,7 @@ import {
   ThemeColors,
   SourceOrSubSource,
   constants,
+  mapSourceIdToExternalId,
 } from '@devhub/core'
 
 import { sharedStyles } from '../../../styles/shared'
@@ -161,10 +162,14 @@ export const NewsSubtypesWithFilter = React.memo(
       let selectedFilteredSubSourcesCount = 0
       const filteredSubSources: string[] = source.subSourceIds.filter(
         (subType: string) => {
-          const show = mapSourceIdToName(
-            subType,
-            idToSourceOrSubSourceMap,
-          ).includes(filter)
+          // Either name match or external id match (used for Twitter)
+          const show =
+            mapSourceIdToName(subType, idToSourceOrSubSourceMap).includes(
+              filter,
+            ) ||
+            mapSourceIdToExternalId(subType, idToSourceOrSubSourceMap).includes(
+              filter,
+            )
           if (show && selectedSubtypes.includes(subType)) {
             selectedFilteredSubSourcesCount++
           }
@@ -313,7 +318,7 @@ export const NewsSubtypesWithFilter = React.memo(
 
     return (
       <View>
-        {source.subSourceIds.length > MAX_ITEM_WITHOUT_FILTER
+        {shouldShowSubSourceInput(source, idToSourceOrSubSourceMap)
           ? renderGenericFormTextInput(source, filter, setFilter)
           : null}
         {shouldShowError(source) &&
@@ -351,6 +356,20 @@ function isSourceOpenToAddSubsource(
 ) {
   return constants.SOURCE_NAMES_ENABLE_ADD_SUBSOURCE.includes(
     mapSourceIdToName(sourceId, idToSourceOrSubSourceMap),
+  )
+}
+
+// Show a search bar in source if one of following conditions is met:
+// 1. The source allows add new sub source.
+// 2. There are more than MAX_ITEM_WITHOUT_FILTER subsources in the source.
+function shouldShowSubSourceInput(
+  source: NewsFeedColumnSource,
+  idToSourceOrSubSourceMap: Record<string, SourceOrSubSource>,
+): boolean {
+  return (
+    constants.SOURCE_NAMES_ENABLE_ADD_SUBSOURCE.includes(
+      mapSourceIdToName(source.sourceId, idToSourceOrSubSourceMap),
+    ) || source.subSourceIds.length > MAX_ITEM_WITHOUT_FILTER
   )
 }
 

@@ -181,6 +181,8 @@ export interface SourceOrSubSource {
 
   // record subsource's parent source id
   parentSourceId?: string
+  // User's external id in the original website.
+  externalId?: string
 }
 
 export interface ColumnOptions {

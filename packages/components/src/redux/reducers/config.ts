@@ -184,6 +184,7 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
         draft.idToSourceOrSubSourceMap[action.payload.subsourceId] = {
           name: action.payload.name,
           id: action.payload.subsourceId,
+          externalId: action.payload.externalId,
         }
         draft.idToSourceOrSubSourceMap[action.payload.sourceId].state = 'loaded'
       })
