@@ -8,6 +8,7 @@ import { Spacer } from '../components/common/Spacer'
 import { HeaderMessage } from '../components/common/HeaderMessage'
 import { ThemedText } from '../components/themed/ThemedText'
 import { Button } from '../components/common/Button'
+import { Checkbox } from '../components/common/Checkbox'
 import { Container, ScreenBreakpoints } from '../components/common/Container'
 import { sharedStyles } from '../styles/shared'
 import { TagToken } from '../components/common/TagToken'
@@ -154,6 +155,7 @@ export const AddSourceOrSubsourceScreen = React.memo(
         time: '',
         image: '',
         postUrl: '',
+        postUrlIsRelativePath: false,
       },
       validationSchema: props.isAddingSource ? sourceSchema : subsourceSchema,
       validateOnChange: false,
@@ -375,7 +377,9 @@ export const AddSourceOrSubsourceScreen = React.memo(
                 <br />
                 4.爬虫对于该页面会爬取多个Post(最终每个Post会成为newsfeed里的一条新闻),
                 用 Base Selector来输入一个jquery
-                path，所有满足该jquery的所有页面元素都会成为一个Post，其他jquery都是以这个post为起点的相对路径
+                path，所有满足该jquery的所有页面元素都会成为一个Post，其他jquery都是在这个post内部。
+                jquery selector语法参考
+                https://www.w3schools.com/jquery/jquery_ref_selectors.asp
                 <br />
                 5.用Title等selector来指定相对于Base selector的jquery
                 path，来提取每条新闻的详细信息 <br />
@@ -422,6 +426,13 @@ export const AddSourceOrSubsourceScreen = React.memo(
               {getTextInput(formik, '*Time Selector', '', TIME)}
               {getTextInput(formik, '*Image Selector', '', IMAGE)}
               {getTextInput(formik, '*Post URL Selector', '', POSTURL)}
+              <Checkbox
+                checked={formik.values.postUrlIsRelativePath}
+                label="Is post url relative path?"
+                onChange={(checked) => {
+                  formik.setFieldValue('postUrlIsRelativePath', checked)
+                }}
+              />
 
               <Spacer height={contentPadding} />
               <View style={{ flexDirection: 'row' }}>

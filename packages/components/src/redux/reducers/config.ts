@@ -119,11 +119,11 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
           }
 
           // update sources children
-          for (let i = 0; i < draft.availableNewsFeedSources.length; i++) {
+          for (let j = 0; j < draft.availableNewsFeedSources.length; j++) {
             if (
-              !(subsourceId in draft.availableNewsFeedSources[i].subSourceIds)
+              !(subsourceId in draft.availableNewsFeedSources[j].subSourceIds)
             ) {
-              draft.availableNewsFeedSources[i].subSourceIds.push(subsourceId)
+              draft.availableNewsFeedSources[j].subSourceIds.push(subsourceId)
             }
           }
         }
