@@ -260,7 +260,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   if (!subSourceId) return null
 
   const shouldExpand =
-    defaultExpand || (!!item.thread && item.thread.length > 0)
+    defaultExpand || item.subSource?.profileURL?.includes('twitter.com')
   // Whether has thread to show.
   const hasThread = !!item.thread && item.thread.length > 0
   const timestamp = time ? Date.parse(time) : new Date().toISOString()
@@ -482,7 +482,6 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
   function renderBaseCardSummary() {
     if (!item || !item.thread || item?.thread.length == 0) return null
-    console.log('render base card summary')
     return (
       <BaseCard
         columnId={columnId}
