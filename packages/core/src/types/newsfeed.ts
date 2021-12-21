@@ -415,12 +415,11 @@ export interface FeedSeedState {
   name: string
 }
 
-export type SignalType = 'SEED_STATE' | 'SET_ITEMS_READ_STATUS'
-
 export interface Signal {
   signalType: SignalType
-  signalPayload: string
 }
+
+export type SignalType = 'SEED_STATE'
 
 export interface TryCustomizedCrawlerPost {
   // Source is a predefined list of information sources, such as "weibo",

@@ -24,10 +24,9 @@ export function SwipeableCard(props: CardWithLinkProps) {
   function handleMarkAsReadOrUnread() {
     if (!item) return null
     dispatch(
-      actions.setItemsReadStatus({
+      actions.markItemAsRead({
         itemNodeIds: [item.id],
         read: !isRead,
-        syncup: true,
       }),
     )
   }
@@ -35,7 +34,7 @@ export function SwipeableCard(props: CardWithLinkProps) {
   function handleSave() {
     if (!item) return null
     dispatch(
-      actions.setItemSavedStatus({
+      actions.markItemAsSaved({
         itemNodeId: item.id,
         save: !isSaved,
       }),

@@ -1,37 +1,31 @@
 import { NewsFeedData } from '@devhub/core'
 import { createAction } from '../helpers'
 
-export function setItemSavedStatus(payload: {
+export function markItemAsSaved(payload: {
   // Indicate the item under action.
   itemNodeId: string
   // Indicate whether user saves or unsaves, true for saves.
   save: boolean
 }) {
-  return createAction('SET_ITEM_SAVED_STATUS', payload)
+  return createAction('MARK_ITEM_AS_SAVED', payload)
 }
 
-export function setItemDuplicationReadStatus(payload: {
+export function markItemDuplicationAsRead(payload: {
   // Indicate the item under action.
   itemNodeId: string
   // Indicate whether all duplications are read
   read: boolean
-  // Indicate whether this action need to syncup to database
-  // mainly to avoid a loop when we syncdown the read status
-  syncup: boolean
 }) {
-  return createAction('SET_ITEM_DUPLICATION_READ_STATUS', payload)
+  return createAction('MARK_ITEM_DUPLICATION_AS_READ', payload)
 }
 
-export function setItemsReadStatus(payload: {
+export function markItemAsRead(payload: {
   // Indicate the item under action.
   itemNodeIds: string[]
   // Indicate whether user read this item or not
   read: boolean
-  // Indicate whether this action need to syncup to database
-  // mainly to avoid a loop when we syncdown the read status
-  syncup: boolean
 }) {
-  return createAction('SET_ITEMS_READ_STATUS', payload)
+  return createAction('MARK_ITEM_AS_READ', payload)
 }
 
 export function capatureView(payload: {
