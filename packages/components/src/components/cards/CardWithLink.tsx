@@ -1,21 +1,17 @@
 import { Column } from '@devhub/core'
 import React, { useCallback, useMemo, useRef } from 'react'
 import { StyleSheet, TouchableHighlightProps, View } from 'react-native'
-import { useDispatch } from 'react-redux'
 
 import { useHover } from '../../hooks/use-hover'
 import { useIsItemFocused } from '../../hooks/use-is-item-focused'
 import { useItem } from '../../hooks/use-item'
 import { getLastUsedInputType } from '../../hooks/use-last-input-type'
-import { useReduxState } from '../../hooks/use-redux-state'
 import { emitter } from '../../libs/emitter'
 import { Platform } from '../../libs/platform'
-import * as actions from '../../redux/actions'
-import * as selectors from '../../redux/selectors'
 import { sharedStyles } from '../../styles/shared'
 import { tryFocus } from '../../utils/helpers/shared'
 import { getCardBackgroundThemeColor } from '../columns/ColumnRenderer'
-import { Link, LinkProps } from '../common/Link'
+import { Link } from '../common/Link'
 import { getTheme, useTheme } from '../context/ThemeContext'
 import {
   ThemedTouchableHighlight,
@@ -63,8 +59,6 @@ export const CardWithLink = React.memo((props: CardWithLinkProps) => {
   }, [/* appViewMode, */ columnId, item])
 
   // const isReadRef = useDynamicRef(!!(cardProps && cardProps.isRead))
-
-  const dispatch = useDispatch()
 
   const updateStyles = useCallback(
     () => {
