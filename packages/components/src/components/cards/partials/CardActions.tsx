@@ -61,7 +61,7 @@ export function CardActions(props: CardActionsProps) {
         }}
         onPress={() => {
           dispatch(
-            actions.markItemAsSaved({
+            actions.setItemSavedStatus({
               itemNodeId: itemNodeId,
               save: !isSaved,
             }),
@@ -92,9 +92,10 @@ export function CardActions(props: CardActionsProps) {
         }}
         onPress={() => {
           dispatch(
-            actions.markItemAsRead({
+            actions.setItemsReadStatus({
               itemNodeIds: [itemNodeId],
               read: !isRead,
+              syncup: true,
             }),
           )
         }}
