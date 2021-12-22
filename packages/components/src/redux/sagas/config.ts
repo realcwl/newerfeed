@@ -77,6 +77,7 @@ interface TryCustomizedCrawlerResponse {
       title: string
       content: string
       images: string[]
+      originUrl: string
       baseHtml: string
     }[]
   }
@@ -363,6 +364,7 @@ function GetPostsFromTryCustomizedCrawlerResponse(
       content: post.content,
       baseHtml: post.baseHtml,
       images: post.images,
+      originUrl: post.originUrl,
     }
     res.push(singlePost)
   }
@@ -390,6 +392,7 @@ function tryCustomizedCrawlerRequest(spec: CustomizedCrawlerSpec): string {
         content: true,
         images: true,
         baseHtml: true,
+        originUrl: true,
       },
     },
   })

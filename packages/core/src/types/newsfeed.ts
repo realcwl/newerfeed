@@ -432,6 +432,8 @@ export interface TryCustomizedCrawlerPost {
   images: string[]
 
   baseHtml: string
+
+  originUrl: string
 }
 
 export interface CustomizedCrawlerSpec {
