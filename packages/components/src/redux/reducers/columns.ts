@@ -492,7 +492,7 @@ export const columnsReducer: Reducer<State> = (
               "trying to read/unread an item that's not in the data list: ",
               itemNodeId,
             )
-            return
+            continue
           }
           const entry = draft.dataById[itemNodeId]
           entry.isRead = read

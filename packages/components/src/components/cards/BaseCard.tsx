@@ -8,7 +8,7 @@ import {
   Linking,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { getDateSmallText, getFullDateText } from '@devhub/core'
+import { getDateSmallText, getFullDateText, NewsFeedData } from '@devhub/core'
 import { Platform } from '../../libs/platform'
 import { sharedStyles } from '../../styles/shared'
 import {
@@ -240,6 +240,10 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   } = props
   const dispatch = useDispatch()
   const item = useItem(nodeIdOrId)
+  const rootItem: NewsFeedData | undefined = !!rootNodeIdOrId
+    ? useItem(rootNodeIdOrId)
+    : undefined
+
   if (!item) return null
 
   const {
@@ -355,12 +359,11 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   // 0 initial, adding up to trigger expand
   useEffect(() => {
     if (
-      (showMoreSignal !== 0 ||
-        (!!parentShowMoreSignal && parentShowMoreSignal !== 0)) &&
-      hasMore &&
-      !textShown
+      showMoreSignal !== 0 ||
+      (!!parentShowMoreSignal && parentShowMoreSignal !== 0)
     ) {
       setTextShown(true)
+      if (setThreadVisibility) setThreadVisibility()
     }
   }, [showMoreSignal, parentShowMoreSignal])
 
@@ -586,7 +589,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
               <View
                 style={[sharedStyles.horizontal, sharedStyles.alignItemsCenter]}
               >
-                {!isRead && !isRetweeted && !shareMode && (
+                {!isRead && !isRetweeted && !shareMode && !rootItem?.isRead && (
                   <ThemedIcon
                     family="octicon"
                     name="dot-fill"
@@ -725,7 +728,9 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                           onPress={() =>
                             dispatch(
                               markItemAsRead({
-                                itemNodeIds: [nodeIdOrId],
+                                itemNodeIds: rootNodeIdOrId
+                                  ? [nodeIdOrId, rootNodeIdOrId]
+                                  : [nodeIdOrId],
                                 read: true,
                               }),
                             )
