@@ -110,16 +110,21 @@ export const AddSourceOrSubsourceScreen = React.memo(
       return null
     }
 
-    const getDefaultSourceId = () => {
-      for (let i = 0; i < availableNewsFeedSources.length; i++) {
-        if (
-          idToSourceOrSubSourceMap[availableNewsFeedSources[i].sourceId]
-            .name === '公司博客'
-        ) {
-          return availableNewsFeedSources[i].sourceId
+    const getDefaultSourceId = (): string => {
+      if (availableNewsFeedSources) {
+        for (let i = 0; i < availableNewsFeedSources.length; i++) {
+          if (
+            idToSourceOrSubSourceMap[availableNewsFeedSources[i].sourceId]
+              .name === '公司博客'
+          ) {
+            return availableNewsFeedSources[i].sourceId
+          }
+        }
+        if (availableNewsFeedSources.length > 0) {
+          return availableNewsFeedSources[0].sourceId
         }
       }
-      return availableNewsFeedSources[0].sourceId
+      return ''
     }
 
     const sourceSchema = Yup.object().shape({
@@ -199,49 +204,50 @@ export const AddSourceOrSubsourceScreen = React.memo(
           <Spacer height={contentPadding} />
           <HeaderMessage>Crawled Result Preview</HeaderMessage>
           <Spacer height={contentPadding} />
-          {tryCustomizedCrawlerPosts.map((post, index) => {
-            return (
-              <View key={index} style={[sharedStyles.fullWidth]}>
-                <ThemedText
-                  color="foregroundColor"
-                  style={[sharedStyles.largeText]}
-                >
-                  <b>Index:</b> {index}
-                </ThemedText>
-                <ThemedText
-                  color="foregroundColor"
-                  style={[sharedStyles.largeText]}
-                >
-                  <b>Title:</b> {post.title}
-                </ThemedText>
-                <ThemedText
-                  color="foregroundColor"
-                  style={[sharedStyles.largeText]}
-                >
-                  <b>Content:</b> {post.content}
-                </ThemedText>
-                <ThemedText
-                  color="foregroundColor"
-                  style={[sharedStyles.largeText]}
-                >
-                  <b>Origin Url:</b> {post.originUrl}
-                </ThemedText>
-                <ThemedText
-                  color="foregroundColor"
-                  style={[sharedStyles.largeText]}
-                >
-                  <b>Images:</b> {post.images.join(', ')}
-                </ThemedText>
-                <ThemedText
-                  color="foregroundColor"
-                  style={[sharedStyles.largeText]}
-                >
-                  <b>Element Html:</b> {post.baseHtml}
-                </ThemedText>
-                <Spacer height={contentPadding} />
-              </View>
-            )
-          })}
+          {tryCustomizedCrawlerPosts &&
+            tryCustomizedCrawlerPosts.map((post, index) => {
+              return (
+                <View key={index} style={[sharedStyles.fullWidth]}>
+                  <ThemedText
+                    color="foregroundColor"
+                    style={[sharedStyles.largeText]}
+                  >
+                    <b>Index:</b> {index}
+                  </ThemedText>
+                  <ThemedText
+                    color="foregroundColor"
+                    style={[sharedStyles.largeText]}
+                  >
+                    <b>Title:</b> {post.title}
+                  </ThemedText>
+                  <ThemedText
+                    color="foregroundColor"
+                    style={[sharedStyles.largeText]}
+                  >
+                    <b>Content:</b> {post.content}
+                  </ThemedText>
+                  <ThemedText
+                    color="foregroundColor"
+                    style={[sharedStyles.largeText]}
+                  >
+                    <b>Origin Url:</b> {post.originUrl}
+                  </ThemedText>
+                  <ThemedText
+                    color="foregroundColor"
+                    style={[sharedStyles.largeText]}
+                  >
+                    <b>Images:</b> {post.images.join(', ')}
+                  </ThemedText>
+                  <ThemedText
+                    color="foregroundColor"
+                    style={[sharedStyles.largeText]}
+                  >
+                    <b>Element Html:</b> {post.baseHtml}
+                  </ThemedText>
+                  <Spacer height={contentPadding} />
+                </View>
+              )
+            })}
         </View>
       )
     }
@@ -274,15 +280,16 @@ export const AddSourceOrSubsourceScreen = React.memo(
                 formik.setFieldValue('subSourceParentSourceId', v.target.value)
               }}
             >
-              {availableNewsFeedSources.map((source, index) => {
-                return (
-                  <option
-                    key={index}
-                    value={source.sourceId}
-                    label={idToSourceOrSubSourceMap[source.sourceId].name}
-                  />
-                )
-              })}
+              {availableNewsFeedSources &&
+                availableNewsFeedSources.map((source, index) => {
+                  return (
+                    <option
+                      key={index}
+                      value={source.sourceId}
+                      label={idToSourceOrSubSourceMap[source.sourceId].name}
+                    />
+                  )
+                })}
             </select>
           </View>
           {getTextInput(formik, 'Name of the Sub Source', '', 'subSourceName')}
