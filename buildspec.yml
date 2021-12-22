@@ -16,7 +16,7 @@ phases:
       - $(aws ecr get-login --no-include-email --region us-west-1)
       - REPOSITORY_URL=213288384225.dkr.ecr.us-west-1.amazonaws.com/frontend
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=latest
+      - IMAGE_TAG=FRONTEND-${COMMIT_HASH}
   build:
     commands:
       - echo Build started on `date`

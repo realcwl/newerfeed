@@ -1,5 +1,5 @@
 # host node ourselves b/c docker hub got tired of serving terabytes for public traffic
-FROM node:16.5.0
+FROM 213288384225.dkr.ecr.us-west-1.amazonaws.com/node:16
 
 WORKDIR /usr/src/frontend
 
