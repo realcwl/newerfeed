@@ -326,43 +326,44 @@ export const AddSourceOrSubsourceScreen = React.memo(
     const getListForDeletion = () => {
       return (
         <View style={[sharedStyles.fullWidth]}>
-          {availableCustomizedSubSourcesIds.map((subSourceId, index) => {
-            return (
-              <View key={index} style={{ width: '100%' }}>
-                <Spacer height={contentPadding} />
-                <View style={{ flexDirection: 'row' }}>
-                  <TagToken
-                    label={'Delete'}
-                    colors={{
-                      backgroundThemeColor: theme.isDark
-                        ? 'blueGray'
-                        : undefined,
-                      foregroundThemeColor: theme.isDark ? 'white' : 'black',
-                      foregroundHoverThemeColor: theme.isDark
-                        ? 'white'
-                        : 'black',
-                    }}
-                    onPress={() => {
-                      dispatch(
-                        deleteCustomizedSubSource({
-                          id: subSourceId,
-                        }),
-                      )
-                    }}
-                    size={20 * scaleFactor}
-                  />
-                  <ThemedText
-                    color="foregroundColor"
-                    style={{ textAlign: 'center' }}
-                  >
-                    {idToSourceOrSubSourceMap[subSourceId]
-                      ? idToSourceOrSubSourceMap[subSourceId].name
-                      : 'subsource id not found'}
-                  </ThemedText>
+          {availableCustomizedSubSourcesIds &&
+            availableCustomizedSubSourcesIds.map((subSourceId, index) => {
+              return (
+                <View key={index} style={{ width: '100%' }}>
+                  <Spacer height={contentPadding} />
+                  <View style={{ flexDirection: 'row' }}>
+                    <TagToken
+                      label={'Delete'}
+                      colors={{
+                        backgroundThemeColor: theme.isDark
+                          ? 'blueGray'
+                          : undefined,
+                        foregroundThemeColor: theme.isDark ? 'white' : 'black',
+                        foregroundHoverThemeColor: theme.isDark
+                          ? 'white'
+                          : 'black',
+                      }}
+                      onPress={() => {
+                        dispatch(
+                          deleteCustomizedSubSource({
+                            id: subSourceId,
+                          }),
+                        )
+                      }}
+                      size={20 * scaleFactor}
+                    />
+                    <ThemedText
+                      color="foregroundColor"
+                      style={{ textAlign: 'center' }}
+                    >
+                      {idToSourceOrSubSourceMap[subSourceId]
+                        ? idToSourceOrSubSourceMap[subSourceId].name
+                        : 'subsource id not found'}
+                    </ThemedText>
+                  </View>
                 </View>
-              </View>
-            )
-          })}
+              )
+            })}
         </View>
       )
     }
