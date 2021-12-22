@@ -307,7 +307,8 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
   const files = attachments?.filter((a) => a.dataType === 'file') ?? []
 
   const textStyle = largeMode && sharedStyles.extraLargeText
-  const parseLinebreak = (text: string) => {
+  const parseSpecialCharacter = (text: string) => {
+    text = text.replace('&amp;', '&')
     return text.split('\\n').map((txt, i, row) => (
       <ThemedText color="foregroundColorMuted65" key={txt} style={textStyle}>
         {txt}
@@ -323,7 +324,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
 
     while ((match = REGEX_IS_URL.exec(text ?? 'no content')) !== null) {
       const textLink = text.slice(match.index, match.index + match[0].length)
-      res.push(parseLinebreak(text.slice(prev, match.index)))
+      res.push(parseSpecialCharacter(text.slice(prev, match.index)))
       res.push(
         <ThemedText
           color="red"
@@ -343,7 +344,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
       )
       prev = match.index + match[0].length
     }
-    res.push(parseLinebreak(text.slice(prev)))
+    res.push(parseSpecialCharacter(text.slice(prev)))
     return res
   }
 
@@ -736,6 +737,7 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
                             )
                           }
                           style={largeMode && sharedStyles.extraLargeText}
+                          numberOfLines={9999}
                         >
                           {getTextComponentToShow(text)}
                         </ThemedText>
