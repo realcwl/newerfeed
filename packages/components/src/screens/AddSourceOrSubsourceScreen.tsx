@@ -110,16 +110,21 @@ export const AddSourceOrSubsourceScreen = React.memo(
       return null
     }
 
-    const getDefaultSourceId = () => {
-      for (let i = 0; i < availableNewsFeedSources.length; i++) {
-        if (
-          idToSourceOrSubSourceMap[availableNewsFeedSources[i].sourceId]
-            .name === '公司博客'
-        ) {
-          return availableNewsFeedSources[i].sourceId
+    const getDefaultSourceId = (): string => {
+      if (availableNewsFeedSources) {
+        for (let i = 0; i < availableNewsFeedSources.length; i++) {
+          if (
+            idToSourceOrSubSourceMap[availableNewsFeedSources[i].sourceId]
+              .name === '公司博客'
+          ) {
+            return availableNewsFeedSources[i].sourceId
+          }
+        }
+        if (availableNewsFeedSources.length > 0) {
+          return availableNewsFeedSources[0].sourceId
         }
       }
-      return availableNewsFeedSources[0].sourceId
+      return ''
     }
 
     const sourceSchema = Yup.object().shape({
