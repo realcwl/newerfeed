@@ -48,6 +48,7 @@ import { Button } from '../common/Button'
 import { useItem } from '../../hooks/use-item'
 import { ButtonGroup } from '../common/ButtonGroup'
 import { viewCapturingItemNodeIdSelector } from '../../redux/selectors'
+import { TouchableOpacity } from 'react-native-web'
 
 const SIGNAL_RESET_MAX = 100
 // Number of characters to render show more button.
@@ -500,335 +501,354 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
     if (!item) return null
     return (
       <View ref={rootRef ? undefined : ref}>
-        {!!item.thread &&
-          item.thread?.map((data, idx) =>
-            idx == 0 ? (
-              <View key={`thread-card-${nodeIdOrId}-${data.id}`}>
-                <BaseCard
-                  columnId={columnId}
-                  nodeIdOrId={data.id}
-                  isRetweeted={isRetweeted}
-                  shareMode={shareMode}
-                  type="COLUMN_TYPE_NEWS_FEED"
-                  rootRef={ref}
-                  rootNodeIdOrId={nodeIdOrId}
-                  defaultExpand={true}
-                />
-              </View>
-            ) : (
-              <View key={`thread-card-${nodeIdOrId}-${data.id}`}>
-                <BaseCard
-                  columnId={columnId}
-                  nodeIdOrId={data.id}
-                  isRetweeted={isRetweeted}
-                  shareMode={shareMode}
-                  hideActions={true}
-                  type="COLUMN_TYPE_NEWS_FEED"
-                  rootRef={ref}
-                  defaultExpand={true}
-                />
-              </View>
-            ),
-          )}
-        <View
-          key={`base-card-container-${type}-${nodeIdOrId}-inner`}
-          style={{
-            backgroundColor: !isRetweeted
-              ? 'transparent'
-              : theme.backgroundColorLess2,
-            overflow: 'hidden',
-          }}
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() =>
+            dispatch(
+              markItemAsRead({
+                itemNodeIds: rootNodeIdOrId
+                  ? [nodeIdOrId, rootNodeIdOrId]
+                  : [nodeIdOrId],
+                read: true,
+              }),
+            )
+          }
         >
-          <ImageViewer
-            images={images}
-            index={imageIndexToView}
-            setIndex={setImageIndexToView}
-          />
-          <View style={[styles.innerContainer]}>
-            {/* Render Header part of the card */}
-            <View
-              style={[
-                sharedStyles.horizontal,
-                sharedStyles.marginVerticalQuarter,
-                isWeb && !hasTitle && sharedStyles.marginBottomHalf,
-              ]}
-            >
-              <View
-                style={
-                  largeMode && !isRetweeted
-                    ? styles.avatarContainer
-                    : styles.smallAvatarContainer
-                }
-              >
-                <Avatar
-                  avatarUrl={subSource ? subSource.avatarURL : ''}
-                  disableLink={false}
-                  linkURL={subSource ? subSource.profileURL : ''}
-                  style={styles.avatar}
-                  size={getAvatarSize()}
-                />
-              </View>
-              <ThemedText
-                color="foregroundColorMuted65"
-                numberOfLines={1}
-                style={[
-                  styles.authorName,
-                  sharedStyles.alignSelfCenter,
-                  largeMode &&
-                    (isRetweeted
-                      ? sharedStyles.largeText
-                      : sharedStyles.extraLargeText),
-                ]}
-                {...Platform.select({
-                  web: { title: getFullDateText(timestamp) },
-                })}
-                onPress={handleAvatarClick}
-              >
-                {subSource ? subSource.name : ''}
-              </ThemedText>
-
-              <View
-                style={[sharedStyles.horizontal, sharedStyles.alignItemsCenter]}
-              >
-                {!isRead && !isRetweeted && !shareMode && !rootItem?.isRead && (
-                  <ThemedIcon
-                    family="octicon"
-                    name="dot-fill"
-                    color={'primaryBackgroundColor'}
-                    size={smallTextSize}
+          {!!item.thread &&
+            item.thread?.map((data, idx) =>
+              idx == 0 ? (
+                <View key={`thread-card-${nodeIdOrId}-${data.id}`}>
+                  <BaseCard
+                    columnId={columnId}
+                    nodeIdOrId={data.id}
+                    isRetweeted={isRetweeted}
+                    shareMode={shareMode}
+                    type="COLUMN_TYPE_NEWS_FEED"
+                    rootRef={ref}
+                    rootNodeIdOrId={nodeIdOrId}
+                    defaultExpand={true}
                   />
-                )}
+                </View>
+              ) : (
+                <View key={`thread-card-${nodeIdOrId}-${data.id}`}>
+                  <BaseCard
+                    columnId={columnId}
+                    nodeIdOrId={data.id}
+                    isRetweeted={isRetweeted}
+                    shareMode={shareMode}
+                    hideActions={true}
+                    type="COLUMN_TYPE_NEWS_FEED"
+                    rootRef={ref}
+                    defaultExpand={true}
+                  />
+                </View>
+              ),
+            )}
+          <View
+            key={`base-card-container-${type}-${nodeIdOrId}-inner`}
+            style={{
+              backgroundColor: !isRetweeted
+                ? 'transparent'
+                : theme.backgroundColorLess2,
+              overflow: 'hidden',
+            }}
+          >
+            <ImageViewer
+              images={images}
+              index={imageIndexToView}
+              setIndex={setImageIndexToView}
+            />
+            <View style={[styles.innerContainer]}>
+              {/* Render Header part of the card */}
+              <View
+                style={[
+                  sharedStyles.horizontal,
+                  sharedStyles.marginVerticalQuarter,
+                  isWeb && !hasTitle && sharedStyles.marginBottomHalf,
+                ]}
+              >
+                <View
+                  style={
+                    largeMode && !isRetweeted
+                      ? styles.avatarContainer
+                      : styles.smallAvatarContainer
+                  }
+                >
+                  <Avatar
+                    avatarUrl={subSource ? subSource.avatarURL : ''}
+                    disableLink={false}
+                    linkURL={subSource ? subSource.profileURL : ''}
+                    style={styles.avatar}
+                    size={getAvatarSize()}
+                  />
+                </View>
+                <ThemedText
+                  color="foregroundColorMuted65"
+                  numberOfLines={1}
+                  style={[
+                    styles.authorName,
+                    sharedStyles.alignSelfCenter,
+                    largeMode &&
+                      (isRetweeted
+                        ? sharedStyles.largeText
+                        : sharedStyles.extraLargeText),
+                  ]}
+                  {...Platform.select({
+                    web: { title: getFullDateText(timestamp) },
+                  })}
+                  onPress={handleAvatarClick}
+                >
+                  {subSource ? subSource.name : ''}
+                </ThemedText>
 
-                <IntervalRefresh interval={60000} date={timestamp}>
-                  {() => {
-                    const dateText = getDateSmallText(timestamp)
-                    if (!dateText) return null
+                <View
+                  style={[
+                    sharedStyles.horizontal,
+                    sharedStyles.alignItemsCenter,
+                  ]}
+                >
+                  {!isRead &&
+                    !isRetweeted &&
+                    !shareMode &&
+                    !rootItem?.isRead && (
+                      <ThemedIcon
+                        family="octicon"
+                        name="dot-fill"
+                        color={'primaryBackgroundColor'}
+                        size={smallTextSize}
+                      />
+                    )}
 
-                    return (
-                      <>
-                        <Text>{'  '}</Text>
-                        <Link
-                          analyticsCategory="card_action"
-                          analyticsLabel={'card_link'}
-                          enableUnderlineHover
-                          href={link}
-                          textProps={{
-                            color: 'foregroundColorMuted65',
-                            style: { fontSize: smallTextSize },
-                          }}
-                        >
-                          <ThemedText
-                            color="foregroundColorMuted65"
-                            numberOfLines={1}
-                            style={[
-                              styles.timestampText,
-                              largeMode && sharedStyles.largeText,
-                            ]}
-                            {...Platform.select({
-                              web: { title: getFullDateText(timestamp) },
-                            })}
+                  <IntervalRefresh interval={60000} date={timestamp}>
+                    {() => {
+                      const dateText = getDateSmallText(timestamp)
+                      if (!dateText) return null
+
+                      return (
+                        <>
+                          <Text>{'  '}</Text>
+                          <Link
+                            analyticsCategory="card_action"
+                            analyticsLabel={'card_link'}
+                            enableUnderlineHover
+                            href={link}
+                            textProps={{
+                              color: 'foregroundColorMuted65',
+                              style: { fontSize: smallTextSize },
+                            }}
                           >
-                            {dateText.toLowerCase()}
-                          </ThemedText>
-                        </Link>
-                      </>
-                    )
-                  }}
-                </IntervalRefresh>
-                {!shouldHideActions() && (
-                  <>
-                    {supportFastScreenshot && (
+                            <ThemedText
+                              color="foregroundColorMuted65"
+                              numberOfLines={1}
+                              style={[
+                                styles.timestampText,
+                                largeMode && sharedStyles.largeText,
+                              ]}
+                              {...Platform.select({
+                                web: { title: getFullDateText(timestamp) },
+                              })}
+                            >
+                              {dateText.toLowerCase()}
+                            </ThemedText>
+                          </Link>
+                        </>
+                      )
+                    }}
+                  </IntervalRefresh>
+                  {!shouldHideActions() && (
+                    <>
+                      {supportFastScreenshot && (
+                        <ThemedIcon
+                          family="material"
+                          name={isCapturingView ? 'camera' : 'camera-alt'}
+                          color={'foregroundColorMuted65'}
+                          size={smallTextSize}
+                          style={styles.actionIcon}
+                          onPress={handleClickCamera}
+                        />
+                      )}
                       <ThemedIcon
                         family="material"
-                        name={isCapturingView ? 'camera' : 'camera-alt'}
+                        name={'share'}
                         color={'foregroundColorMuted65'}
                         size={smallTextSize}
                         style={styles.actionIcon}
-                        onPress={handleClickCamera}
+                        onPress={routeToSharedPostPage}
                       />
-                    )}
-                    <ThemedIcon
-                      family="material"
-                      name={'share'}
-                      color={'foregroundColorMuted65'}
-                      size={smallTextSize}
-                      style={styles.actionIcon}
-                      onPress={routeToSharedPostPage}
-                    />
-                    <ThemedIcon
-                      family="octicon"
-                      name={isSaved ? 'bookmark-fill' : 'bookmark'}
-                      color={isSaved ? 'orange' : 'foregroundColorMuted65'}
-                      size={smallTextSize}
-                      style={styles.actionIcon}
-                      onPress={() => {
-                        dispatch(
-                          markItemAsSaved({
-                            itemNodeId: nodeIdOrId,
-                            save: !isSaved,
-                          }),
-                        )
-                      }}
-                    />
-                  </>
-                )}
+                      <ThemedIcon
+                        family="octicon"
+                        name={isSaved ? 'bookmark-fill' : 'bookmark'}
+                        color={isSaved ? 'orange' : 'foregroundColorMuted65'}
+                        size={smallTextSize}
+                        style={styles.actionIcon}
+                        onPress={() => {
+                          dispatch(
+                            markItemAsSaved({
+                              itemNodeId: nodeIdOrId,
+                              save: !isSaved,
+                            }),
+                          )
+                        }}
+                      />
+                    </>
+                  )}
+                </View>
               </View>
-            </View>
 
-            {/* Render Non Header part of the card */}
-            <View>
-              <View style={[sharedStyles.vertical]}>
-                {hasTitle && (
-                  <View
-                    style={[
-                      sharedStyles.horizontal,
-                      sharedStyles.marginVerticalQuarter,
-                    ]}
-                  >
+              {/* Render Non Header part of the card */}
+              <View>
+                <View style={[sharedStyles.vertical]}>
+                  {hasTitle && (
                     <View
-                      style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}
+                      style={[
+                        sharedStyles.horizontal,
+                        sharedStyles.marginVerticalQuarter,
+                      ]}
                     >
-                      <View style={sharedStyles.horizontalAndVerticallyAligned}>
-                        <ThemedText
-                          color="foregroundColor"
-                          style={[
-                            styles.title,
-                            sharedStyles.flex,
-                            largeMode && sharedStyles.extraLargeText,
-                          ]}
-                          onPress={() =>
-                            link &&
-                            Linking.openURL(
-                              link.startsWith('http') ||
-                                link.startsWith('https')
-                                ? link
-                                : `http://${link}`,
-                            )
-                          }
-                        >
-                          {title}
-                        </ThemedText>
-                      </View>
-                    </View>
-                  </View>
-                )}
-
-                {hasText && (
-                  <View
-                    style={[
-                      sharedStyles.horizontal,
-                      sharedStyles.marginTopQuarter,
-                    ]}
-                  >
-                    <View
-                      style={[sharedStyles.flex, sharedStyles.alignSelfCenter]}
-                    >
-                      <View style={sharedStyles.horizontalAndVerticallyAligned}>
-                        <ThemedText
-                          color="foregroundColorMuted65"
-                          onPress={() =>
-                            dispatch(
-                              markItemAsRead({
-                                itemNodeIds: rootNodeIdOrId
-                                  ? [nodeIdOrId, rootNodeIdOrId]
-                                  : [nodeIdOrId],
-                                read: true,
-                              }),
-                            )
-                          }
-                          style={largeMode && sharedStyles.extraLargeText}
-                          numberOfLines={9999}
-                        >
-                          {getTextComponentToShow(text)}
-                        </ThemedText>
-                      </View>
-                      {!shareMode && hasMore && !hasThread && (
+                      <View
+                        style={[
+                          sharedStyles.flex,
+                          sharedStyles.alignSelfCenter,
+                        ]}
+                      >
                         <View
-                          style={[
-                            sharedStyles.horizontalAndVerticallyAligned,
-                            styles.marginTop6,
-                          ]}
+                          style={sharedStyles.horizontalAndVerticallyAligned}
                         >
                           <ThemedText
-                            color="primaryBackgroundColor"
-                            onPress={toggleShowMoreText}
+                            color="foregroundColor"
                             style={[
-                              styles.showMoreOrLessText,
+                              styles.title,
                               sharedStyles.flex,
+                              largeMode && sharedStyles.extraLargeText,
                             ]}
+                            onPress={() =>
+                              link &&
+                              Linking.openURL(
+                                link.startsWith('http') ||
+                                  link.startsWith('https')
+                                  ? link
+                                  : `http://${link}`,
+                              )
+                            }
                           >
-                            {textShown ? 'show less' : 'show more'}
+                            {title}
                           </ThemedText>
                         </View>
-                      )}
-                    </View>
-                  </View>
-                )}
-
-                {/* {!isRetweeted && tags && tags.length > 0 && (
-            <ButtonGroup data={tags.map((tag) => ({ id: tag, name: tag }))} />
-          )} */}
-
-                {images.length > 0 && (
-                  <View style={[styles.fileContainer]}>
-                    {images.map((image, i) => {
-                      return (
-                        <TouchableHighlight
-                          onPress={() => {
-                            setImageIndexToView(i)
-                          }}
-                          key={image.id}
-                        >
-                          <Image
-                            source={{
-                              uri: image.url,
-                            }}
-                            style={{
-                              width: (shareMode ? 80 : 60) * scaleFactor,
-                              height: (shareMode ? 80 : 60) * scaleFactor,
-                              margin: (shareMode ? 4 : 2) * scaleFactor,
-                            }}
-                            resizeMode="cover"
-                          />
-                        </TouchableHighlight>
-                      )
-                    })}
-                  </View>
-                )}
-
-                {files.length > 0 && (
-                  <View style={[styles.fileContainer]}>
-                    {files.map((file) => {
-                      return <FileDownloader key={file.id} file={file} />
-                    })}
-                  </View>
-                )}
-
-                {!!repostedFrom && (
-                  <View>
-                    <Spacer height={sizes.verticalSpaceSize} />
-                    <BaseCard
-                      {...repostedFrom}
-                      columnId={columnId}
-                      isRetweeted={true}
-                      showMoreSignal={showMoreSignal}
-                      defaultExpand={shouldExpand}
-                      shareMode={shareMode}
-                    />
-                  </View>
-                )}
-
-                {!isRetweeted &&
-                  !!duplicateIds &&
-                  duplicateIds.length > 0 &&
-                  !isCapturingView && (
-                    <View style={[styles.deduplicationBarContainer]}>
-                      {renderDeduplicationBar()}
+                      </View>
                     </View>
                   )}
 
-                <Spacer height={sizes.verticalSpaceSize} />
-                {/* 
+                  {hasText && (
+                    <View
+                      style={[
+                        sharedStyles.horizontal,
+                        sharedStyles.marginTopQuarter,
+                      ]}
+                    >
+                      <View
+                        style={[
+                          sharedStyles.flex,
+                          sharedStyles.alignSelfCenter,
+                        ]}
+                      >
+                        <View
+                          style={sharedStyles.horizontalAndVerticallyAligned}
+                        >
+                          <ThemedText
+                            color="foregroundColorMuted65"
+                            style={largeMode && sharedStyles.extraLargeText}
+                            numberOfLines={9999}
+                          >
+                            {getTextComponentToShow(text)}
+                          </ThemedText>
+                        </View>
+                        {!shareMode && hasMore && !hasThread && (
+                          <View
+                            style={[
+                              sharedStyles.horizontalAndVerticallyAligned,
+                              styles.marginTop6,
+                            ]}
+                          >
+                            <ThemedText
+                              color="primaryBackgroundColor"
+                              onPress={toggleShowMoreText}
+                              style={[
+                                styles.showMoreOrLessText,
+                                sharedStyles.flex,
+                              ]}
+                            >
+                              {textShown ? 'show less' : 'show more'}
+                            </ThemedText>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                  )}
+
+                  {/* {!isRetweeted && tags && tags.length > 0 && (
+            <ButtonGroup data={tags.map((tag) => ({ id: tag, name: tag }))} />
+          )} */}
+
+                  {images.length > 0 && (
+                    <View style={[styles.fileContainer]}>
+                      {images.map((image, i) => {
+                        return (
+                          <TouchableHighlight
+                            onPress={() => {
+                              setImageIndexToView(i)
+                            }}
+                            key={image.id}
+                          >
+                            <Image
+                              source={{
+                                uri: image.url,
+                              }}
+                              style={{
+                                width: (shareMode ? 80 : 60) * scaleFactor,
+                                height: (shareMode ? 80 : 60) * scaleFactor,
+                                margin: (shareMode ? 4 : 2) * scaleFactor,
+                              }}
+                              resizeMode="cover"
+                            />
+                          </TouchableHighlight>
+                        )
+                      })}
+                    </View>
+                  )}
+
+                  {files.length > 0 && (
+                    <View style={[styles.fileContainer]}>
+                      {files.map((file) => {
+                        return <FileDownloader key={file.id} file={file} />
+                      })}
+                    </View>
+                  )}
+
+                  {!!repostedFrom && (
+                    <View>
+                      <Spacer height={sizes.verticalSpaceSize} />
+                      <BaseCard
+                        {...repostedFrom}
+                        columnId={columnId}
+                        isRetweeted={true}
+                        showMoreSignal={showMoreSignal}
+                        defaultExpand={shouldExpand}
+                        shareMode={shareMode}
+                      />
+                    </View>
+                  )}
+
+                  {!isRetweeted &&
+                    !!duplicateIds &&
+                    duplicateIds.length > 0 &&
+                    !isCapturingView && (
+                      <View style={[styles.deduplicationBarContainer]}>
+                        {renderDeduplicationBar()}
+                      </View>
+                    )}
+
+                  <Spacer height={sizes.verticalSpaceSize} />
+                  {/* 
         {!!renderCardActions && !isRetweeted && (
           <>
             <CardActions
@@ -846,56 +866,57 @@ export const BaseCard = React.memo((props: BaseCardProps) => {
             <Spacer height={sizes.verticalSpaceSize} />
           </>
         )} */}
+                </View>
               </View>
             </View>
           </View>
-        </View>
 
-        {(hasThread || !!setThreadVisibility) && (
-          <View style={[styles.innerContainer]}>
-            <View style={[sharedStyles.horizontal]}>
-              <View style={[sharedStyles.horizontalAndVerticallyAligned]}>
-                <ThemedText
-                  color="primaryBackgroundColor"
-                  onPress={() => {
-                    !!setThreadVisibility
-                      ? setThreadVisibility()
-                      : setShowThread(!showThread)
-                  }}
-                  style={[styles.showMoreOrLessText, sharedStyles.flex]}
-                >
-                  {!!setThreadVisibility ? 'show thread' : 'hide thread'}
-                </ThemedText>
+          {(hasThread || !!setThreadVisibility) && (
+            <View style={[styles.innerContainer]}>
+              <View style={[sharedStyles.horizontal]}>
+                <View style={[sharedStyles.horizontalAndVerticallyAligned]}>
+                  <ThemedText
+                    color="primaryBackgroundColor"
+                    onPress={() => {
+                      !!setThreadVisibility
+                        ? setThreadVisibility()
+                        : setShowThread(!showThread)
+                    }}
+                    style={[styles.showMoreOrLessText, sharedStyles.flex]}
+                  >
+                    {!!setThreadVisibility ? 'show thread' : 'hide thread'}
+                  </ThemedText>
+                </View>
               </View>
             </View>
-          </View>
-        )}
+          )}
 
-        {!isRetweeted &&
-          showDuplication &&
-          duplicateIds?.map((id, idx) => (
-            <View
-              key={`duplication-card-${nodeIdOrId}-${id}`}
-              style={
-                idx === 0
-                  ? {
-                      shadowRadius: 10,
-                      shadowColor: theme.foregroundColorMuted40,
-                    }
-                  : {
-                      borderTopColor: theme.backgroundColorTransparent05,
-                      borderTopWidth: 1 * scaleFactor,
-                    }
-              }
-            >
-              <BaseCard
-                columnId={columnId}
-                nodeIdOrId={id}
-                isRetweeted={true}
-                type="COLUMN_TYPE_NEWS_FEED"
-              />
-            </View>
-          ))}
+          {!isRetweeted &&
+            showDuplication &&
+            duplicateIds?.map((id, idx) => (
+              <View
+                key={`duplication-card-${nodeIdOrId}-${id}`}
+                style={
+                  idx === 0
+                    ? {
+                        shadowRadius: 10,
+                        shadowColor: theme.foregroundColorMuted40,
+                      }
+                    : {
+                        borderTopColor: theme.backgroundColorTransparent05,
+                        borderTopWidth: 1 * scaleFactor,
+                      }
+                }
+              >
+                <BaseCard
+                  columnId={columnId}
+                  nodeIdOrId={id}
+                  isRetweeted={true}
+                  type="COLUMN_TYPE_NEWS_FEED"
+                />
+              </View>
+            ))}
+        </TouchableOpacity>
       </View>
     )
   }
