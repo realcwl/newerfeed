@@ -224,6 +224,18 @@ export const AddSourceOrSubsourceScreen = React.memo(
                   color="foregroundColor"
                   style={[sharedStyles.largeText]}
                 >
+                  <b>Origin Url:</b> {post.originUrl}
+                </ThemedText>
+                <ThemedText
+                  color="foregroundColor"
+                  style={[sharedStyles.largeText]}
+                >
+                  <b>Images:</b> {post.images.join(', ')}
+                </ThemedText>
+                <ThemedText
+                  color="foregroundColor"
+                  style={[sharedStyles.largeText]}
+                >
                   <b>Element Html:</b> {post.baseHtml}
                 </ThemedText>
                 <Spacer height={contentPadding} />
