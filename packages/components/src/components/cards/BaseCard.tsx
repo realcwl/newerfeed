@@ -48,7 +48,7 @@ import { Button } from '../common/Button'
 import { useItem } from '../../hooks/use-item'
 import { ButtonGroup } from '../common/ButtonGroup'
 import { viewCapturingItemNodeIdSelector } from '../../redux/selectors'
-import { TouchableOpacity } from 'react-native-web'
+import { TouchableOpacity } from '../common/TouchableOpacity'
 
 const SIGNAL_RESET_MAX = 100
 // Number of characters to render show more button.
