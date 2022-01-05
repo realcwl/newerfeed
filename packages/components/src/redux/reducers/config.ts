@@ -113,10 +113,8 @@ export const configReducer: Reducer<State> = (state = initialState, action) => {
           draft.availableCustomizedSubSourcesIds.push(subsourceId)
 
           // update id to subsource map
-          if (!(subsourceId in draft.idToSourceOrSubSourceMap)) {
-            draft.idToSourceOrSubSourceMap[subsourceId] =
-              action.payload.subSources[i]
-          }
+          draft.idToSourceOrSubSourceMap[subsourceId] =
+            action.payload.subSources[i]
 
           // update sources children
           for (let j = 0; j < draft.availableNewsFeedSources.length; j++) {

@@ -183,6 +183,8 @@ export interface SourceOrSubSource {
   parentSourceId?: string
   // User's external id in the original website.
   externalId?: string
+
+  customizedCrawlConfig?: CustomizedCrawlerSpec
 }
 
 export interface ColumnOptions {

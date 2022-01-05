@@ -14,6 +14,7 @@ import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
+import { parse } from 'pb-text-format-to-json'
 
 // Response returned from the backend for available sources.
 interface SourcesResponse {
@@ -221,7 +222,7 @@ function* deleteCustomizedSubSource(
     return
   }
 }
-// On each login success we fetch all login sources available.
+// On each login success we fetch all customized subsources available.
 function* fetchCustomizedSubSources() {
   const appToken = yield* select(selectors.appTokenSelector)
 
@@ -252,10 +253,23 @@ function* fetchCustomizedSubSources() {
     yield put(
       setCustomizedSubSources({
         subSources: subSourcesResponse.data.data.subSources.map((subSource) => {
+          const input = subSource.customizedCrawlerParams
+          const output = parse(input.replaceAll('" ', '"\n')) // newline is required to saparate fields in the textproto lib for js
           return {
             id: subSource.id,
             name: subSource.name,
             parentSourceId: subSource.source.id,
+            customizedCrawlConfig: {
+              base: output['base_selector'],
+              content: output['content_relative_selector'],
+              title: output['title_relative_selector'],
+              startUrl: output['crawl_url'],
+              externalId: output['external_id_relative_selector'],
+              image: output['image_relative_selector'],
+              postUrl: output['origin_url_relative_selector'],
+              postUrlIsRelativePath: output['origin_url_is_relative_path'],
+              time: output['time_relative_selector'],
+            },
           }
         }),
       }),

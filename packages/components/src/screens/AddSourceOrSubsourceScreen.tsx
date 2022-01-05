@@ -362,6 +362,27 @@ export const AddSourceOrSubsourceScreen = React.memo(
                     <ThemedText
                       color="foregroundColor"
                       style={{ textAlign: 'center' }}
+                      onPress={() => {
+                        const subsource = idToSourceOrSubSourceMap[subSourceId]
+                        const config = subsource.customizedCrawlConfig
+                        formik.setFieldValue('startUrl', config?.startUrl)
+                        formik.setFieldValue('base', config?.base)
+                        formik.setFieldValue('title', config?.title)
+                        formik.setFieldValue('content', config?.content)
+                        formik.setFieldValue('externalId', config?.externalId)
+                        formik.setFieldValue('time', config?.time)
+                        formik.setFieldValue('image', config?.image)
+                        formik.setFieldValue('postUrl', config?.postUrl)
+                        formik.setFieldValue(
+                          'postUrlIsRelativePath',
+                          config?.postUrlIsRelativePath,
+                        )
+                        formik.setFieldValue('subSourceName', subsource.name)
+                        formik.setFieldValue(
+                          'subSourceParentSourceId',
+                          subsource.parentSourceId,
+                        )
+                      }}
                     >
                       {idToSourceOrSubSourceMap[subSourceId]
                         ? idToSourceOrSubSourceMap[subSourceId].name
