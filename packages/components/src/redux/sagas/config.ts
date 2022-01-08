@@ -14,7 +14,7 @@ import { jsonToGraphQLQuery } from 'json-to-graphql-query'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
 import { ExtractActionFromActionCreator } from '../types/base'
-import { parse } from 'pb-text-format-to-json'
+import { parse } from '../../libs/pb-text-format-to-json'
 
 // Response returned from the backend for available sources.
 interface SourcesResponse {
