@@ -32,3 +32,7 @@ target 'devhub' do
     installer.configure_support_catalyst(catalyst_supported_pods, catalyst_unsupported_pods)
   end
 end
+
+target 'OneSignalNotificationServiceExtension' do
+  pod 'OneSignalXCFramework', '>= 3.0', '< 4.0'
+end
